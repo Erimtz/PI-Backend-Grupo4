@@ -1,15 +1,18 @@
-package com.gym.controllers;
+package com.gym.security.controllers;
 
-import com.gym.controllers.request.CreateUserDTO;
-import com.gym.controllers.request.UpdateUserDTO;
-import com.gym.entities.ERole;
-import com.gym.entities.RoleEntity;
-import com.gym.entities.UserEntity;
-import com.gym.repositories.RoleRepository;
-import com.gym.repositories.UserRepository;
+import com.gym.security.controllers.request.ChangePasswordDTO;
+import com.gym.security.controllers.request.CreateUserDTO;
+import com.gym.security.controllers.request.UpdateUserDTO;
+import com.gym.security.enums.ERole;
+import com.gym.security.entities.RoleEntity;
+import com.gym.security.entities.UserEntity;
+import com.gym.security.repositories.RoleRepository;
+import com.gym.security.repositories.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +20,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
-public class PrincipalController {
+@RequestMapping("/user")
+public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -29,23 +32,18 @@ public class PrincipalController {
     @Autowired
     private RoleRepository roleRepository;
 
-    @GetMapping("/hello")
-    public String hello(){
-        return "Hello World Not Secured";
-    }
-
-    @GetMapping("/helloSecured")
-    public String helloSecured(){
-        return "Hello World Secured";
-    }
-    @PostMapping("/createAdminUser")
+//    @GetMapping("/hello")
+//    public String hello(){
+//        return "Hello World Not Secured";
+//    }
+//
+//    @GetMapping("/helloSecured")
+//    public String helloSecured(){
+//        return "Hello World Secured";
+//    }
+    @PostMapping("/create-admin-user")
     public ResponseEntity<?> createAdminUser(@Valid @RequestBody CreateUserDTO createUserDTO){
 
-//        Set<RoleEntity> roles = createUserDTO.getRoles().stream()
-//                .map(role -> RoleEntity.builder()
-//                        .name(ERole.valueOf(role))
-//                        .build())
-//                .collect(Collectors.toSet());
         if (userRepository.existsByEmail(createUserDTO.getEmail())) {
             return ResponseEntity.badRequest().body("El email ya está en uso.");
         }
@@ -75,7 +73,7 @@ public class PrincipalController {
         return ResponseEntity.ok(userEntity);
     }
 
-    @PostMapping("/createUser")
+    @PostMapping("/create-user")
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
 
         // Crear un nuevo usuario con los atributos del DTO y el rol USER
@@ -95,7 +93,7 @@ public class PrincipalController {
         return ResponseEntity.ok(userEntity);
     }
 
-    @PutMapping("/updateUser/{username}")
+    @PutMapping("/update-user/{username}")
     public ResponseEntity<?> updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserDTO updateUserDTO) {
         Optional<UserEntity> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
@@ -119,8 +117,43 @@ public class PrincipalController {
         return ResponseEntity.ok(user);
     }
 
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
+                                            @RequestBody ChangePasswordDTO changePasswordDTO) {
 
-    @DeleteMapping("/deleteUser")
+        // Obtener los datos del objeto de solicitud
+        String currentPassword = changePasswordDTO.getCurrentPassword();
+        String newPassword = changePasswordDTO.getNewPassword();
+        String confirmPassword = changePasswordDTO.getConfirmPassword();
+
+        // Verificar si la nueva contraseña y la confirmación de la contraseña son iguales
+        if (!newPassword.equals(confirmPassword)) {
+            return ResponseEntity.badRequest().body("La nueva contraseña y la confirmación de la contraseña no coinciden");
+        }
+
+        // Obtener el nombre de usuario del UserDetails
+        String username = userDetails.getUsername();
+
+        // Obtener el usuario desde el repositorio
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Verificar si la contraseña actual proporcionada coincide con la contraseña almacenada
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return ResponseEntity.badRequest().body("La contraseña actual es incorrecta");
+        }
+
+        // Codificar la nueva contraseña
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+        // Actualizar la contraseña del usuario
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Contraseña actualizada exitosamente");
+    }
+
+    @DeleteMapping("/delete-user")
     public String deleteUser(@RequestParam String id){
         userRepository.deleteById(Long.parseLong(id));
 

@@ -1,5 +1,6 @@
-package com.gym.entities;
+package com.gym.security.entities;
 
+import com.gym.security.entities.RoleEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

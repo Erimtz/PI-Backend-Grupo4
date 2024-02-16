@@ -1,5 +1,6 @@
-package com.gym.entities;
+package com.gym.security.entities;
 
+import com.gym.security.enums.ERole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

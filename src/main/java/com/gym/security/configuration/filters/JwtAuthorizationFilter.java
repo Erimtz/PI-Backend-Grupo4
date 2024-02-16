@@ -1,7 +1,7 @@
-package com.gym.security.filters;
+package com.gym.security.configuration.filters;
 
-import com.gym.security.jwt.JwtUtils;
-import com.gym.services.UserDetailsServiceImpl;
+import com.gym.security.configuration.jwt.JwtUtils;
+import com.gym.security.services.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

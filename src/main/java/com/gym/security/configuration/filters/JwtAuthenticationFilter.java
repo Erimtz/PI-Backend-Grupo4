@@ -1,10 +1,10 @@
-package com.gym.security.filters;
+package com.gym.security.configuration.filters;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gym.entities.UserEntity;
-import com.gym.security.jwt.JwtUtils;
+import com.gym.security.entities.UserEntity;
+import com.gym.security.configuration.jwt.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

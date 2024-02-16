@@ -1,4 +1,4 @@
-package com.gym.security.jwt;
+package com.gym.security.configuration.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

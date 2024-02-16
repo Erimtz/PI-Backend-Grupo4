@@ -1,7 +1,7 @@
-package com.gym.repositories;
+package com.gym.security.repositories;
 
-import com.gym.entities.ERole;
-import com.gym.entities.RoleEntity;
+import com.gym.security.enums.ERole;
+import com.gym.security.entities.RoleEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.gym.controllers.request;
+package com.gym.security.controllers.request;
 
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;

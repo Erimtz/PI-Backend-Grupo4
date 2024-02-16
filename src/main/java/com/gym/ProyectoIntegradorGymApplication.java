@@ -1,9 +1,9 @@
 package com.gym;
 
-import com.gym.entities.ERole;
-import com.gym.entities.RoleEntity;
-import com.gym.entities.UserEntity;
-import com.gym.repositories.UserRepository;
+import com.gym.security.enums.ERole;
+import com.gym.security.entities.RoleEntity;
+import com.gym.security.entities.UserEntity;
+import com.gym.security.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -46,8 +46,20 @@ public class ProyectoIntegradorGymApplication {
 							.build()))
 					.build();
 
+			UserEntity userEntity3 = UserEntity.builder()
+					.email("aleandreslg@gmail.com")
+					.username("alejandro")
+					.firstName("Alejandro")
+					.lastName("Laurito")
+					.password(passwordEncoder.encode("123456"))
+					.roles(Set.of(RoleEntity.builder()
+							.name(ERole.valueOf(ERole.ADMIN.name()))
+							.build()))
+					.build();
+
 			userRepository.save(userEntity);
 			userRepository.save(userEntity2);
+			userRepository.save(userEntity3);
 		};
 	}
 }

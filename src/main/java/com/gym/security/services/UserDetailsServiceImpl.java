@@ -1,7 +1,7 @@
-package com.gym.services;
+package com.gym.security.services;
 
-import com.gym.entities.UserEntity;
-import com.gym.repositories.UserRepository;
+import com.gym.security.entities.UserEntity;
+import com.gym.security.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

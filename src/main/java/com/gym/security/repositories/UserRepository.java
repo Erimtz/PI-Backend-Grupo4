@@ -1,6 +1,6 @@
-package com.gym.repositories;
+package com.gym.security.repositories;
 
-import com.gym.entities.UserEntity;
+import com.gym.security.entities.UserEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -18,4 +18,6 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
+
+    Optional<UserEntity> findByEmail(String email);
 }
