@@ -1,25 +1,17 @@
 package com.gym.controllers.request;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateUserDTO {
+public class UpdateUserDTO {
     @Email
-    @NotBlank
     private String email;
     private String firstName;
     private String lastName;
-    @NotBlank
-    private String username;
-    @NotBlank
-    private String password;
-    private Set<String> roles;
+
 }

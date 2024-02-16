@@ -41,6 +41,6 @@ public class Account {
     @OneToMany(targetEntity = Transfer.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
     private List<Transfer> transferList;
 
-    @OneToMany(targetEntity = PaymentMethod.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
-    private List<PaymentMethod> paymentMethodSet;
+//    @OneToMany(targetEntity = PaymentMethod.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
+//    private List<PaymentMethod> paymentMethodSet;
 }

@@ -18,7 +18,6 @@ public class Subscription {
     private Long id;
     private String name;
     private Double price;
-//    private UserEntity user;
     @Column(name = "start_date")
     private LocalDate startDate;
     @Column(name = "end_date")

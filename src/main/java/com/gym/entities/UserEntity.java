@@ -25,6 +25,10 @@ public class UserEntity {
     @NotBlank
     @Size(max = 80)
     private String email;
+    @Column(name = "first_name")
+    private String firstName;
+    @Column(name = "last_name")
+    private String lastName;
     @NotBlank
     @Size(max = 30)
     private String username;

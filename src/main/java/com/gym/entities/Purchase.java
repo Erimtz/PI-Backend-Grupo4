@@ -16,14 +16,13 @@ import java.util.List;
 @Entity
 @Table(name = "purchases")
 public class Purchase {
-    // Mi compra va a tener un id de compra, va a tener un usuario que realizo la compra, va a tener una lista de productos comprados, va a tener una lista de cupones que utilicé para descontar del total de la compra
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(targetEntity = ProductStore.class, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "purchase")
-    private List<ProductStore> productList;
+    @OneToMany(targetEntity = Product.class, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "purchase")
+    private List<Product> productList;
 
     @OneToMany(targetEntity = Subscription.class, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "purchase")
     private List<Subscription> subscriptionList;

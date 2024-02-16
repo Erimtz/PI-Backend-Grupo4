@@ -20,7 +20,6 @@ public class Transfer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-//    private PaymentMethod paymentMethod;
     @Column(name = "transfer_date")
     private LocalDate transferDate;
     private BigDecimal amount;
