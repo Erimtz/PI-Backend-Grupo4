@@ -46,20 +46,20 @@ public class ProyectoIntegradorGymApplication {
 							.build()))
 					.build();
 
-			UserEntity userEntity3 = UserEntity.builder()
-					.email("aleandreslg@gmail.com")
-					.username("alejandro")
-					.firstName("Alejandro")
-					.lastName("Laurito")
-					.password(passwordEncoder.encode("123456"))
-					.roles(Set.of(RoleEntity.builder()
-							.name(ERole.valueOf(ERole.ADMIN.name()))
-							.build()))
-					.build();
+//			UserEntity userEntity3 = UserEntity.builder()
+//					.email("aleandreslg@gmail.com")
+//					.username("alejandro")
+//					.firstName("Alejandro")
+//					.lastName("Laurito")
+//					.password(passwordEncoder.encode("123456"))
+//					.roles(Set.of(RoleEntity.builder()
+//							.name(ERole.valueOf(ERole.ADMIN.name()))
+//							.build()))
+//					.build();
 
 			userRepository.save(userEntity);
 			userRepository.save(userEntity2);
-			userRepository.save(userEntity3);
+//			userRepository.save(userEntity3);
 		};
 	}
 }

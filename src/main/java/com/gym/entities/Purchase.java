@@ -30,9 +30,9 @@ public class Purchase {
     @Column(name = "purchase_date")
     private LocalDate purchaseDate;
 
-//    @OneToMany(fetch = FetchType.LAZY)
-//    @JoinTable(name = "user_purchase_coupons", joinColumns = @JoinColumn(name = "purchase_id"), inverseJoinColumns = @JoinColumn(name = "coupon_id"))
-//    private List<Coupon> couponsApplied;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_purchase_coupons", joinColumns = @JoinColumn(name = "purchase_id"), inverseJoinColumns = @JoinColumn(name = "coupon_id"))
+    private List<Coupon> couponsApplied;
 
     @ManyToOne(targetEntity = Account.class)
     @JoinColumn(name = "account_id")

@@ -40,8 +40,7 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(csrfConfigurer -> csrfConfigurer.disable())
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
-                    authorizationManagerRequestMatcherRegistry.requestMatchers("/hello").permitAll();
-                    authorizationManagerRequestMatcherRegistry.requestMatchers("/password-reset/**").permitAll();
+                    authorizationManagerRequestMatcherRegistry.requestMatchers("/user/hello", "/user/create-user", "/password-reset/**").permitAll();
                     authorizationManagerRequestMatcherRegistry.anyRequest().authenticated();
                 })
                 .sessionManagement(sessionManagementConfigurer -> {

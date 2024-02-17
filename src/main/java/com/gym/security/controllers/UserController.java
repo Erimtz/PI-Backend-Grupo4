@@ -1,5 +1,6 @@
 package com.gym.security.controllers;
 
+import com.gym.exceptions.UserAlreadyExistsException;
 import com.gym.security.controllers.request.ChangePasswordDTO;
 import com.gym.security.controllers.request.CreateUserDTO;
 import com.gym.security.controllers.request.UpdateUserDTO;
@@ -11,6 +12,7 @@ import com.gym.security.repositories.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
@@ -32,15 +35,17 @@ public class UserController {
     @Autowired
     private RoleRepository roleRepository;
 
-//    @GetMapping("/hello")
-//    public String hello(){
-//        return "Hello World Not Secured";
-//    }
-//
-//    @GetMapping("/helloSecured")
-//    public String helloSecured(){
-//        return "Hello World Secured";
-//    }
+    @GetMapping("/hello")
+    public String hello(){
+        return "Hello World Not Secured";
+    }
+
+    @GetMapping("/helloSecured")
+    public String helloSecured(){
+        return "Hello World Secured";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create-admin-user")
     public ResponseEntity<?> createAdminUser(@Valid @RequestBody CreateUserDTO createUserDTO){
 
@@ -48,16 +53,34 @@ public class UserController {
             return ResponseEntity.badRequest().body("El email ya está en uso.");
         }
 
-        // Verificar si el username ya existe en la base de datos
         if (userRepository.existsByUsername(createUserDTO.getUsername())) {
             return ResponseEntity.badRequest().body("El username ya está en uso.");
         }
 
+//        Set<RoleEntity> roles = createUserDTO.getRoles().stream()
+//                .map(role -> RoleEntity.builder()
+//                        .name(ERole.valueOf(role))
+//                        .build())
+//                .collect(Collectors.toSet());
+
         Set<RoleEntity> roles = new HashSet<>();
+
         for (String roleName : createUserDTO.getRoles()) {
-            RoleEntity roleEntity = roleRepository.findByName(ERole.valueOf(roleName))
-                    .orElseGet(() -> roleRepository.save(new RoleEntity(null, ERole.valueOf(roleName))));
-            roles.add(roleEntity);
+            RoleEntity role = roleRepository.findByName(ERole.valueOf(roleName))
+                    .orElseGet(() -> {
+                        RoleEntity newRole = RoleEntity.builder()
+                                .name(ERole.valueOf(roleName))
+                                .build();
+                        return roleRepository.save(newRole);
+                    });
+            roles.add(role);
+        }
+
+        if (userRepository.existsByUsername(createUserDTO.getUsername())) {
+            throw new UserAlreadyExistsException("El usuario ya existe con el nombre de usuario: " + createUserDTO.getUsername());
+        }
+        if (userRepository.existsByEmail(createUserDTO.getEmail())) {
+            throw new UserAlreadyExistsException("El usuario ya existe con el correo electrónico: " + createUserDTO.getEmail());
         }
 
         UserEntity userEntity = UserEntity.builder()
@@ -76,24 +99,56 @@ public class UserController {
     @PostMapping("/create-user")
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
 
-        // Crear un nuevo usuario con los atributos del DTO y el rol USER
+        Optional<RoleEntity> userRoleOptional = roleRepository.findByName(ERole.USER);
+
+        RoleEntity userRole = userRoleOptional.orElseGet(() -> {
+            RoleEntity newUserRole = RoleEntity.builder()
+                    .name(ERole.USER)
+                    .build();
+            return roleRepository.save(newUserRole);
+        });
+
         UserEntity userEntity = UserEntity.builder()
                 .username(createUserDTO.getUsername())
                 .firstName(createUserDTO.getFirstName())
                 .lastName(createUserDTO.getLastName())
                 .email(createUserDTO.getEmail())
                 .password(passwordEncoder.encode(createUserDTO.getPassword()))
-                .roles(Collections.singleton(
-                        RoleEntity.builder()
-                                .name(ERole.USER)
-                                .build()))
+                .roles(Collections.singleton(userRole))
                 .build();
+
+//        if (userRepository.existsByUsername(createUserDTO.getUsername())) {
+//            throw new UserAlreadyExistsException("El usuario ya existe con el nombre de usuario: " + createUserDTO.getUsername());
+//        }
+//        if (userRepository.existsByEmail(createUserDTO.getEmail())) {
+//            throw new UserAlreadyExistsException("El usuario ya existe con el correo electrónico: " + createUserDTO.getEmail());
+//        }
+
+        if (userRepository.existsByEmail(createUserDTO.getEmail())) {
+            return ResponseEntity.badRequest().body("El email ya está en uso.");
+        }
+
+        if (userRepository.existsByUsername(createUserDTO.getUsername())) {
+            return ResponseEntity.badRequest().body("El username ya está en uso.");
+        }
+
+//        UserEntity userEntity = UserEntity.builder()
+//                .username(createUserDTO.getUsername())
+//                .firstName(createUserDTO.getFirstName())
+//                .lastName(createUserDTO.getLastName())
+//                .email(createUserDTO.getEmail())
+//                .password(passwordEncoder.encode(createUserDTO.getPassword()))
+//                .roles(Collections.singleton(
+//                        RoleEntity.builder()
+//                                .name(ERole.USER)
+//                                .build()))
+//                .build();
 
         userRepository.save(userEntity);
         return ResponseEntity.ok(userEntity);
     }
 
-    @PutMapping("/update-user/{username}")
+    @PutMapping("/update/{username}")
     public ResponseEntity<?> updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserDTO updateUserDTO) {
         Optional<UserEntity> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
@@ -121,32 +176,26 @@ public class UserController {
     public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
                                             @RequestBody ChangePasswordDTO changePasswordDTO) {
 
-        // Obtener los datos del objeto de solicitud
+
         String currentPassword = changePasswordDTO.getCurrentPassword();
         String newPassword = changePasswordDTO.getNewPassword();
         String confirmPassword = changePasswordDTO.getConfirmPassword();
 
-        // Verificar si la nueva contraseña y la confirmación de la contraseña son iguales
         if (!newPassword.equals(confirmPassword)) {
             return ResponseEntity.badRequest().body("La nueva contraseña y la confirmación de la contraseña no coinciden");
         }
 
-        // Obtener el nombre de usuario del UserDetails
         String username = userDetails.getUsername();
 
-        // Obtener el usuario desde el repositorio
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // Verificar si la contraseña actual proporcionada coincide con la contraseña almacenada
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             return ResponseEntity.badRequest().body("La contraseña actual es incorrecta");
         }
 
-        // Codificar la nueva contraseña
         String encodedPassword = passwordEncoder.encode(newPassword);
 
-        // Actualizar la contraseña del usuario
         user.setPassword(encodedPassword);
         userRepository.save(user);
 
