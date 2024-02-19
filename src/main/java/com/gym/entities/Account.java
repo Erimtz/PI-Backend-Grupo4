@@ -22,9 +22,9 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+//    @OneToOne
+//    @JoinColumn(name = "user_id")
+//    private UserEntity user;
 
     @Column(name = "credit_balance")
     private BigDecimal creditBalance;

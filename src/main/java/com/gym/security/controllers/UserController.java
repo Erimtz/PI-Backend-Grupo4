@@ -1,27 +1,33 @@
 package com.gym.security.controllers;
 
 import com.gym.exceptions.UserAlreadyExistsException;
+import com.gym.security.configuration.jwt.JwtUtils;
 import com.gym.security.controllers.request.ChangePasswordDTO;
 import com.gym.security.controllers.request.CreateUserDTO;
 import com.gym.security.controllers.request.UpdateUserDTO;
+import com.gym.security.controllers.request.UserProfileDTO;
 import com.gym.security.enums.ERole;
 import com.gym.security.entities.RoleEntity;
 import com.gym.security.entities.UserEntity;
 import com.gym.security.repositories.RoleRepository;
 import com.gym.security.repositories.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,6 +36,8 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtils jwtUtils;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -173,9 +181,19 @@ public class UserController {
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails,
-                                            @RequestBody ChangePasswordDTO changePasswordDTO) {
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO, HttpServletRequest request) {
 
+        String token = request.getHeader("Authorization");
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No se encontró un token de autorización válido.");
+        }
+        token = token.substring(7);
+
+        String username = jwtUtils.getUsernameFromToken(token);
+
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No se pudo obtener el nombre de usuario del token.");
+        }
 
         String currentPassword = changePasswordDTO.getCurrentPassword();
         String newPassword = changePasswordDTO.getNewPassword();
@@ -184,8 +202,6 @@ public class UserController {
         if (!newPassword.equals(confirmPassword)) {
             return ResponseEntity.badRequest().body("La nueva contraseña y la confirmación de la contraseña no coinciden");
         }
-
-        String username = userDetails.getUsername();
 
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -208,4 +224,26 @@ public class UserController {
 
         return "Se ha borrado el user con ID=".concat(id);
     }
+
+//    @GetMapping("/profile")
+//    public ResponseEntity<UserProfileDTO> showProfile(@AuthenticationPrincipal UserDetails userDetails) {
+//
+//        String username = userDetails.getUsername();
+//        List<String> roles = userDetails.getAuthorities().stream()
+//                .map(GrantedAuthority::getAuthority)
+//                .collect(Collectors.toList());
+//
+//        UserEntity userEntity = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+//
+//        UserProfileDTO userProfileDTO = new UserProfileDTO(
+//                username,
+//                userEntity.getFirstName(),
+//                userEntity.getLastName(),
+//                userEntity.getEmail(),
+//                roles
+//        );
+//
+//        return ResponseEntity.ok(userProfileDTO);
+//    }
 }

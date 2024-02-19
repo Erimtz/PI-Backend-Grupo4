@@ -1,16 +1,18 @@
 package com.gym.security.configuration.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -23,17 +25,21 @@ public class JwtUtils {
     @Value("${jwt.time.expiration}")
     private String timeExpiration;
 
+    @Autowired
+    private HttpServletRequest request;
+
     public String generateAccessToken(String username){
 
         Instant now = Instant.now();
+        Instant expirationTime = now.plusSeconds(86400);
         Date issuedAt = Date.from(now);
-        Date expiration = Date.from(now.plusMillis(Long.parseLong(timeExpiration)));
+        Date expiration = Date.from(expirationTime);
 
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(issuedAt)
                 .expiration(expiration)
-                .signWith(getSignatureKey(), SignatureAlgorithm.HS256)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
@@ -45,14 +51,24 @@ public class JwtUtils {
                     .parseClaimsJws(token)
                     .getBody();
             return true;
-        } catch (Exception e){
-            log.error("Token invalido, error: ".concat(e.getMessage()));
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Token inválido, error: {}", e.getMessage());
             return false;
         }
     }
 
     public String getUsernameFromToken(String token){
-        return getClaim(token, Claims::getSubject);
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(getSignatureKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Token inválido, error: {}", e.getMessage());
+            return null;
+        }
     }
 
     public <T> T getClaim(String token, Function<Claims, T> claimsTFunction){
@@ -69,7 +85,41 @@ public class JwtUtils {
     }
 
     public Key getSignatureKey(){
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String getAccessTokenFromRequest() {
+        String tokenHeader = request.getHeader("Authorization");
+        if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
+            return tokenHeader.substring(7);
+        }
+        return null;
+    }
+
+    public boolean isTokenNearExpiration(String token) {
+        try {
+            Date expirationDate = Jwts.parser()
+                    .setSigningKey(getSignatureKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getExpiration();
+            Instant now = Instant.now();
+            Date current = Date.from(now);
+            long differenceInMillis = expirationDate.getTime() - current.getTime();
+            return differenceInMillis < (5 * 60 * 1000);
+        } catch (JwtException e) {
+            log.error("Error al verificar la expiración del token: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    public String refreshExpiredToken(String expiredToken) {
+        if (isTokenNearExpiration(expiredToken)) {
+            String username = getUsernameFromToken(expiredToken);
+            return generateAccessToken(username);
+        }
+        return null;
     }
 }
