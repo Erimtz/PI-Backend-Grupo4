@@ -42,6 +42,12 @@ public class Account {
     @OneToMany(targetEntity = Transfer.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
     private List<Transfer> transferList;
 
-//    @OneToMany(targetEntity = PaymentMethod.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
+    public Account(UserEntity user, BigDecimal creditBalance, Rank rank) {
+        this.user = user;
+        this.creditBalance = creditBalance;
+        this.rank = rank;
+    }
+
+    //    @OneToMany(targetEntity = PaymentMethod.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
 //    private List<PaymentMethod> paymentMethodSet;
 }

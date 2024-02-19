@@ -1,5 +1,8 @@
 package com.gym;
 
+import com.gym.entities.ERank;
+import com.gym.entities.Rank;
+import com.gym.repositories.RankRepository;
 import com.gym.security.enums.ERole;
 import com.gym.security.entities.RoleEntity;
 import com.gym.security.entities.UserEntity;
@@ -25,6 +28,9 @@ public class ProyectoIntegradorGymApplication {
 	@Autowired
 	UserRepository userRepository;
 
+	@Autowired
+	RankRepository rankRepository;
+
 	@Bean
 	CommandLineRunner init(){
 		return args -> {
@@ -45,6 +51,28 @@ public class ProyectoIntegradorGymApplication {
 							.name(ERole.valueOf(ERole.USER.name()))
 							.build()))
 					.build();
+
+			Rank rankEntity = Rank.builder()
+					.name(ERank.BRONZE)
+					.build();
+
+			Rank rankEntity2 = Rank.builder()
+					.name(ERank.GOLD)
+					.build();
+
+			Rank rankEntity3 = Rank.builder()
+					.name(ERank.PLATINUM)
+					.build();
+
+			Rank rankEntity4 = Rank.builder()
+					.name(ERank.SILVER)
+					.build();
+
+			rankRepository.save(rankEntity);
+			rankRepository.save(rankEntity2);
+			rankRepository.save(rankEntity3);
+			rankRepository.save(rankEntity4);
+
 
 //			UserEntity userEntity3 = UserEntity.builder()
 //					.email("aleandreslg@gmail.com")
