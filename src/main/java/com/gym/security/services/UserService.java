@@ -108,6 +108,8 @@ public class UserService {
                 .roles(Collections.singleton(userRole))
                 .build();
 
+        userRepository.save(userEntity);
+
         Optional<Rank> accountRankOptional = rankRepository.findByName(ERank.BRONZE);
 
         Rank rankAccount = accountRankOptional.orElseGet(() -> {
@@ -126,7 +128,7 @@ public class UserService {
                 .build();
         accountRepository.save(account);
 
-        return userRepository.save(userEntity);
+        return userEntity;
     }
 
     public UserEntity updateUser(String username, UpdateUserDTO updateUserDTO) {
@@ -187,6 +189,7 @@ public class UserService {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("El usuario con ID=" + id + " no existe.");
         }
+        accountRepository.deleteById(id-2);
         userRepository.deleteById(id);
     }
 }
