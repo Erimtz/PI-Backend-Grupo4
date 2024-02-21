@@ -1,9 +1,14 @@
 package com.gym.security.services;//package com.gym.security.services;
 
+import com.gym.entities.Account;
+import com.gym.entities.ERank;
+import com.gym.entities.Rank;
 import com.gym.exceptions.EmailAlreadyExistsException;
 import com.gym.exceptions.UnauthorizedException;
 import com.gym.exceptions.UserNotFoundException;
 import com.gym.exceptions.UsernameAlreadyExistsException;
+import com.gym.repositories.AccountRepository;
+import com.gym.repositories.RankRepository;
 import com.gym.security.configuration.jwt.JwtUtils;
 import com.gym.security.controllers.request.ChangePasswordDTO;
 import com.gym.security.controllers.request.CreateUserDTO;
@@ -18,10 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -31,6 +34,11 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtUtils jwtUtils;
+
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private RankRepository rankRepository;
 
     @Autowired
     public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
@@ -99,6 +107,24 @@ public class UserService {
                 .password(passwordEncoder.encode(createUserDTO.getPassword()))
                 .roles(Collections.singleton(userRole))
                 .build();
+
+        Optional<Rank> accountRankOptional = rankRepository.findByName(ERank.BRONZE);
+
+        Rank rankAccount = accountRankOptional.orElseGet(() -> {
+            Rank newAccountRank = Rank.builder()
+                    .name(ERank.BRONZE)
+                    .build();
+            return rankRepository.save(newAccountRank);
+        });
+        Account account = Account.builder()
+                .user(userEntity)
+                .transferList(new ArrayList<>())
+                .couponList(new ArrayList<>())
+                .purchaseList(new ArrayList<>())
+                .creditBalance(BigDecimal.valueOf(0.0))
+                .rank(rankAccount)
+                .build();
+        accountRepository.save(account);
 
         return userRepository.save(userEntity);
     }

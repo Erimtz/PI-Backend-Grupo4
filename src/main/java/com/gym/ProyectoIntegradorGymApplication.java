@@ -1,5 +1,8 @@
 package com.gym;
 
+import com.gym.entities.ERank;
+import com.gym.entities.Rank;
+import com.gym.repositories.RankRepository;
 import com.gym.security.enums.ERole;
 import com.gym.security.entities.RoleEntity;
 import com.gym.security.entities.UserEntity;
@@ -10,6 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 import java.util.Set;
 
@@ -24,6 +28,9 @@ public class ProyectoIntegradorGymApplication {
 	PasswordEncoder passwordEncoder;
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	RankRepository rankRepository;
 
 	@Bean
 	CommandLineRunner init(){
@@ -46,20 +53,30 @@ public class ProyectoIntegradorGymApplication {
 							.build()))
 					.build();
 
-//			UserEntity userEntity3 = UserEntity.builder()
-//					.email("aleandreslg@gmail.com")
-//					.username("alejandro")
-//					.firstName("Alejandro")
-//					.lastName("Laurito")
-//					.password(passwordEncoder.encode("123456"))
-//					.roles(Set.of(RoleEntity.builder()
-//							.name(ERole.valueOf(ERole.ADMIN.name()))
-//							.build()))
-//					.build();
+			Rank rankEntity = Rank.builder()
+					.name(ERank.BRONZE)
+					.build();
+
+			Rank rankEntity2 = Rank.builder()
+					.name(ERank.GOLD)
+					.build();
+
+			Rank rankEntity3 = Rank.builder()
+					.name(ERank.PLATINUM)
+					.build();
+
+			Rank rankEntity4 = Rank.builder()
+					.name(ERank.SILVER)
+					.build();
+
+			rankRepository.save(rankEntity);
+			rankRepository.save(rankEntity2);
+			rankRepository.save(rankEntity3);
+			rankRepository.save(rankEntity4);
+
 
 			userRepository.save(userEntity);
 			userRepository.save(userEntity2);
-//			userRepository.save(userEntity3);
 		};
 	}
 }

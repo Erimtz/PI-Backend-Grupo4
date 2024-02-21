@@ -22,9 +22,9 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @OneToOne
-//    @JoinColumn(name = "user_id")
-//    private UserEntity user;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     @Column(name = "credit_balance")
     private BigDecimal creditBalance;
@@ -42,6 +42,21 @@ public class Account {
     @OneToMany(targetEntity = Transfer.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
     private List<Transfer> transferList;
 
-//    @OneToMany(targetEntity = PaymentMethod.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
+    public Account(UserEntity user, BigDecimal creditBalance, Rank rank) {
+        this.user = user;
+        this.creditBalance = creditBalance;
+        this.rank = rank;
+    }
+
+    public Account(UserEntity user, BigDecimal creditBalance, Rank rank, List<Coupon> couponList, List<Purchase> purchaseList, List<Transfer> transferList) {
+        this.user = user;
+        this.creditBalance = creditBalance;
+        this.rank = rank;
+        this.couponList = couponList;
+        this.purchaseList = purchaseList;
+        this.transferList = transferList;
+    }
+
+    //    @OneToMany(targetEntity = PaymentMethod.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
 //    private List<PaymentMethod> paymentMethodSet;
 }
