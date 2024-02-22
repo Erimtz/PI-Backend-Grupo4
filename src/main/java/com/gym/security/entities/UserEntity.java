@@ -34,9 +34,18 @@ public class UserEntity {
     @Size(max = 30)
     private String username;
     private String password;
+    @Column(name = "token_password")
+    private String tokenPassword;
 
     @ManyToMany(fetch = FetchType.EAGER, targetEntity = RoleEntity.class, cascade = CascadeType.PERSIST) //
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<RoleEntity> roles;
 
+    public UserEntity(String email, String firstName, String lastName, String username, String password) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.password = password;
+    }
 }

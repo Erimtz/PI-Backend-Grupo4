@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByUsername(String username);
+    Optional<UserEntity> findByUsernameOrEmail(String username, String email);
+    Optional<UserEntity> findByTokenPassword(String tokenPassword);
 
 //    @Query("SELECT u from UserEntity u WHERE u.username = ?1")
 //    Optional<UserEntity> getName(String username);

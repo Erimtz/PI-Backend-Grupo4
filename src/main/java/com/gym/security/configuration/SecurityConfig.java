@@ -59,7 +59,7 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(csrfConfigurer -> csrfConfigurer.disable())
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
-                    authorizationManagerRequestMatcherRegistry.requestMatchers("/user/hello", "/user/create-user", "/password-reset/**").permitAll();
+                    authorizationManagerRequestMatcherRegistry.requestMatchers("/user/hello", "/user/create-user", "/password-reset/**", "/email/**").permitAll();
                     authorizationManagerRequestMatcherRegistry.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
                     authorizationManagerRequestMatcherRegistry.anyRequest().authenticated();
                 })

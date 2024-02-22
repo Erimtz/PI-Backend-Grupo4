@@ -1,6 +1,7 @@
 package com.gym.mail.services;
 
 
+import com.gym.mail.domain.EmailValuesDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +11,13 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EmailServiceImpl implements IEmailService{
@@ -21,6 +26,8 @@ public class EmailServiceImpl implements IEmailService{
     private String emailAccount;
     @Autowired
     private JavaMailSender mailSender;
+    @Autowired
+    private TemplateEngine templateEngine;
 
     @Override
     public void sendEmail(String[] toUsers, String subject, String message) {
@@ -33,7 +40,7 @@ public class EmailServiceImpl implements IEmailService{
     }
 
     @Override
-    public void SendEmailWithFile(String[] toUsers, String subject, String message, File file) {
+    public void sendEmailWithFile(String[] toUsers, String subject, String message, File file) {
 
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -50,6 +57,32 @@ public class EmailServiceImpl implements IEmailService{
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
-
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    @Value("${mail.urlFront}")
+    private String urlFront;
+
+    public void sendEmailTemplate(EmailValuesDTO dto) {
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            Context context = new Context();
+            Map<String, Object> model = new HashMap<>();
+            model.put("username", dto.getUsername());
+            model.put("url", urlFront + dto.getTokenPassword());
+            context.setVariables(model);
+            String htmlText = templateEngine.process("email-template", context);
+            helper.setFrom(dto.getMailFrom());
+            helper.setTo(dto.getMailTo());
+            helper.setSubject(dto.getSubject());
+            helper.setText(htmlText, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

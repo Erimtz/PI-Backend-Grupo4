@@ -1,12 +1,10 @@
 package com.gym.security.services;//package com.gym.security.services;
 
+import com.gym.dto.Message;
 import com.gym.entities.Account;
 import com.gym.entities.ERank;
 import com.gym.entities.Rank;
-import com.gym.exceptions.EmailAlreadyExistsException;
-import com.gym.exceptions.UnauthorizedException;
-import com.gym.exceptions.UserNotFoundException;
-import com.gym.exceptions.UsernameAlreadyExistsException;
+import com.gym.exceptions.*;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.RankRepository;
 import com.gym.security.configuration.jwt.JwtUtils;
@@ -20,6 +18,7 @@ import com.gym.security.repositories.RoleRepository;
 import com.gym.security.repositories.UserRepository;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -191,5 +190,36 @@ public class UserService {
         }
         accountRepository.deleteById(id-2);
         userRepository.deleteById(id);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public Optional<UserEntity> getByUsername(String username){
+        return userRepository.findByUsername(username);
+    }
+
+    public Optional<UserEntity> getByUsernameOrEmail(String usernameOrEmail){
+        return userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+    }
+
+    public Optional<UserEntity> getByTokenPassword(String tokenPassword){
+        return userRepository.findByTokenPassword(tokenPassword);
+    }
+
+    public Message save(CreateUserDTO createUserDTO){
+        if(userRepository.existsByUsername(createUserDTO.getUsername()))
+            throw new CustomException(HttpStatus.BAD_REQUEST, "ese nombre de usuario ya existe");
+        if(userRepository.existsByEmail(createUserDTO.getEmail()))
+            throw new CustomException(HttpStatus.BAD_REQUEST, "ese email de usuario ya existe");
+        UserEntity user =
+                new UserEntity(createUserDTO.getFirstName(), createUserDTO.getLastName(), createUserDTO.getUsername(), createUserDTO.getEmail(),
+                        passwordEncoder.encode(createUserDTO.getPassword()));
+        Set<RoleEntity> roles = new HashSet<>();
+        roles.add(roleRepository.findByName(ERole.USER).get());
+//        if(createUserDTO.getRoles().contains("admin"))
+//            roles.add(rolService.getByRolNombre(RolNombre.ROLE_ADMIN).get());
+        user.setRoles(roles);
+        userRepository.save(user);
+        return new Message(user.getUsername() + " ha sido creado");
     }
 }

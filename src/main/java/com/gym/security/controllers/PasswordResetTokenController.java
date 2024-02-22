@@ -48,7 +48,7 @@ public class PasswordResetTokenController {
     @PostMapping("/reset")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
 
-        String token = resetPasswordDTO.getToken();
+        String token = resetPasswordDTO.getTokenPassword();
         String password = resetPasswordDTO.getPassword();
         String confirmPassword = resetPasswordDTO.getConfirmPassword();
 
