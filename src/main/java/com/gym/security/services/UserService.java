@@ -188,7 +188,8 @@ public class UserService {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("El usuario con ID=" + id + " no existe.");
         }
-        accountRepository.deleteById(id-2);
+        Account account = accountRepository.findByUserId(id).get();
+        accountRepository.deleteById(account.getId());
         userRepository.deleteById(id);
     }
 
