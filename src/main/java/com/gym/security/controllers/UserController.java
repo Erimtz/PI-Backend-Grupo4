@@ -38,14 +38,26 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create-admin-user")
+    @PostMapping("/create-admin")
     public ResponseEntity<?> createAdminUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
+        if (userService.existsByEmail(createUserDTO.getEmail())) {
+            return ResponseEntity.badRequest().body("El email ya está en uso.");
+        }
+        if (userService.existsByUsername(createUserDTO.getUsername())) {
+            return ResponseEntity.badRequest().body("El username ya está en uso.");
+        }
         UserEntity createdUser = userService.createAdminUser(createUserDTO);
         return ResponseEntity.ok(createdUser);
     }
 
     @PostMapping("/create-user")
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
+        if (userService.existsByEmail(createUserDTO.getEmail())) {
+            return ResponseEntity.badRequest().body("El email ya está en uso.");
+        }
+        if (userService.existsByUsername(createUserDTO.getUsername())) {
+            return ResponseEntity.badRequest().body("El username ya está en uso.");
+        }
         UserEntity userEntity = userService.createUser(createUserDTO);
         return ResponseEntity.ok(userEntity);
     }

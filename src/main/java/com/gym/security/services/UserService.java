@@ -207,6 +207,14 @@ public class UserService {
         return userRepository.findByTokenPassword(tokenPassword);
     }
 
+    public boolean existsByEmail(String email){
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean existsByUsername(String username){
+        return userRepository.existsByUsername(username);
+    }
+
     public Message save(CreateUserDTO createUserDTO){
         if(userRepository.existsByUsername(createUserDTO.getUsername()))
             throw new CustomException(HttpStatus.BAD_REQUEST, "ese nombre de usuario ya existe");

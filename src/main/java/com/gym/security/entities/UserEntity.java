@@ -25,6 +25,7 @@ public class UserEntity {
     @Email
     @NotBlank
     @Size(max = 80)
+    @Column(unique = true)
     private String email;
     @Column(name = "first_name")
     private String firstName;
@@ -32,6 +33,7 @@ public class UserEntity {
     private String lastName;
     @NotBlank
     @Size(max = 30)
+    @Column(unique = true)
     private String username;
     private String password;
     @Column(name = "token_password")
