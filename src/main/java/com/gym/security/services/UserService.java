@@ -7,6 +7,7 @@ import com.gym.entities.Rank;
 import com.gym.exceptions.*;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.RankRepository;
+import com.gym.repositories.SubscriptionRepository;
 import com.gym.security.configuration.jwt.JwtUtils;
 import com.gym.security.controllers.request.ChangePasswordDTO;
 import com.gym.security.controllers.request.CreateUserDTO;
@@ -16,6 +17,8 @@ import com.gym.security.entities.UserEntity;
 import com.gym.security.enums.ERole;
 import com.gym.security.repositories.RoleRepository;
 import com.gym.security.repositories.UserRepository;
+import com.gym.services.AccountService;
+import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +40,11 @@ public class UserService {
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
+    private AccountService accountService;
+    @Autowired
     private RankRepository rankRepository;
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
 
     @Autowired
     public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
@@ -81,6 +88,7 @@ public class UserService {
         return userRepository.save(userEntity);
     }
 
+    @Transactional
     public UserEntity createUser(CreateUserDTO createUserDTO) {
         Optional<RoleEntity> userRoleOptional = roleRepository.findByName(ERole.USER);
         RoleEntity userRole = userRoleOptional.orElseGet(() -> {
@@ -125,7 +133,7 @@ public class UserService {
                 .creditBalance(BigDecimal.valueOf(0.0))
                 .rank(rankAccount)
                 .build();
-        accountRepository.save(account);
+        accountService.createAccount(userEntity);
 
         return userEntity;
     }
@@ -189,6 +197,7 @@ public class UserService {
             throw new UserNotFoundException("El usuario con ID=" + id + " no existe.");
         }
         Account account = accountRepository.findByUserId(id).get();
+        subscriptionRepository.deleteById(account.getId()); // por ahora el id de account y subscription son iguales y se supone que no debería variar pero hay que modificar el metodo por si llega a variar
         accountRepository.deleteById(account.getId());
         userRepository.deleteById(id);
     }

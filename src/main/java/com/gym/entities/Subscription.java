@@ -18,6 +18,8 @@ public class Subscription {
     private Long id;
     private String name;
     private Double price;
+    @Column(name = "image_url")
+    private String imageUrl;
     @Column(name = "start_date")
     private LocalDate startDate;
     @Column(name = "end_date")
@@ -27,7 +29,11 @@ public class Subscription {
     @Column(name = "automatic_renewal")
     private Boolean automaticRenewal;
 
-    @ManyToOne(targetEntity = Purchase.class)
-    @JoinColumn(name = "purchase_id")
-    private Purchase purchase;
+    @OneToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
+
+//    @ManyToOne(targetEntity = Purchase.class)
+//    @JoinColumn(name = "purchase_id")
+//    private Purchase purchase;
 }

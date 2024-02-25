@@ -24,8 +24,12 @@ public class Purchase {
     @OneToMany(targetEntity = Product.class, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "purchase")
     private List<Product> productList;
 
-    @OneToMany(targetEntity = Subscription.class, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "purchase")
-    private List<Subscription> subscriptionList;
+//    @OneToMany(targetEntity = Subscription.class, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "purchase")
+//    private List<Subscription> subscriptionList;
+
+    @ManyToOne(targetEntity = StoreSubscription.class, fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_subscription_id")
+    private StoreSubscription storeSubscription;
 
     @Column(name = "purchase_date")
     private LocalDate purchaseDate;
