@@ -49,7 +49,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Traer el producto de categoria")
-    @GetMapping("/categoria={category_id}")
+    @GetMapping("/category={category_id}")
     public ResponseEntity<List<ProductDTO>> getProductByCategory(@PathVariable(name = "category_id") Long category_id) throws ResourceNotFoundException{
         return new ResponseEntity<>(productService.getProductsByCategory(category_id),HttpStatus.OK);
     }

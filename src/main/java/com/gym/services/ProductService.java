@@ -83,7 +83,7 @@ public class ProductService {
         if (product.isPresent()){
             return product.get().toDto();
         }else {
-            return null;
+            throw new ResourceNotFoundException("The product with id " + id + " has not been found to be deleted.");
         }
 
     }
