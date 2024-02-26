@@ -70,7 +70,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (subscriptionOptional.isPresent()) {
             Subscription subscription = subscriptionOptional.get();
 
-            // Actualizar solo los campos que se proporcionan en el DTO
             if (subscriptionDTO.getName() != null && !subscriptionDTO.getName().isEmpty()) {
                 subscription.setName(subscriptionDTO.getName());
             }
@@ -89,22 +88,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             if (subscriptionDTO.getPlanType() != null && !subscriptionDTO.getPlanType().isEmpty()) {
                 subscription.setPlanType(subscriptionDTO.getPlanType());
             }
-            // Conservar los valores existentes de automaticRenewal y account
             if (subscriptionDTO.getAutomaticRenewal() != null){
                 subscription.setAutomaticRenewal(subscriptionDTO.getAutomaticRenewal());
             }
 
-            // subscription.setAccount(subscriptionDTO.getAccount());
-
             return subscriptionRepository.save(subscription);
         } else {
-            // Manejo si no se encuentra la suscripción
             throw new NoSuchElementException("Subscription with ID " + subscriptionDTO.getId() + " not found");
         }
     }
 
     @Override
     public void deleteSubscriptionById(Long id) {
-        subscriptionRepository.deleteById(id);
+        Optional<Subscription> subscriptionOptional = subscriptionRepository.findById(id);
+        if (subscriptionOptional.isPresent()) {
+            subscriptionRepository.deleteById(id);
+        }
+        throw new NoSuchElementException("Subscription with ID " + id + " not found");
     }
 }

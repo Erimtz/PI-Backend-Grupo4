@@ -1,5 +1,6 @@
 package com.gym.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +27,7 @@ public class StoreSubscription {
     private String planType;
 
     @OneToMany(mappedBy = "storeSubscription", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Purchase.class)
+    @JsonIgnore
     private List<Purchase> purchases;
 
 }
