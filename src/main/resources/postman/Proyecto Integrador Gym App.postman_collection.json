@@ -7,936 +7,1262 @@
 	},
 	"item": [
 		{
-			"name": "Test Authentication Not Secured",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/user/hello",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"user",
-						"hello"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Test Authentication Secured",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODE4NDA2OSwiZXhwIjoxNzA4MjcwNDY5fQ.bUtedIHRa52U2W9IdQffOOovAhgV2qhS7_Ux_yznscU",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/user/helloSecured",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"user",
-						"helloSecured"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Login",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"username\":\"ale\",\r\n    \"password\":\"123123\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/login",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Test Authorization Admin",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODE4NDA2OSwiZXhwIjoxNzA4MjcwNDY5fQ.bUtedIHRa52U2W9IdQffOOovAhgV2qhS7_Ux_yznscU",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/accessAdmin",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"accessAdmin"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Test Authorization User",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODE4NDA2OSwiZXhwIjoxNzA4MjcwNDY5fQ.bUtedIHRa52U2W9IdQffOOovAhgV2qhS7_Ux_yznscU",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/accessUser",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"accessUser"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create User",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODE4Mzg2MywiZXhwIjoxNzA4MjcwMjYzfQ.1XQPWx0VYCdUissGASsFLHDW1TokkeCWh19N4wlzwJU",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Alejandro\",\r\n    \"lastName\": \"Laurito\",\r\n    \"email\":\"ale@mail.com\",\r\n    \"username\":\"ale\",\r\n    \"password\": \"123456\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/user/create-user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"user",
-						"create-user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Admin",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODE4NDA2OSwiZXhwIjoxNzA4MjcwNDY5fQ.bUtedIHRa52U2W9IdQffOOovAhgV2qhS7_Ux_yznscU",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Alejandro\",\r\n    \"lastName\": \"Laurito\",\r\n    \"email\":\"ale@mail.com\",\r\n    \"username\":\"ale\",\r\n    \"password\": \"123456\",\r\n    \"roles\":[\"ADMIN\"]\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/user/create-admin",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"user",
-						"create-admin"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update User",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODA2NjIwOSwiZXhwIjoxNzA4MTUyNjA5fQ.dRO-w3ad1OTY0HUvjaVIovjZmMgEnL-BZH0FTRGfVmI",
-							"type": "string"
-						}
-					]
-				},
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Andrés\",\r\n    \"lastName\": \"Gallo\",\r\n    \"email\":\"aleandreslg@gmail.com\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/user/update/ale",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"user",
-						"update",
-						"ale"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Forgot Password",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "email",
-							"value": "aleandreslg@gmail.com",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "http://localhost:8080/password-reset/forgot",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"password-reset",
-						"forgot"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Reset Password",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODA2NjIwOSwiZXhwIjoxNzA4MTUyNjA5fQ.dRO-w3ad1OTY0HUvjaVIovjZmMgEnL-BZH0FTRGfVmI",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"token\": \"8392e353-0d91-4560-a985-c85cc13e128b\",\r\n    \"password\": \"123123\",\r\n    \"confirmPassword\": \"123123\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/password-reset/reset",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"password-reset",
-						"reset"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Change Password",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"currentPassword\": \"123456\",\r\n    \"newPassword\": \"123123\",\r\n    \"confirmPassword\": \"123123\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/user/change-password",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"user",
-						"change-password"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete User",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNhIiwiaWF0IjoxNzA4Mzc3NTQ2LCJleHAiOjE3MDg0NjM5NDZ9.hksq58j-GOFPWO-qiUvViq-HPVFtSfUEyUJo-v4FUyI",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "id",
-							"value": "2",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "http://localhost:8080/user/delete-user",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"user",
-						"delete-user"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Send Message",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODA1NzA1NCwiZXhwIjoxNzA4MTQzNDU0fQ.pL98TNu65mkscgPwoWF1NEvNy5Wklf7BEcF7C5Ku_gQ",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"toUsers\":[\r\n        \"aleandreslg@gmail.com\"\r\n    ],\r\n    \"subject\": \"Prueba 2 envio email solo texto\",\r\n    \"message\": \"Prueba 2 con springboot y emailsender para enviar correos a través de una aplicación\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/email/sendMessage",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"email",
-						"sendMessage"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Send Message With File",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNhIiwiaWF0IjoxNzA4Mzc3NTQ2LCJleHAiOjE3MDg0NjM5NDZ9.hksq58j-GOFPWO-qiUvViq-HPVFtSfUEyUJo-v4FUyI",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": [
-						{
-							"key": "toUsers",
-							"value": "\"lucadxtx17@gmail.com\"",
-							"type": "text"
+			"name": "User",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"auth": {
+							"type": "noauth"
 						},
-						{
-							"key": "subject",
-							"value": "Prueba Email Con Archivo",
-							"type": "text"
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\":\"ale\",\r\n    \"password\":\"123123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						{
-							"key": "message",
-							"value": "Prueba Final Endpoint con Archivo",
-							"type": "text"
+						"url": {
+							"raw": "http://localhost:8080/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODE4Mzg2MywiZXhwIjoxNzA4MjcwMjYzfQ.1XQPWx0VYCdUissGASsFLHDW1TokkeCWh19N4wlzwJU",
+									"type": "string"
+								}
+							]
 						},
-						{
-							"key": "file",
-							"type": "file",
-							"src": "/E:/DESCARGAS/Java-logo.png"
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Alejandro\",\r\n    \"lastName\": \"Laurito\",\r\n    \"email\":\"ale@mail.com\",\r\n    \"username\":\"ale\",\r\n    \"password\": \"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/create-user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"create-user"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:8080/email/sendMessageFile",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"email",
-						"sendMessageFile"
-					]
+				{
+					"name": "Create Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODE4NDA2OSwiZXhwIjoxNzA4MjcwNDY5fQ.bUtedIHRa52U2W9IdQffOOovAhgV2qhS7_Ux_yznscU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Alejandro\",\r\n    \"lastName\": \"Laurito\",\r\n    \"email\":\"ale@mail.com\",\r\n    \"username\":\"ale\",\r\n    \"password\": \"123456\",\r\n    \"roles\":[\"ADMIN\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/create-admin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"create-admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg5NzA4MzcsImV4cCI6MTcwOTA1NzIzN30.69dEsgEuq-q2wYAQU-GTipswukET8HV-fEf6Fj23PZc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Andrés\",\r\n    \"lastName\": \"Gallo\",\r\n    \"email\":\"aleandreslg@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/update/ale",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"update",
+								"ale"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNhIiwiaWF0IjoxNzA4Mzc3NTQ2LCJleHAiOjE3MDg0NjM5NDZ9.hksq58j-GOFPWO-qiUvViq-HPVFtSfUEyUJo-v4FUyI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "id",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/delete-user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"delete-user"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "New Forgot Password",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"mailTo\":\"aleandreslg@gmail.com\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "Test",
+			"item": [
+				{
+					"name": "Test Authentication Not Secured",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user/hello",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"hello"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:8080/email/send-mail-recover",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"email",
-						"send-mail-recover"
-					]
+				{
+					"name": "Test Authentication Secured",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODE4NDA2OSwiZXhwIjoxNzA4MjcwNDY5fQ.bUtedIHRa52U2W9IdQffOOovAhgV2qhS7_Ux_yznscU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user/helloSecured",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"helloSecured"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Test Authorization Admin",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODE4NDA2OSwiZXhwIjoxNzA4MjcwNDY5fQ.bUtedIHRa52U2W9IdQffOOovAhgV2qhS7_Ux_yznscU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/accessAdmin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accessAdmin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Test Authorization User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODE4NDA2OSwiZXhwIjoxNzA4MjcwNDY5fQ.bUtedIHRa52U2W9IdQffOOovAhgV2qhS7_Ux_yznscU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/accessUser",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accessUser"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "New Reset Password",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"password\":\"123123\",\r\n    \"confirmPassword\":\"123123\",\r\n    \"tokenPassword\":\"457959ca-4995-41e7-bd79-e1772b3b2a00\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "Mail",
+			"item": [
+				{
+					"name": "Send Message",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODA1NzA1NCwiZXhwIjoxNzA4MTQzNDU0fQ.pL98TNu65mkscgPwoWF1NEvNy5Wklf7BEcF7C5Ku_gQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"toUsers\":[\r\n        \"aleandreslg@gmail.com\"\r\n    ],\r\n    \"subject\": \"Prueba 2 envio email solo texto\",\r\n    \"message\": \"Prueba 2 con springboot y emailsender para enviar correos a través de una aplicación\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/email/sendMessage",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"email",
+								"sendMessage"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "http://localhost:8080/email/change-password",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"email",
-						"change-password"
-					]
+				{
+					"name": "Send Message With File",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJsdWNhIiwiaWF0IjoxNzA4Mzc3NTQ2LCJleHAiOjE3MDg0NjM5NDZ9.hksq58j-GOFPWO-qiUvViq-HPVFtSfUEyUJo-v4FUyI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "toUsers",
+									"value": "\"lucadxtx17@gmail.com\"",
+									"type": "text"
+								},
+								{
+									"key": "subject",
+									"value": "Prueba Email Con Archivo",
+									"type": "text"
+								},
+								{
+									"key": "message",
+									"value": "Prueba Final Endpoint con Archivo",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/E:/DESCARGAS/Java-logo.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/email/sendMessageFile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"email",
+								"sendMessageFile"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Get Subscription By Id",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg4MjE3OTEsImV4cCI6MTcwODkwODE5MX0.yIatWqiaW4WHM1el7SIxu2BeyqsqsIcIMFGtoNxs7hU",
-							"type": "string"
+			"name": "Password",
+			"item": [
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"currentPassword\": \"123456\",\r\n    \"newPassword\": \"123123\",\r\n    \"confirmPassword\": \"123123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/change-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"change-password"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/subscription/get/1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"subscription",
-						"get",
-						"1"
-					]
+				{
+					"name": "Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "aleandreslg@gmail.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/password-reset/forgot",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"password-reset",
+								"forgot"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODA2NjIwOSwiZXhwIjoxNzA4MTUyNjA5fQ.dRO-w3ad1OTY0HUvjaVIovjZmMgEnL-BZH0FTRGfVmI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tokenPassword\": \"3205ba8d-9d05-49d2-a7e4-3c0e3f8a2530\",\r\n    \"password\": \"123123\",\r\n    \"confirmPassword\": \"123123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/password-reset/reset",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"password-reset",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"mailTo\":\"aleandreslg@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/email/send-mail-recover",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"email",
+								"send-mail-recover"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"password\":\"123123\",\r\n    \"confirmPassword\":\"123123\",\r\n    \"tokenPassword\":\"457959ca-4995-41e7-bd79-e1772b3b2a00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/email/change-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"email",
+								"change-password"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Get All Subscriptions",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg4MjE3OTEsImV4cCI6MTcwODkwODE5MX0.yIatWqiaW4WHM1el7SIxu2BeyqsqsIcIMFGtoNxs7hU",
-							"type": "string"
+			"name": "Subscription",
+			"item": [
+				{
+					"name": "Get Subscription By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg4MjE3OTEsImV4cCI6MTcwODkwODE5MX0.yIatWqiaW4WHM1el7SIxu2BeyqsqsIcIMFGtoNxs7hU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/subscription/get/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"subscription",
+								"get",
+								"1"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/subscription/get-all",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"subscription",
-						"get-all"
-					]
+				{
+					"name": "Get All Subscriptions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg4MjE3OTEsImV4cCI6MTcwODkwODE5MX0.yIatWqiaW4WHM1el7SIxu2BeyqsqsIcIMFGtoNxs7hU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/subscription/get-all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"subscription",
+								"get-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Expired Subscriptions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg4MjE3OTEsImV4cCI6MTcwODkwODE5MX0.yIatWqiaW4WHM1el7SIxu2BeyqsqsIcIMFGtoNxs7hU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/subscription/get-expired",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"subscription",
+								"get-expired"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Subscription",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg4Mjc0MTcsImV4cCI6MTcwODkxMzgxN30.ESyLbscgEN2ZwWBhQEais2vfEmrWndNuKXRKs0uk2UM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Mensual\",\r\n    \"price\": 100.0,\r\n    \"imageUrl\": \"www.google.com\",\r\n    \"startDate\": \"2024-02-24\",\r\n    \"endDate\": \"2024-03-24\",\r\n    \"planType\": \"Personal\",\r\n    \"automaticRenewal\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/subscription/update/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"subscription",
+								"update",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Active Subscriptions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg4MjE3OTEsImV4cCI6MTcwODkwODE5MX0.yIatWqiaW4WHM1el7SIxu2BeyqsqsIcIMFGtoNxs7hU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/subscription/get-active",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"subscription",
+								"get-active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Subscription",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/subscription/delete/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"subscription",
+								"delete",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Subscription",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"No subscription\",\r\n    \"price\": 0.0,\r\n    \"imageUrl\": \"Direccion imagen sin suscripción\",\r\n    \"startDate\": \"2024-02-24\",\r\n    \"endDate\": \"2024-02-24\",\r\n    \"planType\": \"None\",\r\n    \"automaticRenewal\": false,\r\n    \"account\": {\r\n        \"id\": 1,\r\n        \"user\": {\r\n            \"id\": 3,\r\n            \"email\": \"aleandresl@gmail.com\",\r\n            \"firstName\": \"Alejandro\",\r\n            \"lastName\": \"Laurito\",\r\n            \"username\": \"ale\",\r\n            \"password\": \"$2a$10$s.eS4rO9zJO3NNKM9hAM2eqBcOP3pZ525fWbndTqj1ezpjWNA4IOi\",\r\n            \"tokenPassword\": null,\r\n            \"roles\": [\r\n                {\r\n                    \"id\": 2,\r\n                    \"name\": \"USER\"\r\n                }\r\n            ]\r\n        },\r\n        \"creditBalance\": 0.00,\r\n        \"rank\": {\r\n            \"id\": 1,\r\n            \"name\": \"BRONZE\"\r\n        },\r\n        \"couponList\": [],\r\n        \"purchaseList\": [],\r\n        \"transferList\": []\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/subscription/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"subscription",
+								"create"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Get Expired Subscriptions",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg4MjE3OTEsImV4cCI6MTcwODkwODE5MX0.yIatWqiaW4WHM1el7SIxu2BeyqsqsIcIMFGtoNxs7hU",
-							"type": "string"
+			"name": "Store Subscription",
+			"item": [
+				{
+					"name": "Create Store Subscription",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODkwNjI4NSwiZXhwIjoxNzA4OTkyNjg1fQ.Pzn_PFZyO7gD4ma8kujUSw0zBFZXLY7F6X7VIs2Ca_4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Mensual\",\r\n    \"price\": 100.0,\r\n    \"description\": \"Basic month subscription\",\r\n    \"imageUrl\": \"www.google.com\",\r\n    \"planType\": \"Individual\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/store-subscription/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"store-subscription",
+								"create"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/subscription/get-expired",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"subscription",
-						"get-expired"
-					]
+				{
+					"name": "Update Store Subscription",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODkwNjI4NSwiZXhwIjoxNzA4OTkyNjg1fQ.Pzn_PFZyO7gD4ma8kujUSw0zBFZXLY7F6X7VIs2Ca_4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"Bimonthly\",\r\n    \"price\": 100.0,\r\n    \"description\": \"Basic bimonthly subscription\",\r\n    \"imageUrl\": \"www.instagram.com\",\r\n    \"planType\": \"Duos\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/store-subscription/update/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"store-subscription",
+								"update",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Store Subsription By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODkwNjI4NSwiZXhwIjoxNzA4OTkyNjg1fQ.Pzn_PFZyO7gD4ma8kujUSw0zBFZXLY7F6X7VIs2Ca_4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/store-subscription/get/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"store-subscription",
+								"get",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Store Subscriptions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODkwNjI4NSwiZXhwIjoxNzA4OTkyNjg1fQ.Pzn_PFZyO7gD4ma8kujUSw0zBFZXLY7F6X7VIs2Ca_4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/store-subscription/get-all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"store-subscription",
+								"get-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Store Subscription",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODkwNjI4NSwiZXhwIjoxNzA4OTkyNjg1fQ.Pzn_PFZyO7gD4ma8kujUSw0zBFZXLY7F6X7VIs2Ca_4",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/store-subscription/delete/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"store-subscription",
+								"delete",
+								"1"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Get Active Subscriptions",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg4MjE3OTEsImV4cCI6MTcwODkwODE5MX0.yIatWqiaW4WHM1el7SIxu2BeyqsqsIcIMFGtoNxs7hU",
-							"type": "string"
+			"name": "Coupon",
+			"item": [
+				{
+					"name": "Create Coupon",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg5NjYzODQsImV4cCI6MTcwOTA1Mjc4NH0.9b3u9pFOkCZGEB2l_pS7o3oMqIJ3Cj1SJ_V9NWL8Efk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"issueDate\": \"2024-02-26\",\r\n    \"dueDate\": \"2024-03-26\",\r\n    \"amount\": \"500.00\",\r\n    \"spent\": false,\r\n    \"account\": {\r\n        \"id\": 1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/coupon/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coupon",
+								"create"
+							]
 						}
-					]
+					},
+					"response": []
 				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/subscription/get-active",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"subscription",
-						"get-active"
-					]
+				{
+					"name": "Get All Coupons",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg5NjYzODQsImV4cCI6MTcwOTA1Mjc4NH0.9b3u9pFOkCZGEB2l_pS7o3oMqIJ3Cj1SJ_V9NWL8Efk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/coupon/get-all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coupon",
+								"get-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Coupon By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg5NjYzODQsImV4cCI6MTcwOTA1Mjc4NH0.9b3u9pFOkCZGEB2l_pS7o3oMqIJ3Cj1SJ_V9NWL8Efk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/coupon/get/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coupon",
+								"get",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Coupon",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg5NjYzODQsImV4cCI6MTcwOTA1Mjc4NH0.9b3u9pFOkCZGEB2l_pS7o3oMqIJ3Cj1SJ_V9NWL8Efk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"issueDate\": \"2024-02-26\",\r\n    \"dueDate\": \"2024-04-26\",\r\n    \"amount\": \"1000.00\",\r\n    \"spent\": true,\r\n    \"account\": {\r\n        \"id\": 1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/coupon/update/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coupon",
+								"update",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Coupon",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg5NjYzODQsImV4cCI6MTcwOTA1Mjc4NH0.9b3u9pFOkCZGEB2l_pS7o3oMqIJ3Cj1SJ_V9NWL8Efk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/coupon/delete/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coupon",
+								"delete",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Spent Coupons",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg5NzA4MzcsImV4cCI6MTcwOTA1NzIzN30.69dEsgEuq-q2wYAQU-GTipswukET8HV-fEf6Fj23PZc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/coupon/get-all-spent",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coupon",
+								"get-all-spent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Not Spent Coupons",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg5NzA4MzcsImV4cCI6MTcwOTA1NzIzN30.69dEsgEuq-q2wYAQU-GTipswukET8HV-fEf6Fj23PZc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/coupon/get-all-not-spent",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coupon",
+								"get-all-not-spent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Expired Coupons",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg5NzA4MzcsImV4cCI6MTcwOTA1NzIzN30.69dEsgEuq-q2wYAQU-GTipswukET8HV-fEf6Fj23PZc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/coupon/get-all-expired",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coupon",
+								"get-all-expired"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Current Coupons",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg5NzA4MzcsImV4cCI6MTcwOTA1NzIzN30.69dEsgEuq-q2wYAQU-GTipswukET8HV-fEf6Fj23PZc",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/coupon/get-all-current",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"coupon",
+								"get-all-current"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update Subscription",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDg4Mjc0MTcsImV4cCI6MTcwODkxMzgxN30.ESyLbscgEN2ZwWBhQEais2vfEmrWndNuKXRKs0uk2UM",
-							"type": "string"
-						}
-					]
-				},
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Mensual\",\r\n    \"price\": 100.0,\r\n    \"imageUrl\": \"www.google.com\",\r\n    \"startDate\": \"2024-02-24\",\r\n    \"endDate\": \"2024-03-24\",\r\n    \"planType\": \"Personal\",\r\n    \"automaticRenewal\": true\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/subscription/update/1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"subscription",
-						"update",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete Subscription",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/subscription/delete/1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"subscription",
-						"delete",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Subscription",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"No subscription\",\r\n    \"price\": 0.0,\r\n    \"imageUrl\": \"Direccion imagen sin suscripción\",\r\n    \"startDate\": \"2024-02-24\",\r\n    \"endDate\": \"2024-02-24\",\r\n    \"planType\": \"None\",\r\n    \"automaticRenewal\": false,\r\n    \"account\": {\r\n        \"id\": 1,\r\n        \"user\": {\r\n            \"id\": 3,\r\n            \"email\": \"aleandresl@gmail.com\",\r\n            \"firstName\": \"Alejandro\",\r\n            \"lastName\": \"Laurito\",\r\n            \"username\": \"ale\",\r\n            \"password\": \"$2a$10$s.eS4rO9zJO3NNKM9hAM2eqBcOP3pZ525fWbndTqj1ezpjWNA4IOi\",\r\n            \"tokenPassword\": null,\r\n            \"roles\": [\r\n                {\r\n                    \"id\": 2,\r\n                    \"name\": \"USER\"\r\n                }\r\n            ]\r\n        },\r\n        \"creditBalance\": 0.00,\r\n        \"rank\": {\r\n            \"id\": 1,\r\n            \"name\": \"BRONZE\"\r\n        },\r\n        \"couponList\": [],\r\n        \"purchaseList\": [],\r\n        \"transferList\": []\r\n    }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/subscription/create",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"subscription",
-						"create"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Store Subscription",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODkwNjI4NSwiZXhwIjoxNzA4OTkyNjg1fQ.Pzn_PFZyO7gD4ma8kujUSw0zBFZXLY7F6X7VIs2Ca_4",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Mensual\",\r\n    \"price\": 100.0,\r\n    \"description\": \"Basic month subscription\",\r\n    \"imageUrl\": \"www.google.com\",\r\n    \"planType\": \"Individual\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/store-subscription/create",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"store-subscription",
-						"create"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update Store Subscription",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODkwNjI4NSwiZXhwIjoxNzA4OTkyNjg1fQ.Pzn_PFZyO7gD4ma8kujUSw0zBFZXLY7F6X7VIs2Ca_4",
-							"type": "string"
-						}
-					]
-				},
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"Bimonthly\",\r\n    \"price\": 100.0,\r\n    \"description\": \"Basic bimonthly subscription\",\r\n    \"imageUrl\": \"www.instagram.com\",\r\n    \"planType\": \"Duos\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/store-subscription/update/1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"store-subscription",
-						"update",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Store Subsription By Id",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODkwNjI4NSwiZXhwIjoxNzA4OTkyNjg1fQ.Pzn_PFZyO7gD4ma8kujUSw0zBFZXLY7F6X7VIs2Ca_4",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/store-subscription/get/1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"store-subscription",
-						"get",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get All Store Subscriptions",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODkwNjI4NSwiZXhwIjoxNzA4OTkyNjg1fQ.Pzn_PFZyO7gD4ma8kujUSw0zBFZXLY7F6X7VIs2Ca_4",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/store-subscription/get-all",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"store-subscription",
-						"get-all"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete Store Subscription",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwODkwNjI4NSwiZXhwIjoxNzA4OTkyNjg1fQ.Pzn_PFZyO7gD4ma8kujUSw0zBFZXLY7F6X7VIs2Ca_4",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/store-subscription/delete/1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"store-subscription",
-						"delete",
-						"1"
-					]
-				}
-			},
-			"response": []
+			]
 		}
 	]
 }

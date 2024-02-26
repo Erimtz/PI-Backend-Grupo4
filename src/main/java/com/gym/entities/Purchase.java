@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -41,4 +42,11 @@ public class Purchase {
     @ManyToOne(targetEntity = Account.class)
     @JoinColumn(name = "account_id")
     private Account account;
+
+    // ESTO ES UNA BURRADA PROVISORIA PARA QUE NO DE ERROR //////////////////
+    /////////////////////////////////////////////////////////////////////////
+    public BigDecimal calculateTotalAmount(){
+        return new BigDecimal(1);
+    }
+    /////////////////////////////////////////////////////////////////////////
 }
