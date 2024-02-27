@@ -5,6 +5,8 @@ import com.gym.exceptions.UserNotFoundException;
 import com.gym.security.controllers.request.ChangePasswordDTO;
 import com.gym.security.controllers.request.CreateUserDTO;
 import com.gym.security.controllers.request.UpdateUserDTO;
+import com.gym.security.controllers.response.ResponseUserDTO;
+import com.gym.security.controllers.response.UserProfileDTO;
 import com.gym.security.entities.UserEntity;
 import com.gym.security.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,7 +40,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create-admin")
+    @PostMapping("/create/admin")
     public ResponseEntity<?> createAdminUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
         if (userService.existsByEmail(createUserDTO.getEmail())) {
             return ResponseEntity.badRequest().body("El email ya está en uso.");
@@ -50,7 +52,7 @@ public class UserController {
         return ResponseEntity.ok(createdUser);
     }
 
-    @PostMapping("/create-user")
+    @PostMapping("/create/user")
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
         if (userService.existsByEmail(createUserDTO.getEmail())) {
             return ResponseEntity.badRequest().body("El email ya está en uso.");
@@ -58,21 +60,36 @@ public class UserController {
         if (userService.existsByUsername(createUserDTO.getUsername())) {
             return ResponseEntity.badRequest().body("El username ya está en uso.");
         }
-        UserEntity userEntity = userService.createUser(createUserDTO);
-        return ResponseEntity.ok(userEntity);
+        ResponseUserDTO responseUserDTO = userService.createUser(createUserDTO);
+        return ResponseEntity.ok(responseUserDTO);
     }
 
     @PutMapping("/update/{username}")
-    public ResponseEntity<?> updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserDTO updateUserDTO) {
+    public ResponseEntity<?> updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserDTO updateUserDTO, @RequestHeader("Authorization") String authorizationHeader) {
         try {
-            UserEntity userEntity = userService.updateUser(username, updateUserDTO);
-            return ResponseEntity.ok(userEntity);
+            ResponseUserDTO responseUserDTO = userService.updateUser(username, updateUserDTO, authorizationHeader);
+            return ResponseEntity.ok(responseUserDTO);
         } catch (UserNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PutMapping("/change-password")
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<?> getUserProfile(@PathVariable String username, HttpServletRequest request){
+        try {
+            String token = request.getHeader("Authorization");
+            UserProfileDTO userProfileDTO = userService.getUserProfile(username, token);
+            return ResponseEntity.ok(userProfileDTO);
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al procesar la solicitud");
+        }
+    }
+
+    @PutMapping("/update/password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO,
                                             HttpServletRequest request) {
         try {

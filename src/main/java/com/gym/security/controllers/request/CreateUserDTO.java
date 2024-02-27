@@ -25,4 +25,5 @@ public class CreateUserDTO {
     @Min(6)
     private String password;
     private Set<String> roles;
+    private String document;
 }
