@@ -43,6 +43,9 @@ public class Product {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
     private Set<Image> images;
 
+    @OneToMany(mappedBy = "product")
+    private Set<PurchaseDetail> purchaseDetails;
+
     public Product(Long productId) {
     }
 

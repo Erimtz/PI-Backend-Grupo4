@@ -34,4 +34,8 @@ public class Coupon {
     @JoinColumn(name = "account_id")
     @JsonIgnore
     private Account account;
+
+    @ManyToOne(targetEntity = Purchase.class)
+    @JoinColumn(name = "purchase_id")
+    private Purchase purchase;
 }
