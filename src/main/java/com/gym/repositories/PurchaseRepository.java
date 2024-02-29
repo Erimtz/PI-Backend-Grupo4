@@ -1,9 +1,12 @@
 package com.gym.repositories;
 
 import com.gym.entities.Purchase;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-public interface PurchaseRepository extends CrudRepository<Purchase, Long> {
+@Repository
+public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
     //   @Query(value = "select * from purchase where product_id like :productId",nativeQuery = true)
     //    List<Purchase> findByProduct_Id(@Param("productId") Integer productId);
     //

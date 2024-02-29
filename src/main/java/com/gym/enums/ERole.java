@@ -1,4 +1,4 @@
-package com.gym.security.enums;
+package com.gym.enums;
 
 public enum ERole {
     ADMIN,

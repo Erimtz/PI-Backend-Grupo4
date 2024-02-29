@@ -37,6 +37,7 @@ public class ProductDTO {
         product.setName(name);
         product.setDescription(description);
         product.setStock(stock);
+        product.setPrice(price);
         product.setPurchase(purchase);
         product.setCategory(category);
         product.setImages(images);

@@ -2,7 +2,7 @@ package com.gym.services;
 
 import com.gym.dto.AccountDTO;
 import com.gym.entities.Account;
-import com.gym.entities.ERank;
+import com.gym.enums.ERank;
 import com.gym.entities.Rank;
 import com.gym.entities.Subscription;
 import com.gym.repositories.AccountRepository;

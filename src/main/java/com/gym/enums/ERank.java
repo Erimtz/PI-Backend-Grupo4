@@ -1,4 +1,4 @@
-package com.gym.entities;
+package com.gym.enums;
 
 public enum ERank {
     BRONZE,

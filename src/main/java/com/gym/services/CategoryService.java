@@ -35,8 +35,8 @@ public class CategoryService {
         Category categoryToUpdate = categoryRepository.findById(category_id)
                 .orElseThrow(() -> new ResourceNotFoundException("The product with id " + category_id + " has not been found to be updated."));
 
-        if (category.getTitle() != null) {
-            categoryToUpdate.setTitle(category.getTitle());
+        if (category.getName() != null) {
+            categoryToUpdate.setName(category.getName());
         }
         if (category.getDescription() != null) {
             categoryToUpdate.setDescription(category.getDescription());

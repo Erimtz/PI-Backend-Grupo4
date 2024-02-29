@@ -20,7 +20,7 @@ public class Category {
     private Long id;
 
     @Column(name = "title")
-    private String title;
+    private String name;
 
     @Column(name = "description")
     private String description;

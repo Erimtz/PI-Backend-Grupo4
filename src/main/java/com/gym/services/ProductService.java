@@ -1,5 +1,6 @@
 package com.gym.services;
 
+import com.gym.dto.ImageDTO;
 import com.gym.dto.ProductDTO;
 import com.gym.entities.Category;
 import com.gym.entities.Image;
@@ -10,10 +11,7 @@ import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,41 +38,74 @@ public class ProductService {
     }
 
     public ProductDTO saveProduct(ProductDTO productDTO) throws ResourceNotFoundException {
-        Optional<Category> category = categoryRepository.findById(productDTO.getCategory().getId());
-        if (category.isPresent()) {
-
-            //crear el producto y obtener id
-            Product product = productRepository.save(productDTO.toEntity());
-            Long productId = product.getId();
-
-            //obtener el set de imagenes y crear otro set vacio
-            Set<Image> images = productDTO.getImages();
-            Set<Image> imagesAdded = new HashSet<>();
-
-            //por cada imagen setear el producto, guardarlo y setearlo en en nuevo set
-            for (Image i : images) {
-
-                Product product2 = new Product(productId);
-                i.setProduct(product2);
-
-                Image imageSave = imageRepository.save(i);
-                imagesAdded.add(imageSave);
-            }
-
-
-            //setear el nuevo set en el producto original y guardar
-            product.setImages(imagesAdded);
-            productRepository.save(product);
-
-            return  product.toDto();
-
-        } else {
-            if (category.isEmpty()) {
-                throw new ResourceNotFoundException("The category with id " + productDTO.getCategory().getId() + " has not been found.");
-            } else {
-                throw new ResourceNotFoundException("The category with id " + productDTO.getCategory().getId() + "and the city with id" + productDTO.getCategory().getId() + " has not been found.");
-            }
+//        Optional<Category> category = categoryRepository.findById(productDTO.getCategory().getId());
+//        if (category.isPresent()) {
+//
+//            //crear el producto y obtener id
+//            Product product = productRepository.save(productDTO.toEntity());
+//            Long productId = product.getId();
+//
+//            //obtener el set de imagenes y crear otro set vacio
+//            Set<Image> images = productDTO.getImages();
+//            Set<Image> imagesAdded = new HashSet<>();
+//
+//            //por cada imagen setear el producto, guardarlo y setearlo en en nuevo set
+//            for (Image i : images) {
+//
+//                Product product2 = new Product(productId);
+//                i.setProduct(product2);
+//
+//                Image imageSave = imageRepository.save(i);
+//                imagesAdded.add(imageSave);
+//            }
+//
+//
+//            //setear el nuevo set en el producto original y guardar
+//            product.setImages(imagesAdded);
+//            productRepository.save(product);
+//
+//            return  product.toDto();
+//
+//        } else {
+//            if (category.isEmpty()) {
+//                throw new ResourceNotFoundException("The category with id " + productDTO.getCategory().getId() + " has not been found.");
+//            } else {
+//                throw new ResourceNotFoundException("The category with id " + productDTO.getCategory().getId() + "and the city with id" + productDTO.getCategory().getId() + " has not been found.");
+//            }
+//        }
+        // Verificar si la categoría existe
+        Optional<Category> categoryOptional = categoryRepository.findById(productDTO.getCategory().getId());
+        if (categoryOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Category with ID " + productDTO.getCategory().getId() + " not found");
         }
+        Category category = categoryOptional.get();
+
+        Set<Image> images = productDTO.getImages();
+        if (images == null || images.isEmpty()) {
+            throw new IllegalArgumentException("Product must have at least one image");
+        }
+
+        // Crear el producto
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        product.setDescription(productDTO.getDescription());
+        product.setStock(productDTO.getStock());
+        product.setCategory(category);
+
+        // Guardar el producto
+        Product savedProduct = productRepository.save(product);
+
+        // Guardar las imágenes asociadas al producto
+//        Set<Image> images = productDTO.getImages();
+        for (Image image : images) {
+            image.setProduct(savedProduct);
+        }
+        savedProduct.setImages(images); // Setear el conjunto de imágenes en el producto
+        imageRepository.saveAll(images);
+
+        // Retornar el DTO del producto guardado
+        return savedProduct.toDto();
     }
 
     public ProductDTO getProduct(Long id) throws ResourceNotFoundException {

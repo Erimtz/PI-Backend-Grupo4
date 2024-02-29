@@ -5,7 +5,7 @@ import com.gym.dto.ResponseCouponDTO;
 import com.gym.dto.UpdateCouponDTO;
 import com.gym.entities.Account;
 import com.gym.entities.Coupon;
-import com.gym.entities.ERank;
+import com.gym.enums.ERank;
 import com.gym.entities.Purchase;
 import com.gym.exceptions.DatabaseOperationException;
 import com.gym.exceptions.ResourceNotFoundException;

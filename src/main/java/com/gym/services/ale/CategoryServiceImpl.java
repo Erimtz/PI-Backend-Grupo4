@@ -2,7 +2,6 @@ package com.gym.services.ale;
 
 import com.gym.dto.CategoryDTO;
 import com.gym.entities.Category;
-import com.gym.entities.Image;
 import com.gym.exceptions.DatabaseOperationException;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.CategoryRepository;
@@ -38,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService{
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
         try {
             Category category = Category.builder()
-                    .title(categoryDTO.getTitle())
+                    .name(categoryDTO.getName())
                     .imageUrl(categoryDTO.getImageUrl())
                     .description(categoryDTO.getDescription())
                     .build();
@@ -55,8 +54,8 @@ public class CategoryServiceImpl implements CategoryService{
         if (categoryOptional.isPresent()) {
             Category category =categoryOptional.get();
 
-            if (categoryDTO.getTitle() != null) {
-                category.setTitle(categoryDTO.getTitle());
+            if (categoryDTO.getName() != null) {
+                category.setName(categoryDTO.getName());
             }
 
             if (categoryDTO.getImageUrl() != null) {
@@ -84,9 +83,9 @@ public class CategoryServiceImpl implements CategoryService{
     private CategoryDTO convertToDto(Category category) {
         return new CategoryDTO(
                 category.getId(),
-                category.getTitle(),
-                category.getImageUrl(),
-                category.getDescription()
+                category.getName(),
+                category.getDescription(),
+                category.getImageUrl()
         );
     }
 }

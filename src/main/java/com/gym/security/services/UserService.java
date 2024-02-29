@@ -1,8 +1,8 @@
 package com.gym.security.services;//package com.gym.security.services;
 
 import com.gym.dto.Message;
-import com.gym.dto.ResponseCouponDTO;
 import com.gym.entities.*;
+import com.gym.enums.ERank;
 import com.gym.exceptions.*;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.RankRepository;
@@ -15,7 +15,7 @@ import com.gym.security.controllers.response.ResponseUserDTO;
 import com.gym.security.controllers.response.UserProfileDTO;
 import com.gym.security.entities.RoleEntity;
 import com.gym.security.entities.UserEntity;
-import com.gym.security.enums.ERole;
+import com.gym.enums.ERole;
 import com.gym.security.repositories.RoleRepository;
 import com.gym.security.repositories.UserRepository;
 import com.gym.services.AccountService;
@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -1,5 +1,6 @@
 package com.gym.entities;
 
+import com.gym.enums.ERank;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
