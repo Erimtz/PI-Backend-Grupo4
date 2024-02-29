@@ -10,10 +10,7 @@ import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +34,28 @@ public class ProductService {
         productsDTOList= productList.stream().map(p -> p.toDto()).collect(Collectors.toList());
 
         return productsDTOList;
+    }
+
+    public List<ProductDTO> getProductsByName(String name) {
+        List<Product> productList = productRepository.findByName(name);
+        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getProductsByPriceRange(Double minPrice, Double maxPrice) {
+        List<Product> productList = productRepository.findByPriceBetween(minPrice, maxPrice);
+        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getAllProductSortedByPriceAsc() {
+        List<Product> productList = (List<Product>) productRepository.findAll();
+        productList.sort(Comparator.comparing(Product::getPrice));
+        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+    }
+
+    public List<ProductDTO> getAllProductSortedByPriceDesc() {
+        List<Product> productList = (List<Product>) productRepository.findAll();
+        productList.sort(Comparator.comparing(Product::getPrice).reversed());
+        return productList.stream().map(Product::toDto).collect(Collectors.toList());
     }
 
     public ProductDTO saveProduct(ProductDTO productDTO) throws ResourceNotFoundException {
@@ -83,7 +102,7 @@ public class ProductService {
         if (product.isPresent()){
             return product.get().toDto();
         }else {
-            throw new ResourceNotFoundException("The product with id " + id + " has not been found to be deleted.");
+            return null;
         }
 
     }
