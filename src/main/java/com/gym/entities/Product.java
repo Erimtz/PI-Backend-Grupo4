@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -40,8 +39,8 @@ public class Product {
     @JoinColumn(name = "category_id",nullable = false)
     private Category category;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
-    private Set<Image> images;
+    @Column(name = "images")
+    private String images;
 
     public Product(Long productId) {
     }
@@ -52,6 +51,7 @@ public class Product {
         productDto.setName(name);
         productDto.setDescription(description);
         productDto.setStock(stock);
+        productDto.setPrice(price);
         productDto.setPurchase(purchase);
         productDto.setCategory(category);
         productDto.setImages(images);

@@ -1,12 +1,11 @@
 package com.gym.entities;
 
+import com.gym.dto.CategoryDTO;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-
+@Setter
+@Getter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,4 +27,12 @@ public class Category {
     @Column(name = "imageUrl")
     private String imageUrl;
 
+    public CategoryDTO toDto() {
+        CategoryDTO categoryDto = new CategoryDTO();
+        categoryDto.setId(id);
+        categoryDto.setTitle(title);
+        categoryDto.setDescription(description);
+        categoryDto.setImageUrl(imageUrl);
+        return categoryDto;
+    }
 }

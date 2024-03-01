@@ -2,11 +2,10 @@ package com.gym.services;
 
 import com.gym.dto.ProductDTO;
 import com.gym.entities.Category;
-import com.gym.entities.Image;
 import com.gym.entities.Product;
+import com.gym.exceptions.BadRequestException;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.CategoryRepository;
-import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +19,10 @@ public class ProductService {
 
     private CategoryRepository categoryRepository;
 
-    private ImageRepository imageRepository;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, ImageRepository imageRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
-        this.imageRepository = imageRepository;
     }
 
     public List<ProductDTO> getAllProduct(){
@@ -58,41 +55,50 @@ public class ProductService {
         return productList.stream().map(Product::toDto).collect(Collectors.toList());
     }
 
-    public ProductDTO saveProduct(ProductDTO productDTO) throws ResourceNotFoundException {
+    public ProductDTO saveProduct(ProductDTO productDTO) throws ResourceNotFoundException, BadRequestException {
+        // Verificar si el precio es nulo
+        if (productDTO.getPrice() == null) {
+            throw new BadRequestException("El precio del producto es requerido.");
+        }
+
         Optional<Category> category = categoryRepository.findById(productDTO.getCategory().getId());
         if (category.isPresent()) {
+            Product productEntity = productDTO.toEntity();
+            productEntity.setCategory(category.get());
+            // Crear el producto y obtener id
+            Product product = productRepository.save(productEntity);
 
-            //crear el producto y obtener id
-            Product product = productRepository.save(productDTO.toEntity());
-            Long productId = product.getId();
-
-            //obtener el set de imagenes y crear otro set vacio
-            Set<Image> images = productDTO.getImages();
-            Set<Image> imagesAdded = new HashSet<>();
-
-            //por cada imagen setear el producto, guardarlo y setearlo en en nuevo set
-            for (Image i : images) {
-
-                Product product2 = new Product(productId);
-                i.setProduct(product2);
-
-                Image imageSave = imageRepository.save(i);
-                imagesAdded.add(imageSave);
-            }
-
-
-            //setear el nuevo set en el producto original y guardar
-            product.setImages(imagesAdded);
-            productRepository.save(product);
-
-            return  product.toDto();
-
+            // Devolver el DTO del producto guardado
+            return product.toDto();
         } else {
             if (category.isEmpty()) {
-                throw new ResourceNotFoundException("The category with id " + productDTO.getCategory().getId() + " has not been found.");
+                throw new ResourceNotFoundException("La categoría con el ID " + productDTO.getCategory().getId() + " no se encontró.");
             } else {
-                throw new ResourceNotFoundException("The category with id " + productDTO.getCategory().getId() + "and the city with id" + productDTO.getCategory().getId() + " has not been found.");
+                throw new ResourceNotFoundException("La categoría con el ID " + productDTO.getCategory().getId() + " y la ciudad con el ID " + productDTO.getCategory().getId() + " no se encontraron.");
             }
+        }
+    }
+
+    public ProductDTO addImagesToProduct(Long productId, List<String> imageNames) throws ResourceNotFoundException {
+        // Obtener el producto por ID
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+
+            // Agregar las imágenes al producto
+            String currentImages = product.getImages();
+            if (currentImages == null) {
+                currentImages = "";
+            }
+            String newImages = imageNames.stream().collect(Collectors.joining(";"));
+            String updatedImages = currentImages.isEmpty() ? newImages : currentImages + ";" + newImages;
+            product.setImages(updatedImages);
+
+            // Guardar el producto actualizado
+            Product savedProduct = productRepository.save(product);
+            return savedProduct.toDto();
+        } else {
+            throw new ResourceNotFoundException("Product not found with id: " + productId);
         }
     }
 

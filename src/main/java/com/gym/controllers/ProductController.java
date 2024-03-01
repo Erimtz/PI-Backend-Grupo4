@@ -87,8 +87,13 @@ public class ProductController {
     @Operation(summary = "Agregar un producto")
     @PostMapping
     public ResponseEntity<ProductDTO> saveProduct(@RequestBody ProductDTO productDto) throws BadRequestException, ResourceNotFoundException {
-        return new ResponseEntity<>(productService.saveProduct(productDto), HttpStatus.CREATED);
+        if (productDto.getPrice() == null) {
+            throw new BadRequestException("El precio del producto es requerido.");
+        }
 
+        ProductDTO savedProductDto = productService.saveProduct(productDto);
+
+        return new ResponseEntity<>(savedProductDto, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Actualizar un producto")
