@@ -19,7 +19,7 @@ public class ResponseProductDTO {
     private String description;
     private Long stock;
     private Double price;
-    private Purchase purchase;
+//    private Purchase purchase;
     private Long categoryId;
     private Set<Image> images;
 }

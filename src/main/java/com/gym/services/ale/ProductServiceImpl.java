@@ -9,26 +9,23 @@ import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.CategoryRepository;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService{
 
     private final ProductRepository productRepository;
     private final ImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
-
-    @Autowired
-    public ProductServiceImpl(ProductRepository productRepository, ImageRepository imageRepository, CategoryRepository categoryRepository) {
-        this.productRepository = productRepository;
-        this.imageRepository = imageRepository;
-        this.categoryRepository = categoryRepository;
-    }
-
 
     @Override
     public List<ResponseProductDTO> getAllProducts() {
@@ -53,10 +50,7 @@ public class ProductServiceImpl implements ProductService{
         }
         Category category = categoryOptional.get();
 
-        Set<Image> images = requestProductDTO.getImages();
-        if (images == null || images.isEmpty()) {
-            throw new IllegalArgumentException("Product must have at least one image");
-        }
+        Set<Image> images = new HashSet<>();
 
         Product product = new Product();
         product.setName(requestProductDTO.getName());
@@ -64,15 +58,9 @@ public class ProductServiceImpl implements ProductService{
         product.setDescription(requestProductDTO.getDescription());
         product.setStock(requestProductDTO.getStock());
         product.setCategory(category);
+        product.setImages(images);
 
         Product savedProduct = productRepository.save(product);
-
-        for (Image image : images) {
-            image.setProduct(savedProduct);
-        }
-        savedProduct.setImages(images);
-        imageRepository.saveAll(images);
-
         return convertToDto(savedProduct);
     }
 
@@ -96,7 +84,7 @@ public class ProductServiceImpl implements ProductService{
                 product.getDescription(),
                 product.getStock(),
                 product.getPrice(),
-                product.getPurchase(),
+//                product.getPurchase(),
                 product.getCategory().getId(),
                 product.getImages()
         );

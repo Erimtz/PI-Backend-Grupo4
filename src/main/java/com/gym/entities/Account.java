@@ -1,5 +1,6 @@
 package com.gym.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gym.security.entities.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,7 @@ public class Account {
     private List<Coupon> couponList;
 
     @OneToMany(targetEntity = Purchase.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
+    @JsonIgnore
     private List<Purchase> purchaseList;
 
     @OneToMany(targetEntity = Transfer.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")

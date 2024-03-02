@@ -22,12 +22,6 @@ public class Purchase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @OneToMany(targetEntity = Product.class, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "purchase")
-//    private List<Product> productList;
-
-//    @OneToMany(targetEntity = Subscription.class, cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "purchase")
-//    private List<Subscription> subscriptionList;
-
     @OneToMany(mappedBy = "purchase")
     private List<PurchaseDetail> purchaseDetails;
 

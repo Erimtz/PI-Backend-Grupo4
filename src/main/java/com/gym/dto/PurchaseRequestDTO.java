@@ -14,12 +14,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PurchaseDTO {
+public class PurchaseRequestDTO {
 
-    private Long id;
-    private StoreSubscription storeSubscription;
     private List<PurchaseDetail> purchaseDetails;
     private List<Coupon> couponsApplied;
-    private LocalDate purchaseDate;
-    private Account account;
 }

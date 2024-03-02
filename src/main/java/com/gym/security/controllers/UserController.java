@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/create/admin")
+    @PostMapping("/create-admin")
     public ResponseEntity<?> createAdminUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
         if (userService.existsByEmail(createUserDTO.getEmail())) {
             return ResponseEntity.badRequest().body("El email ya está en uso.");
@@ -52,7 +52,7 @@ public class UserController {
         return ResponseEntity.ok(createdUser);
     }
 
-    @PostMapping("/create/user")
+    @PostMapping("/create-user")
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserDTO createUserDTO) {
         if (userService.existsByEmail(createUserDTO.getEmail())) {
             return ResponseEntity.badRequest().body("El email ya está en uso.");

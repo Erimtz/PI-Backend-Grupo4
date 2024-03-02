@@ -31,9 +31,9 @@ public class Product {
     @Column(name = "price")
     private Double price;
 
-    @ManyToOne(targetEntity = Purchase.class)
-    @JoinColumn(name = "purchase_id")
-    private Purchase purchase;
+//    @ManyToOne(targetEntity = Purchase.class)
+//    @JoinColumn(name = "purchase_id")
+//    private Purchase purchase;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @NotNull
@@ -56,7 +56,7 @@ public class Product {
         productDto.setDescription(description);
         productDto.setStock(stock);
         productDto.setPrice(price);
-        productDto.setPurchase(purchase);
+//        productDto.setPurchase(purchase);
         productDto.setCategory(category);
         productDto.setImages(images);
 
