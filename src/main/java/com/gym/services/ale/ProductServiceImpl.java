@@ -70,6 +70,11 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    public Product updateStockPurchase(Long stock) {
+        return null;
+    }
+
+    @Override
     public void deleteProductById(Long id) {
         if (!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("Product with ID " + id + " not found");

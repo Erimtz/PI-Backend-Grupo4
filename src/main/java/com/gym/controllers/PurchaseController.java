@@ -1,9 +1,7 @@
 package com.gym.controllers;
 
-import com.gym.dto.PurchaseRequestDTO;
-import com.gym.entities.Account;
-import com.gym.entities.Purchase;
-import com.gym.services.AccountService;
+import com.gym.dto.request.PurchaseRequestDTO;
+import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.services.PurchaseService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +20,11 @@ public class PurchaseController {
     private final PurchaseService purchaseService;
 
     @PostMapping
-    public ResponseEntity<Purchase> createPurchase(@RequestBody PurchaseRequestDTO requestDTO, HttpServletRequest request) {
+    public ResponseEntity<PurchaseResponseDTO> createPurchase(@RequestBody PurchaseRequestDTO requestDTO, HttpServletRequest request) {
         try {
             String token = request.getHeader("Authorization");
-            Purchase purchase = purchaseService.createPurchase(requestDTO, token);
-            return new ResponseEntity<>(purchase, HttpStatus.CREATED);
+            PurchaseResponseDTO purchaseResponseDTO = purchaseService.createPurchase(requestDTO, token);
+            return new ResponseEntity<>(purchaseResponseDTO, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

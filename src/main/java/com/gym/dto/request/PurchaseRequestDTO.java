@@ -1,4 +1,4 @@
-package com.gym.dto;
+package com.gym.dto.request;
 
 import com.gym.entities.Account;
 import com.gym.entities.Coupon;
@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PurchaseRequestDTO {
 
-    private List<PurchaseDetail> purchaseDetails;
+    private List<PurchaseDetailRequestDTO> purchaseDetails;
     private List<Coupon> couponsApplied;
+    private Long storeSubscriptionId;
 }

@@ -102,4 +102,15 @@ public class StoreSubscriptionServiceImpl implements StoreSubscriptionService {
                 storeSubscription.getPurchases()
         );
     }
+    @Override
+    public StoreSubscription convertToEntity(ResponseStoreSubscription responseStoreSubscription) {
+        StoreSubscription storeSubscription = new StoreSubscription();
+        storeSubscription.setId(responseStoreSubscription.getId());
+        storeSubscription.setName(responseStoreSubscription.getName());
+        storeSubscription.setPrice(responseStoreSubscription.getPrice());
+        storeSubscription.setDescription(responseStoreSubscription.getDescription());
+        storeSubscription.setImageUrl(responseStoreSubscription.getImageUrl());
+        storeSubscription.setPlanType(responseStoreSubscription.getPlanType());
+        return storeSubscription;
+    }
 }

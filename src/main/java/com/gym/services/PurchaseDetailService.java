@@ -1,10 +1,7 @@
 package com.gym.services;
 
-import com.gym.dto.PurchaseDetailDTO;
-import com.gym.dto.PurchaseDetailRequestDTO;
+import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.entities.PurchaseDetail;
-
-import java.util.List;
 
 public interface PurchaseDetailService {
 

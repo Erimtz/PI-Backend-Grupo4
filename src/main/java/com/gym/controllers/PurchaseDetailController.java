@@ -1,6 +1,6 @@
 package com.gym.controllers;
 
-import com.gym.dto.PurchaseDetailRequestDTO;
+import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.entities.PurchaseDetail;
 import com.gym.services.PurchaseDetailService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,4 @@ public class PurchaseDetailController {
         PurchaseDetail purchaseDetail = purchaseDetailService.createPurchaseDetail(requestDTO);
         return new ResponseEntity<>(purchaseDetail, HttpStatus.CREATED);
     }
-
-    // Otros métodos del controlador, si es necesario
 }

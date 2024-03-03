@@ -1,14 +1,12 @@
 package com.gym.services;
 
-import com.gym.dto.PurchaseDetailRequestDTO;
+import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.entities.Product;
 import com.gym.entities.PurchaseDetail;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseDetailRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor

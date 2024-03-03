@@ -1,25 +1,19 @@
 package com.gym.services;
 
-import com.gym.dto.PurchaseRequestDTO;
-import com.gym.entities.Account;
-import com.gym.entities.Product;
-import com.gym.entities.Purchase;
-import com.gym.entities.PurchaseDetail;
-import com.gym.exceptions.UnauthorizedException;
-import com.gym.exceptions.UserNotFoundException;
-import com.gym.repositories.AccountRepository;
+import com.gym.dto.request.PurchaseRequestDTO;
+import com.gym.dto.response.CouponResponseDTO;
+import com.gym.dto.response.PurchaseDetailResponseDTO;
+import com.gym.dto.response.PurchaseResponseDTO;
+import com.gym.entities.*;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseRepository;
-import com.gym.security.configuration.jwt.JwtUtils;
-import com.gym.security.entities.UserEntity;
-import com.gym.security.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,40 +22,70 @@ public class PurchaseServiceImpl implements PurchaseService{
 
     private final PurchaseRepository purchaseRepository;
     private final ProductRepository productRepository;
-    @Autowired
     private final AccountService accountService;
+    private final StoreSubscriptionService storeSubscriptionService;
 
-    public Purchase createPurchase(PurchaseRequestDTO requestDTO, String token) {
+    public PurchaseResponseDTO createPurchase(PurchaseRequestDTO requestDTO, String token) {
         Account account = accountService.getAccountFromToken(token);
         if (account == null) {
             throw new IllegalArgumentException("No se pudo obtener la cuenta del usuario");
         }
+
         Purchase purchase = new Purchase();
         purchase.setPurchaseDate(LocalDate.now());
         purchase.setAccount(account);
 
+        StoreSubscription storeSubscription = storeSubscriptionService.convertToEntity(storeSubscriptionService.getStoreSubscriptionById(requestDTO.getStoreSubscriptionId()));
+        purchase.setStoreSubscription(storeSubscription);
+
         List<PurchaseDetail> purchaseDetails = requestDTO.getPurchaseDetails().stream()
                 .map(detailDTO -> {
+                    Product product = productRepository.findById(detailDTO.getProductId())
+                            .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + detailDTO.getProductId()));
+
                     PurchaseDetail detail = new PurchaseDetail();
-
-                    if (detailDTO.getProduct() == null) {
-
-                        throw new IllegalArgumentException("Product in PurchaseDetailDTO is null");
-                    }
-                    Long productId = detailDTO.getProduct().getId();
-
-                    System.out.println("Searching for product with ID: " + productId);
-
-                    Product product = productRepository.findById(detailDTO.getProduct().getId())
-                            .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + detailDTO.getProduct().getId()));
-
                     detail.setProduct(product);
                     detail.setQuantity(detailDTO.getQuantity());
                     return detail;
                 })
                 .collect(Collectors.toList());
+
         purchase.setPurchaseDetails(purchaseDetails);
         purchase.setCouponsApplied(requestDTO.getCouponsApplied());
-        return purchaseRepository.save(purchase);
+        purchase = purchaseRepository.save(purchase);
+
+        List<PurchaseDetailResponseDTO> detailDTOs = purchaseDetails.stream()
+                .map(detail -> {
+                    PurchaseDetailResponseDTO detailDTO = new PurchaseDetailResponseDTO();
+                    detailDTO.setProductName(detail.getProduct().getName());
+                    detailDTO.setQuantity(detail.getQuantity());
+                    detailDTO.setSubtotal(calculateSubtotal(detail));
+                    return detailDTO;
+                })
+                .collect(Collectors.toList());
+
+        List<CouponResponseDTO> couponsResponseDTO = requestDTO.getCouponsApplied().stream()
+                .map(coupon -> new CouponResponseDTO(coupon.getId(), coupon.getAmount()))
+                .collect(Collectors.toList());
+
+        Double total = detailDTOs.stream().mapToDouble(PurchaseDetailResponseDTO::getSubtotal).sum();
+        Double discount = couponsResponseDTO.stream().mapToDouble(CouponResponseDTO::getAmount).sum();
+        Double totalAfterDiscounts = total - discount;
+
+        return new PurchaseResponseDTO(detailDTOs, purchase.getStoreSubscription().getPrice(), total, couponsResponseDTO, discount, totalAfterDiscounts);
+    }
+
+    private Double calculateSubtotal(PurchaseDetail purchaseDetail) {
+        if (purchaseDetail.getProduct() != null && purchaseDetail.getProduct().getPrice() != null) {
+            return purchaseDetail.getProduct().getPrice().doubleValue() * purchaseDetail.getQuantity();
+        } else {
+            // Manejo del caso en que el precio del producto es null
+            throw new IllegalArgumentException("Price of the product is null");
+        }
+    }
+
+    private Double calculateTotalAfterDiscounts(Double total, List<Coupon> couponsApplied, StoreSubscription storeSubscription) {
+        Double totalAfterCoupons = total - couponsApplied.stream().mapToDouble(Coupon::getAmount).sum();
+        return totalAfterCoupons - storeSubscription.getPrice();
     }
 }

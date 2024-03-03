@@ -31,10 +31,6 @@ public class Product {
     @Column(name = "price")
     private Double price;
 
-//    @ManyToOne(targetEntity = Purchase.class)
-//    @JoinColumn(name = "purchase_id")
-//    private Purchase purchase;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @NotNull
     @JoinColumn(name = "category_id",nullable = false)
