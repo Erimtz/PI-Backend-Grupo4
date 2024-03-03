@@ -2,15 +2,16 @@ package com.gym.services.ale;
 
 import com.gym.dto.RequestProductDTO;
 import com.gym.dto.ResponseProductDTO;
+import com.gym.dto.request.UpdateStockPurchaseDTO;
 import com.gym.entities.Category;
 import com.gym.entities.Image;
 import com.gym.entities.Product;
+import com.gym.exceptions.NotEnoughStockException;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.CategoryRepository;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -70,8 +71,19 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Product updateStockPurchase(Long stock) {
-        return null;
+    public Product updateStockPurchase(Long productId, Long subtractStock) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            if (product.getStock() >= subtractStock) {
+                product.setStock(product.getStock() - subtractStock);
+                return productRepository.save(product);
+            } else {
+                throw new NotEnoughStockException("The stock is not enough to buy " + subtractStock + " unit(s). Only left " + product.getStock() + " unit(s)");
+            }
+        } else {
+            throw new ResourceNotFoundException("Product with ID " + productId + " not found");
+        }
     }
 
     @Override

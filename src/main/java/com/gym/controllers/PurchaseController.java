@@ -2,6 +2,7 @@ package com.gym.controllers;
 
 import com.gym.dto.request.PurchaseRequestDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
+import com.gym.exceptions.NotEnoughStockException;
 import com.gym.services.PurchaseService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +21,14 @@ public class PurchaseController {
     private final PurchaseService purchaseService;
 
     @PostMapping
-    public ResponseEntity<PurchaseResponseDTO> createPurchase(@RequestBody PurchaseRequestDTO requestDTO, HttpServletRequest request) {
+    public ResponseEntity<?> createPurchase(@RequestBody PurchaseRequestDTO requestDTO, HttpServletRequest request) {
         try {
             String token = request.getHeader("Authorization");
             PurchaseResponseDTO purchaseResponseDTO = purchaseService.createPurchase(requestDTO, token);
             return new ResponseEntity<>(purchaseResponseDTO, HttpStatus.CREATED);
+        } catch (NotEnoughStockException ex) {
+            // Capturar la excepción de stock insuficiente y devolver una respuesta HTTP 400 Bad Request
+            return new ResponseEntity<>("Not enough stock available", HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

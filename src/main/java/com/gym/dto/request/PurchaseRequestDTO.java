@@ -18,5 +18,6 @@ public class PurchaseRequestDTO {
 
     private List<PurchaseDetailRequestDTO> purchaseDetails;
     private List<Coupon> couponsApplied;
+//    private List<Long> couponsIds;
     private Long storeSubscriptionId;
 }
