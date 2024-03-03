@@ -79,4 +79,8 @@ public class CouponController {
         return ResponseEntity.ok(couponDTOS);
     }
 
+    @PostMapping("/convert-response-to-entity")
+    public Coupon convertResponseToEntity(@RequestBody ResponseCouponDTO responseCouponDTO) {
+        return couponService.convertResponseToEntity(responseCouponDTO);
+    }
 }

@@ -9,6 +9,7 @@ import com.gym.enums.ERank;
 import com.gym.entities.Purchase;
 import com.gym.exceptions.DatabaseOperationException;
 import com.gym.exceptions.ResourceNotFoundException;
+import com.gym.repositories.AccountRepository;
 import com.gym.repositories.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,12 +19,16 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class CouponServiceImpl implements CouponService{
 
+    private static final Logger logger = LoggerFactory.getLogger(CouponServiceImpl.class);
     private final CouponRepository couponRepository;
+    private final AccountRepository accountRepository;
 
     @Override
     public List<ResponseCouponDTO> getAllCoupons() {
@@ -37,7 +42,10 @@ public class CouponServiceImpl implements CouponService{
     public ResponseCouponDTO getCouponById(Long id) {
         return couponRepository.findById(id)
                 .map(this::convertToDto)
-                .orElseThrow(() -> new ResourceNotFoundException("Coupon with ID " + id + " not found"));
+                .orElseThrow(() -> {
+                    logger.error("No se encontró ningún cupón con ID: {}", id);
+                    return new ResourceNotFoundException("Coupon with ID " + id + " not found");
+                });
     }
 
     @Override
@@ -297,4 +305,20 @@ public class CouponServiceImpl implements CouponService{
                 coupon.getAccount().getId()
         );
     }
+
+    public Coupon convertResponseToEntity(ResponseCouponDTO responseCouponDTO) {
+        Account account = accountRepository.findByUserId(responseCouponDTO.getAccountId())
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la cuenta asociada al cupón"));
+
+        Coupon coupon = new Coupon();
+        coupon.setId(responseCouponDTO.getId());
+        coupon.setIssueDate(responseCouponDTO.getIssueDate());
+        coupon.setDueDate(responseCouponDTO.getDueDate());
+        coupon.setAmount(responseCouponDTO.getAmount());
+        coupon.setSpent(responseCouponDTO.getSpent());
+        coupon.setAccount(account);
+
+        return coupon;
+    }
+
 }

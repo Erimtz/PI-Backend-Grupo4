@@ -1,5 +1,6 @@
 package com.gym.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,7 +39,19 @@ public class Purchase {
 
     @ManyToOne(targetEntity = Account.class)
     @JoinColumn(name = "account_id")
+    @JsonIgnore
     private Account account;
+
+    @Override
+    public String toString() {
+        return "Purchase{" +
+                "id=" + id +
+                ", purchaseDetails=" + purchaseDetails +
+                ", storeSubscription=" + storeSubscription +
+                ", purchaseDate=" + purchaseDate +
+                ", couponsApplied=" + couponsApplied +
+                '}';
+    }
 
     // ESTO ES UNA BURRADA PROVISORIA PARA QUE NO DE ERROR //////////////////
     /////////////////////////////////////////////////////////////////////////

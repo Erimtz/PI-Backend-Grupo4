@@ -61,6 +61,18 @@ public class Account {
         this.transferList = transferList;
     }
 
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", document='" + document + '\'' +
+                ", user=" + user +
+                ", creditBalance=" + creditBalance +
+                ", rank=" + rank +
+                ", couponList=" + couponList +
+                ", transferList=" + transferList +
+                '}';
+    }
     //    @OneToMany(targetEntity = PaymentMethod.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
 //    private List<PaymentMethod> paymentMethodSet;
 }

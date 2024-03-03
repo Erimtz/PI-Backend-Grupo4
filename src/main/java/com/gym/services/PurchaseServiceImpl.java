@@ -2,6 +2,7 @@ package com.gym.services;
 
 import com.gym.dto.CreateCouponDTO;
 import com.gym.dto.CreateStoreSubscriptionDTO;
+import com.gym.dto.ResponseCouponDTO;
 import com.gym.dto.ResponseStoreSubscription;
 import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
@@ -9,6 +10,7 @@ import com.gym.dto.response.CouponResponseDTO;
 import com.gym.dto.response.PurchaseDetailResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.entities.*;
+import com.gym.repositories.AccountRepository;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseRepository;
 import com.gym.services.ale.ProductService;
@@ -21,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +34,11 @@ public class PurchaseServiceImpl implements PurchaseService{
     private final ProductRepository productRepository;
     private final ProductService productService;
     private final AccountService accountService;
+    private final AccountRepository accountRepository;
     private final StoreSubscriptionService storeSubscriptionService;
+    private final CouponService couponService;
+    private static final Logger logger = LoggerFactory.getLogger(CouponServiceImpl.class);
+
 
     public PurchaseResponseDTO createPurchase(PurchaseRequestDTO requestDTO, String token) {
 
@@ -73,30 +81,44 @@ public class PurchaseServiceImpl implements PurchaseService{
             purchase.setPurchaseDetails(purchaseDetails);
         }
 
-        List<CreateCouponDTO> couponsDTO = requestDTO.getCouponsApplied().stream()
-                .map(coupon -> CreateCouponDTO.builder()
-                        .issueDate(coupon.getIssueDate())
-                        .dueDate(coupon.getDueDate())
-                        .amount(coupon.getAmount())
-                        .spent(coupon.getSpent())
-                        .account(coupon.getAccount())
-                        .build())
-                .collect(Collectors.toList());
-        // Aplicar cupones si están presentes en la solicitud
-        if (!couponsDTO.isEmpty()) {
-            List<Coupon> coupons = couponsDTO.stream()
-                    .map(couponDTO -> Coupon.builder()
-                            .issueDate(couponDTO.getIssueDate())
-                            .dueDate(couponDTO.getDueDate())
-                            .amount(couponDTO.getAmount())
-                            .spent(couponDTO.getSpent())
-                            .account(couponDTO.getAccount())
-                            .build())
-                    .collect(Collectors.toList());
-            purchase.setCouponsApplied(coupons);
+        // Obtener los IDs de los cupones aplicados y agregarlos a la compra
+        List<Long> couponIds = requestDTO.getCouponsIds();
+        if (couponIds != null && !couponIds.isEmpty()) {
+            List<Coupon> appliedCoupons = new ArrayList<>();
+            for (Long couponId : couponIds) {
+                // Buscar y convertir el cupón dentro del mismo bloque try-catch
+                try {
+                    // Buscar el cupón por su ID
+                    ResponseCouponDTO responseCouponDTO = couponService.getCouponById(couponId);
+
+                    // Verificar si el cupón fue encontrado
+                    if (responseCouponDTO != null) {
+                        // Convertir el DTO del cupón a la entidad del cupón
+                        Coupon coupon = new Coupon();
+                        coupon.setId(responseCouponDTO.getId());
+                        coupon.setIssueDate(responseCouponDTO.getIssueDate());
+                        coupon.setDueDate(responseCouponDTO.getDueDate());
+                        coupon.setAmount(responseCouponDTO.getAmount());
+                        coupon.setSpent(responseCouponDTO.getSpent());
+
+                        // Agregar el cupón convertido a la lista de cupones aplicados
+                        appliedCoupons.add(coupon);
+                    } else {
+                        // Si el cupón no fue encontrado, lanzar una excepción
+                        logger.error("No se encontró ningún cupón con ID: {}", couponId);
+                        throw new IllegalArgumentException("Coupon not found with ID: " + couponId);
+                    }
+                } catch (IllegalArgumentException e) {
+                    // Capturar y relanzar la excepción si ocurre un error al buscar el cupón
+                    logger.error("Error al buscar el cupón con ID: {}", couponId, e);
+                    throw new IllegalArgumentException("Error al buscar el cupón con ID: " + couponId);
+                }
+            }
+            // Establecer la lista de cupones aplicados en la compra
+            purchase.setCouponsApplied(appliedCoupons);
         }
 
-        // Guardar la compra
+        // Guardar la compra luego de aplicar los cupones
         purchase = purchaseRepository.save(purchase);
 
         // Realizar otros cálculos y obtener la respuesta
@@ -113,18 +135,29 @@ public class PurchaseServiceImpl implements PurchaseService{
                     .collect(Collectors.toList());
         }
 
-        List<CouponResponseDTO> couponsResponseDTO = requestDTO.getCouponsApplied().stream()
-                .map(coupon -> new CouponResponseDTO(coupon.getId(), coupon.getAmount()))
-                .collect(Collectors.toList());
-
         // Calcular totales y descuentos
         Double total = (detailDTOs.stream().mapToDouble(PurchaseDetailResponseDTO::getSubtotal).sum()) + purchase.getStoreSubscription().getPrice();
         total = Math.round(total * 100.0) / 100.0;
-        Double discount = couponsResponseDTO.stream().mapToDouble(CouponResponseDTO::getAmount).sum();
+
+        Double discount = 0.0;
+        if (purchase.getCouponsApplied() != null) {
+            discount = purchase.getCouponsApplied().stream()
+                    .mapToDouble(Coupon::getAmount)
+                    .sum();
+        }
+
         Double totalAfterDiscounts = total - discount;
         totalAfterDiscounts = Math.round(totalAfterDiscounts * 100.0) / 100.0;
 
         Double subscriptionPrice = purchase.getStoreSubscription() != null ? purchase.getStoreSubscription().getPrice() : 0;
+
+        // Crear la lista de cupones aplicados para la respuesta
+        List<CouponResponseDTO> couponsResponseDTO = new ArrayList<>();
+        if (purchase.getCouponsApplied() != null) {
+            couponsResponseDTO = purchase.getCouponsApplied().stream()
+                    .map(coupon -> new CouponResponseDTO(coupon.getId(), coupon.getAmount()))
+                    .collect(Collectors.toList());
+        }
 
         return new PurchaseResponseDTO(detailDTOs, subscriptionPrice, total, couponsResponseDTO, discount, totalAfterDiscounts);
     }

@@ -6,6 +6,7 @@ import com.gym.entities.Subscription;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CouponService {
 
@@ -20,5 +21,6 @@ public interface CouponService {
     List<ResponseCouponDTO> getCurrentCoupons();
     boolean isCouponSpent(Long couponId);
     boolean isCouponExpired(Long couponId);
+    public Coupon convertResponseToEntity(ResponseCouponDTO responseCouponDTO);
 
 }
