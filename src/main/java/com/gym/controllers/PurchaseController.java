@@ -2,6 +2,7 @@ package com.gym.controllers;
 
 import com.gym.dto.request.PurchaseRequestDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
+import com.gym.exceptions.InsufficientCreditException;
 import com.gym.exceptions.NotEnoughStockException;
 import com.gym.services.PurchaseService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,8 +28,9 @@ public class PurchaseController {
             PurchaseResponseDTO purchaseResponseDTO = purchaseService.createPurchase(requestDTO, token);
             return new ResponseEntity<>(purchaseResponseDTO, HttpStatus.CREATED);
         } catch (NotEnoughStockException ex) {
-            // Capturar la excepción de stock insuficiente y devolver una respuesta HTTP 400 Bad Request
             return new ResponseEntity<>("Not enough stock available", HttpStatus.BAD_REQUEST);
+        } catch (InsufficientCreditException ex) {
+            return new ResponseEntity<>("Insufficient credit balance", HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

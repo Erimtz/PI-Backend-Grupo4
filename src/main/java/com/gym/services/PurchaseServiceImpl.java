@@ -10,23 +10,25 @@ import com.gym.dto.response.CouponResponseDTO;
 import com.gym.dto.response.PurchaseDetailResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.entities.*;
+import com.gym.exceptions.InsufficientCreditException;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseRepository;
 import com.gym.services.ale.ProductService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PurchaseServiceImpl implements PurchaseService{
 
@@ -51,7 +53,7 @@ public class PurchaseServiceImpl implements PurchaseService{
         addCouponsToPurchase(requestDTO, purchase);
 
         // Calcular totales y descuentos, y guardar la compra
-        calculateAndSavePurchaseTotals(purchase);
+        calculateAndSavePurchaseTotals(purchase, token);
 
         // Construir y devolver la respuesta de la compra
         return buildPurchaseResponse(purchase);
@@ -114,13 +116,21 @@ public class PurchaseServiceImpl implements PurchaseService{
         return purchase;
     }
 
-    private void calculateAndSavePurchaseTotals(Purchase purchase) {
+    private void calculateAndSavePurchaseTotals(Purchase purchase, String token) {
 
         Double total = calculateTotal(purchase);
         Double discount = calculateDiscount(purchase);
         Double totalAfterDiscounts = total - discount;
 
-        purchase = purchaseRepository.save(purchase);
+        BigDecimal creditBalance = accountService.getAccountCreditBalance(getAccountFromToken(token));
+        BigDecimal totalAfterDiscountsBigDecimal = BigDecimal.valueOf(totalAfterDiscounts);
+
+        if (totalAfterDiscountsBigDecimal.compareTo(creditBalance) <= 0) {
+            accountService.sustractFromCreditBalance(getAccountFromToken(token), totalAfterDiscountsBigDecimal);
+            purchase = purchaseRepository.save(purchase);
+        } else {
+            throw new InsufficientCreditException("El saldo de crédito de la cuenta es insuficiente para realizar la compra");
+        }
     }
 
     private Double calculateTotal(Purchase purchase) {
@@ -131,11 +141,9 @@ public class PurchaseServiceImpl implements PurchaseService{
                     .mapToDouble(detail -> detail.getProduct().getPrice() * detail.getQuantity())
                     .sum();
         }
-
         if (purchase.getStoreSubscription() != null) {
             total += purchase.getStoreSubscription().getPrice();
         }
-
         return Math.round(total * 100.0) / 100.0;
     }
 
@@ -147,7 +155,6 @@ public class PurchaseServiceImpl implements PurchaseService{
                     .mapToDouble(Coupon::getAmount)
                     .sum();
         }
-
         return discount;
     }
 
@@ -164,9 +171,7 @@ public class PurchaseServiceImpl implements PurchaseService{
                     })
                     .collect(Collectors.toList());
         }
-
         Double subscriptionPrice = purchase.getStoreSubscription() != null ? purchase.getStoreSubscription().getPrice() : 0;
-
         Double total = calculateTotal(purchase);
         Double discount = calculateDiscount(purchase);
         Double totalAfterDiscounts = total - discount;
@@ -178,7 +183,6 @@ public class PurchaseServiceImpl implements PurchaseService{
                     .map(coupon -> new CouponResponseDTO(coupon.getId(), coupon.getAmount()))
                     .collect(Collectors.toList());
         }
-
         return new PurchaseResponseDTO(detailDTOs, subscriptionPrice, total, couponsResponseDTO, discount, totalAfterDiscounts);
     }
 

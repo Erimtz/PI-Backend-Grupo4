@@ -1,10 +1,12 @@
 package com.gym.services;
 
 import com.gym.dto.AccountDTO;
+import com.gym.dto.response.AccountDetailsDTO;
 import com.gym.entities.Account;
 import com.gym.enums.ERank;
 import com.gym.entities.Rank;
 import com.gym.entities.Subscription;
+import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.exceptions.UnauthorizedException;
 import com.gym.exceptions.UserNotFoundException;
 import com.gym.repositories.AccountRepository;
@@ -49,7 +51,7 @@ public class AccountService {
                 .transferList(new ArrayList<>())
                 .couponList(new ArrayList<>())
                 .purchaseList(new ArrayList<>())
-                .creditBalance(BigDecimal.valueOf(0.0))
+                .creditBalance(BigDecimal.valueOf(1000.0))
                 .rank(rankAccount)
                 .build();
         accountRepository.save(account);
@@ -66,6 +68,46 @@ public class AccountService {
             return new AccountDTO(account.getId(), user.getUsername());
         } else {
             throw new IllegalArgumentException("Account not found with ID: " + username);
+        }
+    }
+
+    public AccountDetailsDTO getAccountDetailsById(Long id){
+        Optional<Account> optionalAccount = accountRepository.findById(id);
+        if (optionalAccount.isPresent()) {
+            Account account = optionalAccount.get();
+            AccountDetailsDTO accountDetailsDTO = AccountDetailsDTO.builder()
+                    .id(account.getId())
+                    .userId(account.getUser().getId())
+                    .document(account.getDocument())
+                    .creditBalance(account.getCreditBalance())
+                    .rank(account.getRank().getName().name())
+                    .build();
+            return accountDetailsDTO;
+        } else {
+            throw new ResourceNotFoundException("Account not found with ID: " + id);
+        }
+    }
+
+    public BigDecimal getAccountCreditBalance(Account account) {
+        Boolean accountExists = accountRepository.existsById(account.getId());
+        if (accountExists) {
+            AccountDetailsDTO accountDTO = getAccountDetailsById(account.getId());
+            BigDecimal creditBalance = accountDTO.getCreditBalance();
+            return creditBalance;
+        } else {
+            throw new IllegalArgumentException("Account not found");
+        }
+    }
+
+    public void sustractFromCreditBalance(Account account, BigDecimal totalPurchaseAmount){
+        Optional<Account> optionalAccount = accountRepository.findById(account.getId());
+        if (optionalAccount.isPresent()) {
+            Account accountEntity = optionalAccount.get();
+            BigDecimal newCreditBalance = accountEntity.getCreditBalance().subtract(totalPurchaseAmount);
+            accountEntity.setCreditBalance(newCreditBalance);
+            accountRepository.save(accountEntity);
+        } else {
+            throw new IllegalArgumentException("Account not found");
         }
     }
 

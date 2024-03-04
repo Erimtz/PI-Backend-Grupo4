@@ -56,28 +56,6 @@ public class UserService {
         this.jwtUtils = jwtUtils;
     }
 
-    //    @GetMapping("/profile/{username}")
-//    public ResponseEntity<UserProfileDTO> showProfile(@AuthenticationPrincipal UserDetails userDetails) {
-//
-//        String username = userDetails.getUsername();
-//        List<String> roles = userDetails.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.toList());
-//
-//        UserEntity userEntity = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-//
-//        UserProfileDTO userProfileDTO = new UserProfileDTO(
-//                username,
-//                userEntity.getFirstName(),
-//                userEntity.getLastName(),
-//                userEntity.getEmail(),
-//                roles
-//        );
-//
-//        return ResponseEntity.ok(userProfileDTO);
-//    }
-
     public UserProfileDTO getUserProfile(String username, String token) {
         if (token == null || !token.startsWith("Bearer ")) {
             throw new UnauthorizedException("No se encontró un token de autorización válido.");
@@ -305,28 +283,6 @@ public class UserService {
         userRepository.save(user);
         return new Message(user.getUsername() + " ha sido creado");
     }
-
-//    @GetMapping("/profile/{username}")
-//    public ResponseEntity<UserProfileDTO> showProfile(@AuthenticationPrincipal UserDetails userDetails) {
-//
-//        String username = userDetails.getUsername();
-//        List<String> roles = userDetails.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.toList());
-//
-//        UserEntity userEntity = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-//
-//        UserProfileDTO userProfileDTO = new UserProfileDTO(
-//                username,
-//                userEntity.getFirstName(),
-//                userEntity.getLastName(),
-//                userEntity.getEmail(),
-//                roles
-//        );
-//
-//        return ResponseEntity.ok(userProfileDTO);
-//    }
 
     private ResponseUserDTO convertToDto(Account account) {
         Set<RoleEntity> roles = account.getUser().getRoles();
