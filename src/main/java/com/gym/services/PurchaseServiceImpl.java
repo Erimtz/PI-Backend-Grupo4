@@ -17,6 +17,7 @@ import com.gym.repositories.PurchaseRepository;
 import com.gym.services.ale.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,18 +30,33 @@ import org.slf4j.LoggerFactory;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class PurchaseServiceImpl implements PurchaseService{
 
     private final PurchaseRepository purchaseRepository;
     private final ProductRepository productRepository;
     private final ProductService productService;
     private final AccountService accountService;
-    private final AccountRepository accountRepository;
     private final StoreSubscriptionService storeSubscriptionService;
     private final CouponService couponService;
+    private final CouponGenerationService couponGenerationService;
     private static final Logger logger = LoggerFactory.getLogger(CouponServiceImpl.class);
 
+    public PurchaseServiceImpl(PurchaseRepository purchaseRepository,
+                               ProductRepository productRepository,
+                               ProductService productService,
+                               AccountService accountService,
+                               StoreSubscriptionService storeSubscriptionService,
+                               CouponService couponService,
+                               @Lazy CouponGenerationService couponGenerationService) {
+        this.purchaseRepository = purchaseRepository;
+        this.productRepository = productRepository;
+        this.productService = productService;
+        this.accountService = accountService;
+        this.storeSubscriptionService = storeSubscriptionService;
+        this.couponService = couponService;
+        this.couponGenerationService = couponGenerationService;
+    }
 
     public PurchaseResponseDTO createPurchase(PurchaseRequestDTO requestDTO, String token) {
         // Obtener la cuenta del usuario a partir del token
@@ -127,13 +143,15 @@ public class PurchaseServiceImpl implements PurchaseService{
 
         if (totalAfterDiscountsBigDecimal.compareTo(creditBalance) <= 0) {
             accountService.sustractFromCreditBalance(getAccountFromToken(token), totalAfterDiscountsBigDecimal);
+
             purchase = purchaseRepository.save(purchase);
+            couponGenerationService.createCouponByPurchase(getAccountFromToken(token), BigDecimal.valueOf(total));
         } else {
             throw new InsufficientCreditException("El saldo de crédito de la cuenta es insuficiente para realizar la compra");
         }
     }
 
-    private Double calculateTotal(Purchase purchase) {
+    public Double calculateTotal(Purchase purchase) {
         Double total = 0.0;
 
         if (purchase.getPurchaseDetails() != null) {
