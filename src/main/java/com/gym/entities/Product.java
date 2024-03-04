@@ -1,9 +1,13 @@
 package com.gym.entities;
 
+import com.gym.dto.ImageDTO;
 import com.gym.dto.ProductDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Data
@@ -39,8 +43,9 @@ public class Product {
     @JoinColumn(name = "category_id",nullable = false)
     private Category category;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
     @Column(name = "images")
-    private String images;
+    private Set<Image> images;
 
     public Product(Long productId) {
     }
@@ -54,7 +59,10 @@ public class Product {
         productDto.setPrice(price);
         productDto.setPurchase(purchase);
         productDto.setCategory(category);
-        productDto.setImages(images);
+        Set<ImageDTO> imageSet = images.stream()
+                .map(Image::toDto)
+                .collect(Collectors.toSet());
+        productDto.setImages(imageSet);
 
         return productDto;
     }

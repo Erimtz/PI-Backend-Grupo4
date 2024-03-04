@@ -3,7 +3,8 @@ package com.gym.controllers;
 import com.gym.dto.ProductDTO;
 import com.gym.exceptions.BadRequestException;
 import com.gym.exceptions.ResourceNotFoundException;
-import com.gym.services.CategoryService;
+import com.gym.repositories.ImageRepository;
+import com.gym.repositories.ProductRepository;
 import com.gym.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
@@ -18,13 +19,17 @@ import java.util.List;
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
 public class ProductController {
 
-    private ProductService productService;
+    private static final String UPLOAD_DIR = "src/main/resources/static/images/";
+    private ProductRepository productRepository;
 
-    private CategoryService categoryService;
+    private ImageRepository imageRepository;
 
-    public ProductController(ProductService productService, CategoryService categoryService) {
+    private final ProductService productService;
+
+    public ProductController(ProductRepository productRepository, ImageRepository imageRepository, ProductService productService) {
+        this.productRepository = productRepository;
+        this.imageRepository = imageRepository;
         this.productService = productService;
-        this.categoryService = categoryService;
     }
 
     @Operation(summary = "Traer todos los productos")
@@ -35,13 +40,13 @@ public class ProductController {
         System.out.println(auth.getAuthorities());
         System.out.println(auth.isAuthenticated());
 
-        return ResponseEntity.ok(productService.getAllProduct());
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
     @Operation(summary = "Traer el producto por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProduct(@PathVariable Long id) throws ResourceNotFoundException {
-        ProductDTO productDTO = productService.getProduct(id);
+    public ResponseEntity<ProductDTO> getProductById (@PathVariable Long id) throws ResourceNotFoundException {
+        ProductDTO productDTO = productService.getProductById(id);
         if (productDTO!=null){
             return new ResponseEntity<>(productDTO, HttpStatus.OK);
         }
@@ -50,7 +55,7 @@ public class ProductController {
 
     @Operation(summary = "Traer el producto de categoria")
     @GetMapping("/category={category_id}")
-    public ResponseEntity<List<ProductDTO>> getProductByCategory(@PathVariable(name = "category_id") Long category_id) throws ResourceNotFoundException{
+    public ResponseEntity<ProductDTO> getProductByCategory(@PathVariable(name = "category_id") Long category_id) throws ResourceNotFoundException{
         return new ResponseEntity<>(productService.getProductsByCategory(category_id),HttpStatus.OK);
     }
 
@@ -86,12 +91,12 @@ public class ProductController {
 
     @Operation(summary = "Agregar un producto")
     @PostMapping
-    public ResponseEntity<ProductDTO> saveProduct(@RequestBody ProductDTO productDto) throws BadRequestException, ResourceNotFoundException {
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDto) throws BadRequestException, ResourceNotFoundException {
         if (productDto.getPrice() == null) {
             throw new BadRequestException("El precio del producto es requerido.");
         }
 
-        ProductDTO savedProductDto = productService.saveProduct(productDto);
+        ProductDTO savedProductDto = productService.createProduct(productDto);
 
         return new ResponseEntity<>(savedProductDto, HttpStatus.CREATED);
     }
@@ -104,7 +109,8 @@ public class ProductController {
 
     @Operation(summary = "Eliminar un producto por ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id) throws ResourceNotFoundException {
-        return new ResponseEntity<>(productService.deleteProduct(id), HttpStatus.OK);
+    public ResponseEntity<?> deleteProductById(@PathVariable Long id) throws ResourceNotFoundException {
+        productService.deleteProductById(id);
+        return new ResponseEntity<>("Producto eliminado correctamente", HttpStatus.OK);
     }
 }

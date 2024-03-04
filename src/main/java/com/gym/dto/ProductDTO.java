@@ -1,11 +1,15 @@
 package com.gym.dto;
 
 import com.gym.entities.Category;
+import com.gym.entities.Image;
 import com.gym.entities.Product;
 import com.gym.entities.Purchase;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -26,7 +30,7 @@ public class ProductDTO {
 
     private Category category;
 
-    private String images;
+    private Set<ImageDTO> images;
 
     public Product toEntity() {
         Product product = new Product();
@@ -37,11 +41,12 @@ public class ProductDTO {
         product.setPrice(price);
         product.setPurchase(purchase);
         product.setCategory(category);
-        product.setImages(images);
+        Set<Image> imageSet = images.stream()
+                .map(ImageDTO::toEntity)
+                .collect(Collectors.toSet());
+        product.setImages(imageSet);
 
         return product;
     }
-
-
 }
 
