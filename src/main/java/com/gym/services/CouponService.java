@@ -21,6 +21,7 @@ public interface CouponService {
     List<ResponseCouponDTO> getBySpentFalse();
     List<ResponseCouponDTO> getExpiredCoupons();
     List<ResponseCouponDTO> getCurrentCoupons();
+    void markCouponAsSpent(Long couponId);
     boolean isCouponSpent(Long couponId);
     boolean isCouponExpired(Long couponId);
     public Coupon convertResponseToEntity(ResponseCouponDTO responseCouponDTO);

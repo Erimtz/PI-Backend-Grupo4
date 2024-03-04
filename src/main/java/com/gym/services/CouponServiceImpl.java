@@ -158,6 +158,14 @@ public class CouponServiceImpl implements CouponService{
     }
 
     @Override
+    public void markCouponAsSpent(Long couponId) {
+        Coupon coupon = couponRepository.findById(couponId)
+                .orElseThrow(() -> new ResourceNotFoundException("Coupon with ID " + couponId + " not found"));
+        coupon.setSpent(true);
+        couponRepository.save(coupon);
+    }
+
+    @Override
     public boolean isCouponSpent(Long couponId) {
         return couponRepository.isCouponSpent(couponId);
     }

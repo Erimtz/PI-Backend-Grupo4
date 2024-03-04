@@ -221,6 +221,7 @@ public class PurchaseServiceImpl implements PurchaseService{
                         coupon.setSpent(responseCouponDTO.getSpent());
 
                         appliedCoupons.add(coupon);
+                        couponService.markCouponAsSpent(couponId);
                     } else {
                         logger.error("No se encontró ningún cupón con ID: {}", couponId);
                         throw new IllegalArgumentException("Coupon not found with ID: " + couponId);
