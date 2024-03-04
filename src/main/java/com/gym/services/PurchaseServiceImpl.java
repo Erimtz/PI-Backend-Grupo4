@@ -10,6 +10,7 @@ import com.gym.dto.response.CouponResponseDTO;
 import com.gym.dto.response.PurchaseDetailResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.entities.*;
+import com.gym.exceptions.CouponDiscountExceededException;
 import com.gym.exceptions.InsufficientCreditException;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.ProductRepository;
@@ -84,11 +85,6 @@ public class PurchaseServiceImpl implements PurchaseService{
         }
     }
 
-//    private Double calculateTotalAfterDiscounts(Double total, List<Coupon> couponsApplied, StoreSubscription storeSubscription) {
-//        Double totalAfterCoupons = total - couponsApplied.stream().mapToDouble(Coupon::getAmount).sum();
-//        return totalAfterCoupons - storeSubscription.getPrice();
-//    }
-
     private Account getAccountFromToken(String token) {
         Account account = accountService.getAccountFromToken(token);
         if (account == null) {
@@ -140,6 +136,10 @@ public class PurchaseServiceImpl implements PurchaseService{
 
         BigDecimal creditBalance = accountService.getAccountCreditBalance(getAccountFromToken(token));
         BigDecimal totalAfterDiscountsBigDecimal = BigDecimal.valueOf(totalAfterDiscounts);
+
+        if (discount * 2 > total) {
+            throw new CouponDiscountExceededException("La suma de los descuentos de los cupones no puede superar el 50% del total de la compra");
+        }
 
         if (totalAfterDiscountsBigDecimal.compareTo(creditBalance) <= 0) {
             accountService.sustractFromCreditBalance(getAccountFromToken(token), totalAfterDiscountsBigDecimal);

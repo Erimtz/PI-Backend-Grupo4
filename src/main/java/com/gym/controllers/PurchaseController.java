@@ -2,6 +2,7 @@ package com.gym.controllers;
 
 import com.gym.dto.request.PurchaseRequestDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
+import com.gym.exceptions.CouponDiscountExceededException;
 import com.gym.exceptions.InsufficientCreditException;
 import com.gym.exceptions.NotEnoughStockException;
 import com.gym.services.PurchaseService;
@@ -33,6 +34,8 @@ public class PurchaseController {
             return new ResponseEntity<>("Insufficient credit balance", HttpStatus.BAD_REQUEST);
         } catch (IllegalStateException ex) {
             return new ResponseEntity<>("Coupon has already been spent", HttpStatus.BAD_REQUEST);
+        } catch (CouponDiscountExceededException ex) {
+            return new ResponseEntity<>("Total coupon discount exceeds the maximum allowed", HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
