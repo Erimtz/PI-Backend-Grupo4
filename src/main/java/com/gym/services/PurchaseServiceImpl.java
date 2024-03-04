@@ -212,7 +212,9 @@ public class PurchaseServiceImpl implements PurchaseService{
                 try {
                     ResponseCouponDTO responseCouponDTO = couponService.getCouponById(couponId);
                     if (responseCouponDTO != null) {
-
+                        if (responseCouponDTO.getSpent()) {
+                            throw new IllegalStateException("El cupón con ID " + couponId + " ya ha sido gastado.");
+                        }
                         Coupon coupon = new Coupon();
                         coupon.setId(responseCouponDTO.getId());
                         coupon.setIssueDate(responseCouponDTO.getIssueDate());

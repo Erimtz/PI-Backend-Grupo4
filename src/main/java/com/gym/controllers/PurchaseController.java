@@ -31,6 +31,8 @@ public class PurchaseController {
             return new ResponseEntity<>("Not enough stock available", HttpStatus.BAD_REQUEST);
         } catch (InsufficientCreditException ex) {
             return new ResponseEntity<>("Insufficient credit balance", HttpStatus.BAD_REQUEST);
+        } catch (IllegalStateException ex) {
+            return new ResponseEntity<>("Coupon has already been spent", HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
