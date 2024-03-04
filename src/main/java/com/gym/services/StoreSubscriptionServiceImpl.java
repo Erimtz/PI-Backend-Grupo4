@@ -46,6 +46,7 @@ public class StoreSubscriptionServiceImpl implements StoreSubscriptionService {
                     .description(createStoreSubscriptionDTO.getDescription())
                     .imageUrl(createStoreSubscriptionDTO.getImageUrl())
                     .planType(createStoreSubscriptionDTO.getPlanType())
+                    .durationDays(createStoreSubscriptionDTO.getDurationDays())
                     .purchases(new ArrayList<>())
                     .build();
             storeSubscriptionRepository.save(storeSubscription);
@@ -76,6 +77,9 @@ public class StoreSubscriptionServiceImpl implements StoreSubscriptionService {
             if (updateStoreSubscriptionDTO.getPlanType() != null && !updateStoreSubscriptionDTO.getPlanType().isEmpty()) {
                 storeSubscription.setPlanType(updateStoreSubscriptionDTO.getPlanType());
             }
+            if (updateStoreSubscriptionDTO.getDurationDays() != null) {
+                storeSubscription.setDurationDays(updateStoreSubscriptionDTO.getDurationDays());
+            }
             storeSubscriptionRepository.save(storeSubscription);
             return convertToDto(storeSubscription);
         } else {
@@ -99,7 +103,9 @@ public class StoreSubscriptionServiceImpl implements StoreSubscriptionService {
                 storeSubscription.getDescription(),
                 storeSubscription.getImageUrl(),
                 storeSubscription.getPlanType(),
+                storeSubscription.getDurationDays(),
                 storeSubscription.getPurchases()
+
         );
     }
     @Override
@@ -111,6 +117,7 @@ public class StoreSubscriptionServiceImpl implements StoreSubscriptionService {
         storeSubscription.setDescription(responseStoreSubscription.getDescription());
         storeSubscription.setImageUrl(responseStoreSubscription.getImageUrl());
         storeSubscription.setPlanType(responseStoreSubscription.getPlanType());
+        storeSubscription.setDurationDays(responseStoreSubscription.getDurationDays());
         return storeSubscription;
     }
 }

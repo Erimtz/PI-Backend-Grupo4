@@ -18,5 +18,6 @@ public class ResponseStoreSubscription {
     private String description;
     private String imageUrl;
     private String planType;
+    private Integer durationDays;
     private List<Purchase> purchases;
 }

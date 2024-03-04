@@ -2,12 +2,15 @@ package com.gym.services;
 
 import com.gym.dto.SubscriptionDTO;
 import com.gym.entities.Account;
+import com.gym.entities.StoreSubscription;
 import com.gym.entities.Subscription;
+import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.SubscriptionRepository;
 import jakarta.transaction.Transactional;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -21,6 +24,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+    @Autowired
+    @Lazy
+    private AccountService accountService;
 
     public List<Subscription> getAllSubscriptions(){
         return subscriptionRepository.findAll();
@@ -53,8 +59,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .name("No subscription")
                 .price(0.00)
                 .imageUrl("Direccion imagen sin suscripción")
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now())
+                .startDate(LocalDate.now().minusDays(1))
+                .endDate(LocalDate.now().minusDays(1))
                 .planType("None")
                 .automaticRenewal(false)
                 .account(account)
@@ -96,6 +102,27 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         } else {
             throw new NoSuchElementException("Subscription with ID " + subscriptionDTO.getId() + " not found");
         }
+    }
+
+    @Override
+    @Transactional
+    public Subscription updateSubscriptionPurchase(StoreSubscription storeSubscription, String token) {
+        Account account = accountService.getAccountFromToken(token);
+        if (account == null) {
+            throw new IllegalArgumentException("No se pudo obtener la cuenta del usuario");
+        }
+        Subscription subscription = subscriptionRepository.findByAccountId(account.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("No se pudo obtener la suscripcion con ID: " + account.getId()));
+
+            subscription.setName(storeSubscription.getName());
+            subscription.setPrice(storeSubscription.getPrice());
+            subscription.setImageUrl(storeSubscription.getImageUrl());
+            subscription.setStartDate(LocalDate.now());
+            subscription.setEndDate(LocalDate.now().plusDays(storeSubscription.getDurationDays()));
+            subscription.setPlanType(storeSubscription.getPlanType());
+            subscription.setAutomaticRenewal(subscription.getAutomaticRenewal());
+
+            return subscriptionRepository.save(subscription);
     }
 
     @Override

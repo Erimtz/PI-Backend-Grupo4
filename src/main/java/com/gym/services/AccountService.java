@@ -14,6 +14,7 @@ import com.gym.repositories.RankRepository;
 import com.gym.security.configuration.jwt.JwtUtils;
 import com.gym.security.entities.UserEntity;
 import com.gym.security.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -127,6 +128,14 @@ public class AccountService {
         } else {
             throw new IllegalArgumentException("Account not found for user with ID: " + userId);
         }
+    }
+
+    @Transactional
+    public void updateSubscription(Account account) {
+        if (account == null) {
+            throw new IllegalArgumentException("La cuenta no puede ser nula");
+        }
+        accountRepository.save(account);
     }
 
     public Account getAccountFromToken(String token) {

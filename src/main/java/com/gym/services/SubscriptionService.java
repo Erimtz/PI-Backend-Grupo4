@@ -2,6 +2,7 @@ package com.gym.services;
 
 import com.gym.dto.SubscriptionDTO;
 import com.gym.entities.Account;
+import com.gym.entities.StoreSubscription;
 import com.gym.entities.Subscription;
 
 import java.util.List;
@@ -16,5 +17,6 @@ public interface SubscriptionService {
     Optional<Subscription> getSubscriptionByAccountId(Long id);
     Subscription createSubscription(Account account);
     Subscription updateSubscription(SubscriptionDTO subscriptionDTO);
+    Subscription updateSubscriptionPurchase(StoreSubscription storeSubscription, String token);
     void deleteSubscriptionById(Long id);
 }

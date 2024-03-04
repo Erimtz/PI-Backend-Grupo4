@@ -23,8 +23,12 @@ public class StoreSubscription {
     private String name;
     private Double price;
     private String description;
+    @Column(name = "image_url")
     private String imageUrl;
+    @Column(name = "plan_type")
     private String planType;
+    @Column(name = "duration_days")
+    private Integer durationDays;
 
     @OneToMany(mappedBy = "storeSubscription", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = Purchase.class)
     @JsonIgnore

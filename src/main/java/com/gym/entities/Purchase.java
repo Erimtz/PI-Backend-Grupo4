@@ -55,8 +55,8 @@ public class Purchase {
 
     // ESTO ES UNA BURRADA PROVISORIA PARA QUE NO DE ERROR //////////////////
     /////////////////////////////////////////////////////////////////////////
-    public BigDecimal calculateTotalAmount(){
-        return new BigDecimal(1);
-    }
+//    public BigDecimal calculateTotalAmount(){
+//        return new BigDecimal(1);
+//    }
     /////////////////////////////////////////////////////////////////////////
 }

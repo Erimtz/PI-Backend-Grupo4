@@ -1,5 +1,6 @@
 package com.gym.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,6 +32,7 @@ public class Subscription {
 
     @OneToOne
     @JoinColumn(name = "account_id")
+    @JsonIgnore
     private Account account;
 
 //    @ManyToOne(targetEntity = Purchase.class)

@@ -12,6 +12,7 @@ import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.entities.*;
 import com.gym.exceptions.CouponDiscountExceededException;
 import com.gym.exceptions.InsufficientCreditException;
+import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseRepository;
@@ -25,6 +26,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,7 @@ public class PurchaseServiceImpl implements PurchaseService{
     private final StoreSubscriptionService storeSubscriptionService;
     private final CouponService couponService;
     private final CouponGenerationService couponGenerationService;
+    private final SubscriptionService subscriptionService;
     private static final Logger logger = LoggerFactory.getLogger(CouponServiceImpl.class);
 
     public PurchaseServiceImpl(PurchaseRepository purchaseRepository,
@@ -49,7 +52,8 @@ public class PurchaseServiceImpl implements PurchaseService{
                                AccountService accountService,
                                StoreSubscriptionService storeSubscriptionService,
                                CouponService couponService,
-                               @Lazy CouponGenerationService couponGenerationService) {
+                               @Lazy CouponGenerationService couponGenerationService,
+                               SubscriptionService subscriptionService) {
         this.purchaseRepository = purchaseRepository;
         this.productRepository = productRepository;
         this.productService = productService;
@@ -57,6 +61,7 @@ public class PurchaseServiceImpl implements PurchaseService{
         this.storeSubscriptionService = storeSubscriptionService;
         this.couponService = couponService;
         this.couponGenerationService = couponGenerationService;
+        this.subscriptionService = subscriptionService;
     }
 
     public PurchaseResponseDTO createPurchase(PurchaseRequestDTO requestDTO, String token) {
@@ -80,7 +85,6 @@ public class PurchaseServiceImpl implements PurchaseService{
         if (purchaseDetail.getProduct() != null && purchaseDetail.getProduct().getPrice() != null) {
             return purchaseDetail.getProduct().getPrice().doubleValue() * purchaseDetail.getQuantity();
         } else {
-            // Manejo del caso en que el precio del producto es null
             throw new IllegalArgumentException("Price of the product is null");
         }
     }
@@ -128,6 +132,11 @@ public class PurchaseServiceImpl implements PurchaseService{
         return purchase;
     }
 
+    private boolean isSubscriptionExpired(Subscription subscription) {
+        LocalDate currentDate = LocalDate.now();
+        return subscription.getEndDate().isBefore(currentDate);
+    }
+
     private void calculateAndSavePurchaseTotals(Purchase purchase, String token) {
 
         Double total = calculateTotal(purchase);
@@ -148,6 +157,22 @@ public class PurchaseServiceImpl implements PurchaseService{
             couponGenerationService.createCouponByPurchase(getAccountFromToken(token), BigDecimal.valueOf(total));
         } else {
             throw new InsufficientCreditException("El saldo de crédito de la cuenta es insuficiente para realizar la compra");
+        }
+
+        Account account = purchase.getAccount();
+        Subscription personalSubscription = subscriptionService.getSubscriptionByAccountId(account.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("No se pudo obtener la suscripcion con ID: " + account.getId()));
+        if (personalSubscription != null && isSubscriptionExpired(personalSubscription)) {
+            // Si está vencida, obtener la suscripción de la tienda comprada
+            StoreSubscription storeSubscription = purchase.getStoreSubscription();
+            if (storeSubscription != null) {
+                // Actualizar la suscripción personal del usuario con los detalles de la suscripción de la tienda
+                subscriptionService.updateSubscriptionPurchase(storeSubscription, token);
+                // Guardar la suscripción personal actualizada
+                accountService.updateSubscription(account);
+            } else {
+                logger.warn("User's personal subscription is expired, but no store subscription found for purchase with ID {}", purchase.getId());
+            }
         }
     }
 
@@ -203,6 +228,22 @@ public class PurchaseServiceImpl implements PurchaseService{
         }
         return new PurchaseResponseDTO(detailDTOs, subscriptionPrice, total, couponsResponseDTO, discount, totalAfterDiscounts);
     }
+
+//    private void updateSubscriptionIfExpired(Account account, String token) {
+//        // Obtener la suscripción actual del usuario
+//        Optional<Subscription> subscriptionOptional = subscriptionService.getSubscriptionByAccountId(account.getId());
+//
+//        if (subscriptionOptional.isPresent()) {
+//            Subscription subscription = subscriptionOptional.get();
+//            StoreSubscription storeSubscription = getStoreSubscriptionForPurchase(requestDTO); // Implementa este método según sea necesario
+//
+//            // Verificar si la suscripción actual está vencida
+//            if (subscription.getEndDate().isBefore(LocalDate.now())) {
+//                // Actualizar la suscripción
+//                subscriptionService.updateSubscriptionPurchase(storeSubscription, token);
+//            }
+//        }
+//    }
 
     private void addCouponsToPurchase(PurchaseRequestDTO requestDTO, Purchase purchase) {
         List<Long> couponIds = requestDTO.getCouponsIds();
