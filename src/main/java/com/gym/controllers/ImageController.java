@@ -52,7 +52,7 @@ public class ImageController {
 
     @Operation(summary = "Agregar una imagen")
     @PostMapping("/create")
-    public ResponseEntity<ImageDTO> createImage(@Valid @RequestBody ImageDTO imageDTO) {
+    public ResponseEntity<ImageDTO> createImage(@RequestBody ImageDTO imageDTO) {
         ImageDTO image = imageService.createImage(imageDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(image);
     }
@@ -78,15 +78,15 @@ public class ImageController {
         return "form";
     }
     @PostMapping("/save")
-    public String savePhoto (@RequestParam(name = "file", required = false)MultipartFile foto, Image image,
+    public String savePhoto (@RequestParam(name = "file", required = false)MultipartFile url, Image image,
                              RedirectAttributes flash) {
-        if (!foto.isEmpty()) {
+        if (!url.isEmpty()) {
             String ruta = "C://descargas";
             try {
-                byte[] bytes = foto.getBytes();
-                Path rutaAbsoluta = Paths.get(ruta + "//" + foto.getOriginalFilename());
+                byte[] bytes = url.getBytes();
+                Path rutaAbsoluta = Paths.get(ruta + "//" + url.getOriginalFilename());
                 Files.write(rutaAbsoluta, bytes);
-                image.setFoto(foto.getOriginalFilename());
+                image.setUrl(url.getOriginalFilename());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

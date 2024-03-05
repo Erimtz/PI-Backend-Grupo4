@@ -1,10 +1,13 @@
 package com.gym.services;
 
 import com.gym.dto.ImageDTO;
+import com.gym.dto.ProductDTO;
 import com.gym.entities.Image;
+import com.gym.entities.Product;
 import com.gym.exceptions.DatabaseOperationException;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,13 +15,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class ImageServiceImpl  implements ImageService {
 
-    private ImageRepository imageRepository;
+    private final ImageRepository imageRepository;
 
-    public ImageServiceImpl(ImageRepository imageRepository) {
-        this.imageRepository = imageRepository;
-    }
+    private final ProductService productService;
 
     @Override
     public List<ImageDTO> getAllImages() {
@@ -37,12 +39,17 @@ public class ImageServiceImpl  implements ImageService {
     @Override
     public ImageDTO createImage(ImageDTO imageDTO) {
         try {
+            ProductDTO productDTO = productService.getProductById(imageDTO.getProduct().getId());
+            Product product = productDTO.toEntity();
+
             Image image = Image.builder()
                     .title(imageDTO.getTitle())
-                    .foto(imageDTO.getFoto())
-                    .product(imageDTO.getProduct())
+                    .url(imageDTO.getUrl())
+                    .product(product)
                     .build();
-            imageRepository.save(image);
+
+            Image save = imageRepository.save(image);
+            image.setId(save.getId());
             return image.toDto();
         } catch (Exception e) {
             throw new DatabaseOperationException("Error occurred while saving image", e);
@@ -61,8 +68,8 @@ public class ImageServiceImpl  implements ImageService {
                 image.setTitle(imageDTO.getTitle());
             }
 
-            if (imageDTO.getFoto() != null) {
-                image.setFoto(imageDTO.getFoto());
+            if (imageDTO.getUrl() != null) {
+                image.setUrl(imageDTO.getUrl());
             }
 
             if (imageDTO.getProduct() != null) {

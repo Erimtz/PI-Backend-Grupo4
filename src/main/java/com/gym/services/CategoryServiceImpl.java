@@ -37,7 +37,8 @@ public class CategoryServiceImpl implements CategoryService {
                     .imageUrl(categoryDTO.getImageUrl())
                     .description(categoryDTO.getDescription())
                     .build();
-            categoryRepository.save(category);
+            Category saved = categoryRepository.save(category);
+            categoryDTO.setId(saved.getId());
             return categoryDTO;
         } catch (Exception e) {
             throw new DatabaseOperationException("Error occurred while saving category", e);

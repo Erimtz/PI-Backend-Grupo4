@@ -1,6 +1,6 @@
 package com.gym;
 
-import com.gym.entities.ERank;
+import                                           com.gym.entities.ERank;
 import com.gym.entities.Rank;
 import com.gym.repositories.RankRepository;
 import com.gym.security.enums.ERole;

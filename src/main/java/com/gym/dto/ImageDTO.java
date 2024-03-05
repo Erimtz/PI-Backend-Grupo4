@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 public class ImageDTO {
     private Long id;
     private String title;
-    private String foto;
+    private String url;
     private Product product;
 
     public Image toEntity() {
         Image image = new Image();
         image.setId(id);
         image.setTitle(title);
-        image.setFoto(foto);
+        image.setUrl(url);
         image.setProduct(product);
 
         return image;

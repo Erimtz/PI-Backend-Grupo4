@@ -23,7 +23,7 @@ public class Image implements Serializable {
     @Column
     private String title;
     @Column
-    private String foto;
+    private String url;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @NotNull
@@ -35,7 +35,7 @@ public class Image implements Serializable {
         ImageDTO imageDTO = new ImageDTO();
         imageDTO.setId(id);
         imageDTO.setTitle(title);
-        imageDTO.setFoto(foto);
+        imageDTO.setUrl(url);
         imageDTO.setProduct(product);
         return imageDTO;
     }
