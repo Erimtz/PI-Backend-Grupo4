@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +40,7 @@ public class ImageController {
         return ResponseEntity.ok(imageDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Agregar una imagen")
     @PostMapping("/create")
     public ResponseEntity<ResponseImageDTO> createImage(@Valid @RequestBody RequestImageDTO requestImageDTO) {
@@ -46,6 +48,7 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.CREATED).body(imageDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar una imagen")
     @PutMapping("/update/{id}")
     public ResponseEntity<ResponseImageDTO> updateImage(@PathVariable Long id, @Valid @RequestBody RequestImageDTO requestImageDTO) {
@@ -54,6 +57,7 @@ public class ImageController {
         return ResponseEntity.ok(imageDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar una imagen por ID")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteImageById(@PathVariable Long id) {

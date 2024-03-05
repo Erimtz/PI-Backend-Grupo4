@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +46,7 @@ public class EmailController {
     @Value("${spring.mail.username}")
     private String mailFrom;
 
-//    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/sendMessage")
     public ResponseEntity<?> receiveRequestEmail(@RequestBody EmailDTO emailDTO){
         System.out.println("Mensaje recibido"+ emailDTO);
@@ -94,6 +95,8 @@ public class EmailController {
         dto.setMailTo(user.getEmail());
         dto.setSubject("cambio de contraseña");
         dto.setUsername(user.getUsername());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
         UUID uuid = UUID.randomUUID();
         String tokenPassword = uuid.toString();
         dto.setTokenPassword(tokenPassword);

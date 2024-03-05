@@ -13,5 +13,7 @@ public class EmailValuesDTO {
     private String mailTo;
     private String subject;
     private String username;
+    private String firstName;
+    private String lastName;
     private String tokenPassword;
 }

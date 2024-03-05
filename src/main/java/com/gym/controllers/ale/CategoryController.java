@@ -9,6 +9,7 @@ import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +63,7 @@ public class CategoryController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Agregar una categoria")
     @PostMapping("/create")
     public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryDTO categoryRequest) {
@@ -79,6 +81,7 @@ public class CategoryController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar una categoria")
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDTO categoryRequest) {
@@ -97,6 +100,7 @@ public class CategoryController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar una categoria por ID")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteCategoryById(@PathVariable Long id) {

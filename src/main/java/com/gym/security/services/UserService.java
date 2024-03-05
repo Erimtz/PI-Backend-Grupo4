@@ -4,6 +4,7 @@ import com.gym.dto.Message;
 import com.gym.entities.*;
 import com.gym.enums.ERank;
 import com.gym.exceptions.*;
+import com.gym.mail.services.IEmailService;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.RankRepository;
 import com.gym.repositories.SubscriptionRepository;
@@ -31,7 +32,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
-
 public class UserService {
 
     private final UserRepository userRepository;
@@ -42,10 +42,11 @@ public class UserService {
     private final AccountService accountService;
     private final RankRepository rankRepository;
     private final SubscriptionRepository subscriptionRepository;
+    private final IEmailService emailService;
 
     @Autowired
     public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AccountRepository accountRepository,
-                       AccountService accountService, RankRepository rankRepository, SubscriptionRepository subscriptionRepository) {
+                       AccountService accountService, RankRepository rankRepository, SubscriptionRepository subscriptionRepository, IEmailService emailService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -54,6 +55,7 @@ public class UserService {
         this.rankRepository = rankRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.jwtUtils = jwtUtils;
+        this.emailService = emailService;
     }
 
     public UserProfileDTO getUserProfile(String username, String token) {
@@ -163,6 +165,8 @@ public class UserService {
         Account savedAccount = accountService.createAccount(userEntity);
 
         ResponseUserDTO responseUserDTO = convertToDto(savedAccount);
+
+        emailService.sendEmailNewUser(responseUserDTO);
 
         return responseUserDTO;
     }

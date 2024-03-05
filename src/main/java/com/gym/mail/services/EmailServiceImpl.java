@@ -2,6 +2,7 @@ package com.gym.mail.services;
 
 
 import com.gym.mail.domain.EmailValuesDTO;
+import com.gym.security.controllers.response.ResponseUserDTO;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,8 @@ public class EmailServiceImpl implements IEmailService{
             Context context = new Context();
             Map<String, Object> model = new HashMap<>();
             model.put("username", dto.getUsername());
+            model.put("firstName", dto.getFirstName());
+            model.put("lastName", dto.getLastName());
             model.put("url", urlFront + dto.getTokenPassword());
             context.setVariables(model);
             String htmlText = templateEngine.process("email-template", context);
@@ -85,4 +88,26 @@ public class EmailServiceImpl implements IEmailService{
         }
     }
 
+    @Override
+    public void sendEmailNewUser(ResponseUserDTO dto) {
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            Context context = new Context();
+            Map<String, Object> model = new HashMap<>();
+//            model.put("username", dto.getUsername());
+            model.put("firstName", dto.getFirstName());
+            model.put("lastName", dto.getLastName());
+//            model.put("url", urlFront + dto.getTokenPassword());
+            context.setVariables(model);
+            String htmlText = templateEngine.process("email-new-user", context);
+            helper.setFrom(emailAccount);
+            helper.setTo(dto.getEmail());
+            helper.setSubject("¡Bienvenido a Lightweight! Tu cuenta está lista para empezar");
+            helper.setText(htmlText, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
 }

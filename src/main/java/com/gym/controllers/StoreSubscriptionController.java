@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,12 +39,14 @@ public class StoreSubscriptionController {
         return ResponseEntity.ok(subscription);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<ResponseStoreSubscription> createStoreSubscription(@Valid @RequestBody CreateStoreSubscriptionDTO createStoreSubscriptionDTO) {
         ResponseStoreSubscription subscription = storeSubscriptionService.createStoreSubscription(createStoreSubscriptionDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(subscription);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<ResponseStoreSubscription> updateStoreSubscription(@PathVariable Long id, @Valid @RequestBody UpdateStoreSubscriptionDTO updateStoreSubscriptionDTO) {
         updateStoreSubscriptionDTO.setId(id);
@@ -51,6 +54,7 @@ public class StoreSubscriptionController {
         return ResponseEntity.ok(subscription);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteStoreSubscriptionById(@PathVariable Long id) {
         storeSubscriptionService.deleteStoreSubscriptionById(id);
