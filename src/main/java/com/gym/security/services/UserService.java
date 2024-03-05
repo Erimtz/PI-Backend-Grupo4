@@ -153,6 +153,7 @@ public class UserService {
                     .build();
             return rankRepository.save(newAccountRank);
         });
+        String document = createUserDTO.getDocument();
         Account account = Account.builder()
                 .user(userEntity)
                 .transferList(new ArrayList<>())
@@ -162,7 +163,7 @@ public class UserService {
                 .rank(rankAccount)
                 .document(createUserDTO.getDocument())
                 .build();
-        Account savedAccount = accountService.createAccount(userEntity);
+        Account savedAccount = accountService.createAccount(userEntity, document);
 
         ResponseUserDTO responseUserDTO = convertToDto(savedAccount);
 

@@ -38,7 +38,7 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public Account createAccount(UserEntity user) {
+    public Account createAccount(UserEntity user, String document) {
         Optional<Rank> accountRankOptional = rankRepository.findByName(ERank.BRONZE);
 
         Rank rankAccount = accountRankOptional.orElseGet(() -> {
@@ -49,6 +49,7 @@ public class AccountService {
         });
         Account account = Account.builder()
                 .user(user)
+                .document(document)
                 .transferList(new ArrayList<>())
                 .couponList(new ArrayList<>())
                 .purchaseList(new ArrayList<>())
