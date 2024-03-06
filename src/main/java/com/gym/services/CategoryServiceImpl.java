@@ -1,10 +1,11 @@
-package com.gym.services.ale;
+package com.gym.services;
 
 import com.gym.dto.CategoryDTO;
 import com.gym.entities.Category;
 import com.gym.exceptions.DatabaseOperationException;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.CategoryRepository;
+import com.gym.services.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryServiceImpl implements CategoryService{
+public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
@@ -73,14 +74,16 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public void deleteCategoryById(Long id) {
+    public String deleteCategoryById(Long id) {
         if (!categoryRepository.existsById(id)) {
             throw new ResourceNotFoundException("Category with ID " + id + " not found");
         }
         categoryRepository.deleteById(id);
+        return "Category with id " + id + " deleted succesfully.";
     }
 
-    private CategoryDTO convertToDto(Category category) {
+    @Override
+    public CategoryDTO convertToDto(Category category) {
         return new CategoryDTO(
                 category.getId(),
                 category.getName(),

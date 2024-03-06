@@ -20,4 +20,11 @@ public class RequestImageDTO {
     private String url;
     @NotNull
     private Product product;
+
+    public void setProductId(Long productId) {
+        if (this.product == null) {
+            this.product = new Product();
+        }
+        this.product.setId(productId);
+    }
 }

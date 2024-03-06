@@ -1,7 +1,9 @@
 package com.gym.controllers.ale;
 
+import com.gym.dto.ProductDTO;
 import com.gym.dto.RequestProductDTO;
 import com.gym.dto.ResponseProductDTO;
+import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
 import com.gym.services.ale.ProductService;
@@ -27,12 +29,21 @@ public class ProductController {
     private ProductRepository productoRepository;
     @Autowired
     private ImageRepository imagenRepository;
-//    private CategoryService categoryService;
     private final ProductService productService;
 
     @Autowired
     public ProductController(ProductService productService) {
         this.productService = productService;
+    }
+
+    @Operation(summary = "Traer el producto por ID")
+    @GetMapping("/{id}")
+    public ResponseEntity<ResponseProductDTO> getProductById (@PathVariable Long id) throws ResourceNotFoundException {
+        ResponseProductDTO responseProductDTO = productService.getProductById(id);
+        if (responseProductDTO!=null){
+            return new ResponseEntity<>(responseProductDTO, HttpStatus.OK);
+        }
+        throw new ResourceNotFoundException("The product with id " + id + " has not been found.");
     }
 
     @PreAuthorize("hasRole('ADMIN')")

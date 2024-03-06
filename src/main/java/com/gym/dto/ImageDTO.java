@@ -14,16 +14,6 @@ public class ImageDTO {
     private String url;
     private Long productId; // Id del producto al que pertenece esta imagen
 
-    // Constructor para crear un DTO a partir de una entidad Image
-//    public ImageDTO(Image image) {
-//        this.id = image.getId();
-//        this.title = image.getTitle();
-//        this.url = image.getUrl();
-//        if (image.getProduct() != null) {
-//            this.productId = image.getProduct().getId();
-//        }
-//    }
-
 //    // Método para convertir un DTO a una entidad Image
 //    public Image toEntity() {
 //        Image image = new Image();

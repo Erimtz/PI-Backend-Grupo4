@@ -40,14 +40,14 @@ public class ProductServiceImpl implements ProductService{
     public ResponseProductDTO getProductById(Long id) {
         return productRepository.findById(id)
                 .map(this::convertToDto)
-                .orElseThrow(() -> new ResourceNotFoundException("Category with ID " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
     }
 
     @Override
     public ResponseProductDTO createProduct(RequestProductDTO requestProductDTO) {
         Optional<Category> categoryOptional = categoryRepository.findById(requestProductDTO.getCategoryId());
         if (categoryOptional.isEmpty()) {
-            throw new ResourceNotFoundException("Category with ID " + requestProductDTO.getCategoryId() + " not found");
+            throw new ResourceNotFoundException("Product with ID " + requestProductDTO.getCategoryId() + " not found");
         }
         Category category = categoryOptional.get();
 
@@ -101,10 +101,8 @@ public class ProductServiceImpl implements ProductService{
                 product.getDescription(),
                 product.getStock(),
                 product.getPrice(),
-//                product.getPurchase(),
                 product.getCategory().getId(),
                 product.getImages()
         );
     }
-
 }
