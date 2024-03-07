@@ -1,4 +1,4 @@
-package com.gym.services.ale;
+package com.gym.services;
 
 import com.gym.dto.*;
 import com.gym.entities.Category;
@@ -7,8 +7,6 @@ import com.gym.entities.Product;
 import com.gym.exceptions.DatabaseOperationException;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
-import com.gym.services.CategoryService;
-import com.gym.services.ale.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ImageServiceImpl implements ImageService{
+public class ImageServiceImpl implements ImageService {
 
     private final ImageRepository imageRepository;
     private final ProductService productService;

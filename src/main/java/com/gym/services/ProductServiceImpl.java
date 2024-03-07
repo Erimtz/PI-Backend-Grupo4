@@ -1,8 +1,9 @@
-package com.gym.services.ale;
+package com.gym.services;
 
+import com.gym.dto.ImageDTO;
+import com.gym.dto.ProductDTO;
 import com.gym.dto.RequestProductDTO;
 import com.gym.dto.ResponseProductDTO;
-import com.gym.dto.request.UpdateStockPurchaseDTO;
 import com.gym.entities.Category;
 import com.gym.entities.Image;
 import com.gym.entities.Product;
@@ -11,18 +12,16 @@ import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.CategoryRepository;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
+import com.gym.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ProductServiceImpl implements ProductService{
+public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ImageRepository imageRepository;
@@ -67,7 +66,26 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public ResponseProductDTO updateProduct(RequestProductDTO requestProductDTO) {
-        return null;
+        Product productToUpdate = productRepository.findById(requestProductDTO.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("The product with id " + requestProductDTO.getId() + " has not been found to be updated."));
+
+        if (requestProductDTO.getName() != null) {
+            productToUpdate.setName(requestProductDTO.getName());
+        }
+        if (requestProductDTO.getDescription() != null) {
+            productToUpdate.setDescription(requestProductDTO.getDescription());
+        }
+        if (requestProductDTO.getStock() != null) {
+            productToUpdate.setStock(requestProductDTO.getStock());
+        }
+        if (requestProductDTO.getPrice() != null) {
+            productToUpdate.setPrice(requestProductDTO.getPrice());
+        }
+        if (requestProductDTO.getCategoryId() != null) {
+            productToUpdate.setCategory(categoryRepository.findById(requestProductDTO.getCategoryId()).get());
+        }
+        Product savedProduct = productRepository.save(productToUpdate);
+        return convertToDto(savedProduct);
     }
 
     @Override
@@ -92,6 +110,47 @@ public class ProductServiceImpl implements ProductService{
             throw new ResourceNotFoundException("Product with ID " + id + " not found");
         }
         productRepository.deleteById(id);
+    }
+
+    @Override
+    public ProductDTO getProductsByCategory(Long category_id) throws ResourceNotFoundException {
+
+        List<Product> productList = null;
+        List<ProductDTO> productsDTOList;
+
+        Optional<Category> searchedCategory = categoryRepository.findById(category_id);
+        if (searchedCategory.isPresent()){
+            productList =productRepository.getProductsByCategory(category_id);
+        }else {
+            throw new ResourceNotFoundException("The category with id " + category_id + " has not been found.");
+        }
+
+        productsDTOList= productList.stream().map(p -> p.toDto()).collect(Collectors.toList());
+        return (ProductDTO) productsDTOList;
+
+    }
+
+    @Override
+    public List<ProductDTO> getProductsByName(String name) {
+        List<Product> productList = productRepository.findByName(name);
+        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+    }
+    @Override
+    public List<ProductDTO> getProductsByPriceRange(Double minPrice, Double maxPrice) {
+        List<Product> productList = productRepository.findByPriceBetween(minPrice, maxPrice);
+        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+    }
+    @Override
+    public List<ProductDTO> getAllProductSortedByPriceAsc() {
+        List<Product> productList = productRepository.findAll();
+        productList.sort(Comparator.comparing(Product::getPrice));
+        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+    }
+    @Override
+    public List<ProductDTO> getAllProductSortedByPriceDesc() {
+        List<Product> productList = productRepository.findAll();
+        productList.sort(Comparator.comparing(Product::getPrice).reversed());
+        return productList.stream().map(Product::toDto).collect(Collectors.toList());
     }
 
     private ResponseProductDTO convertToDto(Product product) {

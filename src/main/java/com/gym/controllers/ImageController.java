@@ -1,4 +1,4 @@
-package com.gym.controllers.ale;
+package com.gym.controllers;
 
 import com.gym.dao.IImageDAO;
 import com.gym.dto.*;
@@ -6,8 +6,8 @@ import com.gym.entities.Category;
 import com.gym.entities.Image;
 import com.gym.entities.Product;
 import com.gym.services.CategoryService;
-import com.gym.services.ale.ImageService;
-import com.gym.services.ale.ProductService;
+import com.gym.services.ImageService;
+import com.gym.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +115,7 @@ public class ImageController {
         return "list";
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload/{productId}")
     public ResponseEntity<String> uploadImage(@PathVariable Long productId, @RequestParam("file") MultipartFile file) {
         try {

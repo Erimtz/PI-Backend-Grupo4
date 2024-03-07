@@ -1,9 +1,6 @@
 package com.gym.services;
 
-import com.gym.dto.CreateCouponDTO;
-import com.gym.dto.CreateStoreSubscriptionDTO;
 import com.gym.dto.ResponseCouponDTO;
-import com.gym.dto.ResponseStoreSubscription;
 import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
 import com.gym.dto.response.CouponResponseDTO;
@@ -13,12 +10,9 @@ import com.gym.entities.*;
 import com.gym.exceptions.CouponDiscountExceededException;
 import com.gym.exceptions.InsufficientCreditException;
 import com.gym.exceptions.ResourceNotFoundException;
-import com.gym.repositories.AccountRepository;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseRepository;
-import com.gym.services.ale.ProductService;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +20,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

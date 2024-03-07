@@ -10,4 +10,6 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("select p from Product p where p.category.id = ?1")
     List<Product> getProductsByCategory(Long category_id);
+    List<Product> findByName(String name);
+    List<Product> findByPriceBetween(Double minPrice, Double maxPrice);
 }
