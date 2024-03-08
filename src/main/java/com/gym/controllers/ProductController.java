@@ -1,8 +1,9 @@
 package com.gym.controllers;
 
 import com.gym.dto.ProductDTO;
-import com.gym.dto.RequestProductDTO;
-import com.gym.dto.ResponseProductDTO;
+import com.gym.dto.request.ProductRequestDTO;
+import com.gym.dto.response.ProductResponseDTO;
+import com.gym.entities.Product;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
@@ -19,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Validated
 @RestController
@@ -41,7 +43,7 @@ public class ProductController {
 
     @Operation(summary = "Traer todos los productos")
     @GetMapping("/get-all")
-    public ResponseEntity<List<ResponseProductDTO>> getAllProducts(){
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts(){
         var auth =  SecurityContextHolder.getContext().getAuthentication();
         System.out.println(auth.getPrincipal());
         System.out.println(auth.getAuthorities());
@@ -51,13 +53,24 @@ public class ProductController {
     }
 
     @Operation(summary = "Traer el producto por ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseProductDTO> getProductById (@PathVariable Long id) throws ResourceNotFoundException {
-        ResponseProductDTO responseProductDTO = productService.getProductById(id);
-        if (responseProductDTO!=null){
-            return new ResponseEntity<>(responseProductDTO, HttpStatus.OK);
+    @GetMapping("/get/{id}")
+    public ResponseEntity<ProductResponseDTO> getProductById (@PathVariable Long id) throws ResourceNotFoundException {
+        ProductResponseDTO productResponseDTO = productService.getProductById(id);
+        if (productResponseDTO !=null){
+            return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);
         }
         throw new ResourceNotFoundException("The product with id " + id + " has not been found.");
+    }
+
+    @Operation(summary = "Traer el producto por ID con imagenes")
+    @GetMapping("/get-with-images/{id}")
+    public ResponseEntity<ProductResponseDTO> getProductByIdWithImages (@PathVariable Long id) throws ResourceNotFoundException {
+        Optional<ProductResponseDTO> productResponseOptional  = productService.getProductByIdWithImages(id);
+        if (productResponseOptional.isPresent()) {
+            return new ResponseEntity<>(productResponseOptional.get(), HttpStatus.OK);
+        } else {
+            throw new ResourceNotFoundException("The product with id " + id + " has not been found.");
+        }
     }
 
     @Operation(summary = "Traer el producto de categoria")
@@ -99,9 +112,9 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Agregar un producto")
     @PostMapping("/create")
-    public ResponseEntity<?> createProduct(@Valid @RequestBody RequestProductDTO productRequest) {
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequestDTO productRequest) {
         try {
-            ResponseProductDTO productResponse = productService.createProduct(productRequest);
+            ProductResponseDTO productResponse = productService.createProduct(productRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
         } catch (ValidationException e) {
             return ResponseEntity
@@ -116,15 +129,15 @@ public class ProductController {
 
     @Operation(summary = "Actualizar un producto")
     @PutMapping("/update/{productId}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestBody RequestProductDTO requestProductDTO){
+    public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestBody ProductRequestDTO productRequestDTO){
         try {
             if (productId == null) {
                 return ResponseEntity.badRequest().body("Product ID cannot be null");
             }
-            if (!productId.equals(requestProductDTO.getId())) {
+            if (!productId.equals(productRequestDTO.getId())) {
                 return ResponseEntity.badRequest().body("Product ID in path variable does not match ID in request body");
             }
-            ResponseProductDTO updatedProduct = productService.updateProduct(requestProductDTO);
+            ProductResponseDTO updatedProduct = productService.updateProduct(productRequestDTO);
             return ResponseEntity.ok(updatedProduct);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();

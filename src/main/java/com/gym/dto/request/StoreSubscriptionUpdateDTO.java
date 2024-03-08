@@ -1,4 +1,4 @@
-package com.gym.dto;
+package com.gym.dto.request;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateStoreSubscriptionDTO {
+public class StoreSubscriptionUpdateDTO {
 
     @NotNull(message = "ID cannot be null")
     private Long id;

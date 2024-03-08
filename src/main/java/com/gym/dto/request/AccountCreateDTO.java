@@ -1,4 +1,4 @@
-package com.gym.dto;
+package com.gym.dto.request;
 
 import com.gym.entities.Coupon;
 import com.gym.entities.Purchase;
@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateAccountDTO {
+public class AccountCreateDTO {
 //    private String username;
 
     private UserEntity user;

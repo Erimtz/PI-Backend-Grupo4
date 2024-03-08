@@ -1,16 +1,17 @@
-package com.gym.services;
+package com.gym.services.impl;
 
 import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.entities.Product;
 import com.gym.entities.PurchaseDetail;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseDetailRepository;
+import com.gym.services.PurchaseDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PurchaseDetailServiceImpl implements PurchaseDetailService{
+public class PurchaseDetailServiceImpl implements PurchaseDetailService {
 
     private final PurchaseDetailRepository purchaseDetailRepository;
     private final ProductRepository productRepository;

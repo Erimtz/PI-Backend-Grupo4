@@ -1,4 +1,4 @@
-package com.gym.dto;
+package com.gym.dto.response;
 
 import com.gym.entities.Purchase;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseStoreSubscription {
+public class StoreSubscriptionResponseDTO {
 
     private Long id;
     private String name;

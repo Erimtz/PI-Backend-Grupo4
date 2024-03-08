@@ -1,9 +1,9 @@
-package com.gym.services;
+package com.gym.services.impl;
 
-import com.gym.dto.ImageDTO;
 import com.gym.dto.ProductDTO;
-import com.gym.dto.RequestProductDTO;
-import com.gym.dto.ResponseProductDTO;
+import com.gym.dto.request.ProductRequestDTO;
+import com.gym.dto.response.ImageResponseDTO;
+import com.gym.dto.response.ProductResponseDTO;
 import com.gym.entities.Category;
 import com.gym.entities.Image;
 import com.gym.entities.Product;
@@ -28,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<ResponseProductDTO> getAllProducts() {
+    public List<ProductResponseDTO> getAllProducts() {
         return productRepository.findAll()
                 .stream()
                 .map(this::convertToDto)
@@ -36,27 +36,32 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseProductDTO getProductById(Long id) {
+    public ProductResponseDTO getProductById(Long id) {
         return productRepository.findById(id)
                 .map(this::convertToDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
     }
 
+    public Optional<ProductResponseDTO> getProductByIdWithImages(Long id) {
+        return productRepository.findById(id)
+                .map(this::convertToDto);
+    }
+
     @Override
-    public ResponseProductDTO createProduct(RequestProductDTO requestProductDTO) {
-        Optional<Category> categoryOptional = categoryRepository.findById(requestProductDTO.getCategoryId());
+    public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
+        Optional<Category> categoryOptional = categoryRepository.findById(productRequestDTO.getCategoryId());
         if (categoryOptional.isEmpty()) {
-            throw new ResourceNotFoundException("Product with ID " + requestProductDTO.getCategoryId() + " not found");
+            throw new ResourceNotFoundException("Product with ID " + productRequestDTO.getCategoryId() + " not found");
         }
         Category category = categoryOptional.get();
 
         Set<Image> images = new HashSet<>();
 
         Product product = new Product();
-        product.setName(requestProductDTO.getName());
-        product.setPrice(requestProductDTO.getPrice());
-        product.setDescription(requestProductDTO.getDescription());
-        product.setStock(requestProductDTO.getStock());
+        product.setName(productRequestDTO.getName());
+        product.setPrice(productRequestDTO.getPrice());
+        product.setDescription(productRequestDTO.getDescription());
+        product.setStock(productRequestDTO.getStock());
         product.setCategory(category);
         product.setImages(images);
 
@@ -65,24 +70,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseProductDTO updateProduct(RequestProductDTO requestProductDTO) {
-        Product productToUpdate = productRepository.findById(requestProductDTO.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("The product with id " + requestProductDTO.getId() + " has not been found to be updated."));
+    public ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTO) {
+        Product productToUpdate = productRepository.findById(productRequestDTO.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("The product with id " + productRequestDTO.getId() + " has not been found to be updated."));
 
-        if (requestProductDTO.getName() != null) {
-            productToUpdate.setName(requestProductDTO.getName());
+        if (productRequestDTO.getName() != null) {
+            productToUpdate.setName(productRequestDTO.getName());
         }
-        if (requestProductDTO.getDescription() != null) {
-            productToUpdate.setDescription(requestProductDTO.getDescription());
+        if (productRequestDTO.getDescription() != null) {
+            productToUpdate.setDescription(productRequestDTO.getDescription());
         }
-        if (requestProductDTO.getStock() != null) {
-            productToUpdate.setStock(requestProductDTO.getStock());
+        if (productRequestDTO.getStock() != null) {
+            productToUpdate.setStock(productRequestDTO.getStock());
         }
-        if (requestProductDTO.getPrice() != null) {
-            productToUpdate.setPrice(requestProductDTO.getPrice());
+        if (productRequestDTO.getPrice() != null) {
+            productToUpdate.setPrice(productRequestDTO.getPrice());
         }
-        if (requestProductDTO.getCategoryId() != null) {
-            productToUpdate.setCategory(categoryRepository.findById(requestProductDTO.getCategoryId()).get());
+        if (productRequestDTO.getCategoryId() != null) {
+            productToUpdate.setCategory(categoryRepository.findById(productRequestDTO.getCategoryId()).get());
         }
         Product savedProduct = productRepository.save(productToUpdate);
         return convertToDto(savedProduct);
@@ -153,15 +158,37 @@ public class ProductServiceImpl implements ProductService {
         return productList.stream().map(Product::toDto).collect(Collectors.toList());
     }
 
-    private ResponseProductDTO convertToDto(Product product) {
-        return new ResponseProductDTO(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getStock(),
-                product.getPrice(),
-                product.getCategory().getId(),
-                product.getImages()
+    @Override
+    public ProductResponseDTO convertToDto(Product product) {
+        Set<ImageResponseDTO> imageResponseDTOs = product.getImages().stream()
+                .map(image -> {
+                    ImageResponseDTO imageResponseDTO = new ImageResponseDTO();
+                    imageResponseDTO.setId(image.getId());
+                    imageResponseDTO.setTitle(image.getTitle());
+                    imageResponseDTO.setUrl(image.getUrl());
+                    // No establecer la referencia al producto para evitar la referencia circular
+                    return imageResponseDTO;
+                })
+                .collect(Collectors.toSet());
+
+        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+        productResponseDTO.setId(product.getId());
+        productResponseDTO.setName(product.getName());
+        productResponseDTO.setDescription(product.getDescription());
+        productResponseDTO.setStock(product.getStock());
+        productResponseDTO.setPrice(product.getPrice());
+        productResponseDTO.setCategoryId(product.getCategory().getId());
+        productResponseDTO.setImages(imageResponseDTOs);
+
+        return productResponseDTO;
+    }
+
+    private ImageResponseDTO convertImageToDto(Image image) {
+        return new ImageResponseDTO(
+                image.getId(),
+                image.getTitle(),
+                image.getUrl(),
+                image.getProduct().getId()
         );
     }
 }

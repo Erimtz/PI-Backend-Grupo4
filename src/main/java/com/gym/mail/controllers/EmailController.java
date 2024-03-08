@@ -1,7 +1,7 @@
 package com.gym.mail.controllers;
 
 
-import com.gym.dto.Message;
+import com.gym.dto.response.Message;
 import com.gym.mail.domain.EmailValuesDTO;
 import com.gym.mail.domain.EmailDTO;
 import com.gym.mail.domain.EmailFileDTO;

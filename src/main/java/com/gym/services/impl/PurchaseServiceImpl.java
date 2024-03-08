@@ -1,9 +1,8 @@
-package com.gym.services;
+package com.gym.services.impl;
 
-import com.gym.dto.ResponseCouponDTO;
+import com.gym.dto.CouponResponseDTO;
 import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
-import com.gym.dto.response.CouponResponseDTO;
 import com.gym.dto.response.PurchaseDetailResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.entities.*;
@@ -12,6 +11,7 @@ import com.gym.exceptions.InsufficientCreditException;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseRepository;
+import com.gym.services.*;
 import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 @Service
 @Transactional
 //@RequiredArgsConstructor
-public class PurchaseServiceImpl implements PurchaseService{
+public class PurchaseServiceImpl implements PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
     private final ProductRepository productRepository;
@@ -213,10 +213,10 @@ public class PurchaseServiceImpl implements PurchaseService{
         Double totalAfterDiscounts = total - discount;
         totalAfterDiscounts = Math.round(totalAfterDiscounts * 100.0) / 100.0;
 
-        List<CouponResponseDTO> couponsResponseDTO = new ArrayList<>();
+        List<com.gym.dto.response.CouponResponseDTO> couponsResponseDTO = new ArrayList<>();
         if (purchase.getCouponsApplied() != null) {
             couponsResponseDTO = purchase.getCouponsApplied().stream()
-                    .map(coupon -> new CouponResponseDTO(coupon.getId(), coupon.getAmount()))
+                    .map(coupon -> new com.gym.dto.response.CouponResponseDTO(coupon.getId(), coupon.getAmount()))
                     .collect(Collectors.toList());
         }
         return new PurchaseResponseDTO(detailDTOs, subscriptionPrice, total, couponsResponseDTO, discount, totalAfterDiscounts);
@@ -244,17 +244,17 @@ public class PurchaseServiceImpl implements PurchaseService{
             List<Coupon> appliedCoupons = new ArrayList<>();
             for (Long couponId : couponIds) {
                 try {
-                    ResponseCouponDTO responseCouponDTO = couponService.getCouponById(couponId);
-                    if (responseCouponDTO != null) {
-                        if (responseCouponDTO.getSpent()) {
+                    CouponResponseDTO couponResponseDTO = couponService.getCouponById(couponId);
+                    if (couponResponseDTO != null) {
+                        if (couponResponseDTO.getSpent()) {
                             throw new IllegalStateException("El cupón con ID " + couponId + " ya ha sido gastado.");
                         }
                         Coupon coupon = new Coupon();
-                        coupon.setId(responseCouponDTO.getId());
-                        coupon.setIssueDate(responseCouponDTO.getIssueDate());
-                        coupon.setDueDate(responseCouponDTO.getDueDate());
-                        coupon.setAmount(responseCouponDTO.getAmount());
-                        coupon.setSpent(responseCouponDTO.getSpent());
+                        coupon.setId(couponResponseDTO.getId());
+                        coupon.setIssueDate(couponResponseDTO.getIssueDate());
+                        coupon.setDueDate(couponResponseDTO.getDueDate());
+                        coupon.setAmount(couponResponseDTO.getAmount());
+                        coupon.setSpent(couponResponseDTO.getSpent());
 
                         appliedCoupons.add(coupon);
                         couponService.markCouponAsSpent(couponId);

@@ -1,10 +1,12 @@
 package com.gym.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gym.dto.ProductDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -36,8 +38,8 @@ public class Product {
     @JoinColumn(name = "category_id",nullable = false)
     private Category category;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "product")
-    private Set<Image> images;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
+    private Set<Image> images = new HashSet<>();
 
     @OneToMany(mappedBy = "product")
     private Set<PurchaseDetail> purchaseDetails;
@@ -56,5 +58,10 @@ public class Product {
         productDto.setImages(images);
 
         return productDto;
+    }
+
+    public void addImage(Image image) {
+        this.images.add(image);
+        image.setProduct(this);
     }
 }

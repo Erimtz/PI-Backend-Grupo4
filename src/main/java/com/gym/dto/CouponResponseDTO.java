@@ -1,19 +1,22 @@
 package com.gym.dto;
 
-import com.gym.entities.Product;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseImageDTO {
+public class CouponResponseDTO {
 
     private Long id;
-    private String title;
-    private String url;
-    private Long productId;
+    private LocalDate issueDate;
+    private LocalDate dueDate;
+    private Double amount;
+    private Boolean spent;
+    private Long accountId;
 }

@@ -1,14 +1,15 @@
-package com.gym.services;
+package com.gym.services.impl;
 
-import com.gym.dto.CreateCouponDTO;
-import com.gym.dto.ResponseCouponDTO;
-import com.gym.dto.UpdateCouponDTO;
+import com.gym.dto.request.CouponCreateDTO;
+import com.gym.dto.CouponResponseDTO;
+import com.gym.dto.request.CouponUpdateDTO;
 import com.gym.entities.Account;
 import com.gym.entities.Coupon;
 import com.gym.exceptions.DatabaseOperationException;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.CouponRepository;
+import com.gym.services.CouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +21,14 @@ import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
-public class CouponServiceImpl implements CouponService{
+public class CouponServiceImpl implements CouponService {
 
     private static final Logger logger = LoggerFactory.getLogger(CouponServiceImpl.class);
     private final CouponRepository couponRepository;
     private final AccountRepository accountRepository;
 
     @Override
-    public List<ResponseCouponDTO> getAllCoupons() {
+    public List<CouponResponseDTO> getAllCoupons() {
         return couponRepository.findAll()
                 .stream()
                 .map(this::convertToDto)
@@ -35,7 +36,7 @@ public class CouponServiceImpl implements CouponService{
     }
 
     @Override
-    public ResponseCouponDTO getCouponById(Long id) {
+    public CouponResponseDTO getCouponById(Long id) {
         return couponRepository.findById(id)
                 .map(this::convertToDto)
                 .orElseThrow(() -> {
@@ -45,14 +46,14 @@ public class CouponServiceImpl implements CouponService{
     }
 
     @Override
-    public ResponseCouponDTO createCoupon(CreateCouponDTO createCouponDTO) {
+    public CouponResponseDTO createCoupon(CouponCreateDTO couponCreateDTO) {
         try {
             Coupon coupon = Coupon.builder()
-                    .issueDate(createCouponDTO.getIssueDate())
-                    .dueDate(createCouponDTO.getDueDate())
-                    .amount(createCouponDTO.getAmount())
-                    .spent(createCouponDTO.getSpent())
-                    .account(createCouponDTO.getAccount())
+                    .issueDate(couponCreateDTO.getIssueDate())
+                    .dueDate(couponCreateDTO.getDueDate())
+                    .amount(couponCreateDTO.getAmount())
+                    .spent(couponCreateDTO.getSpent())
+                    .account(couponCreateDTO.getAccount())
                     .build();
             couponRepository.save(coupon);
             return convertToDto(coupon);
@@ -90,30 +91,30 @@ public class CouponServiceImpl implements CouponService{
 //    }
 
     @Override
-    public ResponseCouponDTO updateCoupon(UpdateCouponDTO updateCouponDTO) {
-        Optional<Coupon> couponOptional = couponRepository.findById(updateCouponDTO.getId());
+    public CouponResponseDTO updateCoupon(CouponUpdateDTO couponUpdateDTO) {
+        Optional<Coupon> couponOptional = couponRepository.findById(couponUpdateDTO.getId());
         if (couponOptional.isPresent()){
             Coupon coupon = couponOptional.get();
 
-            if (updateCouponDTO.getIssueDate() != null) {
-                coupon.setIssueDate(updateCouponDTO.getIssueDate());
+            if (couponUpdateDTO.getIssueDate() != null) {
+                coupon.setIssueDate(couponUpdateDTO.getIssueDate());
             }
-            if (updateCouponDTO.getDueDate() != null) {
-                coupon.setDueDate(updateCouponDTO.getDueDate());
+            if (couponUpdateDTO.getDueDate() != null) {
+                coupon.setDueDate(couponUpdateDTO.getDueDate());
             }
-            if (updateCouponDTO.getAmount() != null) {
-                coupon.setAmount(updateCouponDTO.getAmount());
+            if (couponUpdateDTO.getAmount() != null) {
+                coupon.setAmount(couponUpdateDTO.getAmount());
             }
-            if (updateCouponDTO.getSpent() != null) {
-                coupon.setSpent(updateCouponDTO.getSpent());
+            if (couponUpdateDTO.getSpent() != null) {
+                coupon.setSpent(couponUpdateDTO.getSpent());
             }
-            if (updateCouponDTO.getAccount() != null) {
-                coupon.setAccount(updateCouponDTO.getAccount());
+            if (couponUpdateDTO.getAccount() != null) {
+                coupon.setAccount(couponUpdateDTO.getAccount());
             }
             couponRepository.save(coupon);
             return convertToDto(coupon);
         } else {
-            throw new ResourceNotFoundException("Coupon with ID " + updateCouponDTO.getId() + " not found");
+            throw new ResourceNotFoundException("Coupon with ID " + couponUpdateDTO.getId() + " not found");
         }
     }
 
@@ -126,7 +127,7 @@ public class CouponServiceImpl implements CouponService{
     }
 
     @Override
-    public List<ResponseCouponDTO> getBySpentTrue() {
+    public List<CouponResponseDTO> getBySpentTrue() {
         return couponRepository.findBySpentTrue()
                 .stream()
                 .map(this::convertToDto)
@@ -134,7 +135,7 @@ public class CouponServiceImpl implements CouponService{
     }
 
     @Override
-    public List<ResponseCouponDTO> getBySpentFalse() {
+    public List<CouponResponseDTO> getBySpentFalse() {
         return couponRepository.findBySpentFalse()
                 .stream()
                 .map(this::convertToDto)
@@ -142,7 +143,7 @@ public class CouponServiceImpl implements CouponService{
     }
 
     @Override
-    public List<ResponseCouponDTO> getExpiredCoupons() {
+    public List<CouponResponseDTO> getExpiredCoupons() {
         return couponRepository.findExpiredCoupons()
                 .stream()
                 .map(this::convertToDto)
@@ -150,7 +151,7 @@ public class CouponServiceImpl implements CouponService{
     }
 
     @Override
-    public List<ResponseCouponDTO> getCurrentCoupons() {
+    public List<CouponResponseDTO> getCurrentCoupons() {
         return couponRepository.findCurrentCoupons()
                 .stream()
                 .map(this::convertToDto)
@@ -303,8 +304,8 @@ public class CouponServiceImpl implements CouponService{
 //        }
 //    }
 
-    private ResponseCouponDTO convertToDto(Coupon coupon) {
-        return new ResponseCouponDTO(
+    private CouponResponseDTO convertToDto(Coupon coupon) {
+        return new CouponResponseDTO(
                 coupon.getId(),
                 coupon.getIssueDate(),
                 coupon.getDueDate(),
@@ -314,16 +315,16 @@ public class CouponServiceImpl implements CouponService{
         );
     }
 
-    public Coupon convertResponseToEntity(ResponseCouponDTO responseCouponDTO) {
-        Account account = accountRepository.findByUserId(responseCouponDTO.getAccountId())
+    public Coupon convertResponseToEntity(CouponResponseDTO couponResponseDTO) {
+        Account account = accountRepository.findByUserId(couponResponseDTO.getAccountId())
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró la cuenta asociada al cupón"));
 
         Coupon coupon = new Coupon();
-        coupon.setId(responseCouponDTO.getId());
-        coupon.setIssueDate(responseCouponDTO.getIssueDate());
-        coupon.setDueDate(responseCouponDTO.getDueDate());
-        coupon.setAmount(responseCouponDTO.getAmount());
-        coupon.setSpent(responseCouponDTO.getSpent());
+        coupon.setId(couponResponseDTO.getId());
+        coupon.setIssueDate(couponResponseDTO.getIssueDate());
+        coupon.setDueDate(couponResponseDTO.getDueDate());
+        coupon.setAmount(couponResponseDTO.getAmount());
+        coupon.setSpent(couponResponseDTO.getSpent());
         coupon.setAccount(account);
 
         return coupon;

@@ -1,4 +1,4 @@
-package com.gym.services;
+package com.gym.services.impl;
 
 import com.gym.dto.CategoryDTO;
 import com.gym.entities.Category;

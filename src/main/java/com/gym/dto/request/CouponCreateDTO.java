@@ -1,4 +1,4 @@
-package com.gym.dto;
+package com.gym.dto.request;
 
 import com.gym.entities.Account;
 import jakarta.validation.constraints.*;
@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateCouponDTO {
+public class CouponCreateDTO {
 
 
     private LocalDate issueDate;

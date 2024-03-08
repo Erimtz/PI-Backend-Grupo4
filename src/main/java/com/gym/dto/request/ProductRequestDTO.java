@@ -1,6 +1,5 @@
-package com.gym.dto;
+package com.gym.dto.request;
 
-import com.gym.entities.Category;
 import com.gym.entities.Image;
 import com.gym.entities.Purchase;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestProductDTO {
+public class ProductRequestDTO {
 
     private Long id;
     private String name;

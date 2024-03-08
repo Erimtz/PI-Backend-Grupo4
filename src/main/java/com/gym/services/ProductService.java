@@ -1,17 +1,20 @@
 package com.gym.services;
 
 import com.gym.dto.*;
-import com.gym.dto.request.UpdateStockPurchaseDTO;
+import com.gym.dto.request.ProductRequestDTO;
+import com.gym.dto.response.ProductResponseDTO;
 import com.gym.entities.Product;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductService {
 
-    List<ResponseProductDTO> getAllProducts();
-    ResponseProductDTO getProductById(Long id);
-    ResponseProductDTO createProduct(RequestProductDTO requestProductDTO);
-    ResponseProductDTO updateProduct(RequestProductDTO requestProductDTO);
+    List<ProductResponseDTO> getAllProducts();
+    ProductResponseDTO getProductById(Long id);
+    Optional<ProductResponseDTO> getProductByIdWithImages(Long id);
+    ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO);
+    ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTO);
     Product updateStockPurchase(Long productId, Long subtractStock);
     void deleteProductById(Long id);
 
@@ -24,4 +27,6 @@ public interface ProductService {
     List<ProductDTO> getAllProductSortedByPriceAsc();
 
     List<ProductDTO> getAllProductSortedByPriceDesc();
+
+    ProductResponseDTO convertToDto(Product product);
 }

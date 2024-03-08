@@ -1,6 +1,6 @@
 package com.gym.security.services;//package com.gym.security.services;
 
-import com.gym.dto.Message;
+import com.gym.dto.response.Message;
 import com.gym.entities.*;
 import com.gym.enums.ERank;
 import com.gym.exceptions.*;
@@ -19,7 +19,7 @@ import com.gym.security.entities.UserEntity;
 import com.gym.enums.ERole;
 import com.gym.security.repositories.RoleRepository;
 import com.gym.security.repositories.UserRepository;
-import com.gym.services.AccountService;
+import com.gym.services.impl.AccountService;
 import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;

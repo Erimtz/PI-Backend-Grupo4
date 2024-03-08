@@ -1,6 +1,7 @@
-package com.gym.dto;
+package com.gym.dto.request;
 
 import com.gym.entities.Account;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,12 +13,17 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseCouponDTO {
+public class CouponUpdateDTO {
 
     private Long id;
     private LocalDate issueDate;
+    @Future
     private LocalDate dueDate;
+    @Digits(integer = 4, fraction = 2)
+    @Min(0)
     private Double amount;
     private Boolean spent;
-    private Long accountId;
+    @NotNull
+    private Account account;
+
 }

@@ -1,6 +1,8 @@
 package com.gym.controllers;
 
 import com.gym.dto.*;
+import com.gym.dto.request.CouponCreateDTO;
+import com.gym.dto.request.CouponUpdateDTO;
 import com.gym.entities.Coupon;
 import com.gym.services.CouponService;
 import jakarta.validation.Valid;
@@ -26,29 +28,29 @@ public class CouponController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<ResponseCouponDTO>> getAllCoupons() {
-        List<ResponseCouponDTO> couponDTOS = couponService.getAllCoupons();
+    public ResponseEntity<List<CouponResponseDTO>> getAllCoupons() {
+        List<CouponResponseDTO> couponDTOS = couponService.getAllCoupons();
         return ResponseEntity.ok(couponDTOS);
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<ResponseCouponDTO> getCouponById(@PathVariable Long id) {
-        ResponseCouponDTO couponDTO = couponService.getCouponById(id);
+    public ResponseEntity<CouponResponseDTO> getCouponById(@PathVariable Long id) {
+        CouponResponseDTO couponDTO = couponService.getCouponById(id);
         return ResponseEntity.ok(couponDTO);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
-    public ResponseEntity<ResponseCouponDTO> createCoupon(@Valid @RequestBody CreateCouponDTO createCouponDTO) {
-        ResponseCouponDTO couponDTO = couponService.createCoupon(createCouponDTO);
+    public ResponseEntity<CouponResponseDTO> createCoupon(@Valid @RequestBody CouponCreateDTO couponCreateDTO) {
+        CouponResponseDTO couponDTO = couponService.createCoupon(couponCreateDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(couponDTO);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
-    public ResponseEntity<ResponseCouponDTO> updateCoupon(@PathVariable Long id, @Valid @RequestBody UpdateCouponDTO updateCouponDTO) {
-        updateCouponDTO.setId(id);
-        ResponseCouponDTO couponDTO = couponService.updateCoupon(updateCouponDTO);
+    public ResponseEntity<CouponResponseDTO> updateCoupon(@PathVariable Long id, @Valid @RequestBody CouponUpdateDTO couponUpdateDTO) {
+        couponUpdateDTO.setId(id);
+        CouponResponseDTO couponDTO = couponService.updateCoupon(couponUpdateDTO);
         return ResponseEntity.ok(couponDTO);
     }
 
@@ -61,35 +63,35 @@ public class CouponController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get-all-spent")
-    public ResponseEntity<List<ResponseCouponDTO>> getAllSpentCoupons() {
-        List<ResponseCouponDTO> couponDTOS = couponService.getBySpentTrue();
+    public ResponseEntity<List<CouponResponseDTO>> getAllSpentCoupons() {
+        List<CouponResponseDTO> couponDTOS = couponService.getBySpentTrue();
         return ResponseEntity.ok(couponDTOS);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get-all-not-spent")
-    public ResponseEntity<List<ResponseCouponDTO>> getAllNotSpentCoupons() {
-        List<ResponseCouponDTO> couponDTOS = couponService.getBySpentFalse();
+    public ResponseEntity<List<CouponResponseDTO>> getAllNotSpentCoupons() {
+        List<CouponResponseDTO> couponDTOS = couponService.getBySpentFalse();
         return ResponseEntity.ok(couponDTOS);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get-all-expired")
-    public ResponseEntity<List<ResponseCouponDTO>> getAllExpiredCoupons() {
-        List<ResponseCouponDTO> couponDTOS = couponService.getExpiredCoupons();
+    public ResponseEntity<List<CouponResponseDTO>> getAllExpiredCoupons() {
+        List<CouponResponseDTO> couponDTOS = couponService.getExpiredCoupons();
         return ResponseEntity.ok(couponDTOS);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get-all-current")
-    public ResponseEntity<List<ResponseCouponDTO>> getAllCurrentCoupons() {
-        List<ResponseCouponDTO> couponDTOS = couponService.getCurrentCoupons();
+    public ResponseEntity<List<CouponResponseDTO>> getAllCurrentCoupons() {
+        List<CouponResponseDTO> couponDTOS = couponService.getCurrentCoupons();
         return ResponseEntity.ok(couponDTOS);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/convert-response-to-entity")
-    public Coupon convertResponseToEntity(@RequestBody ResponseCouponDTO responseCouponDTO) {
-        return couponService.convertResponseToEntity(responseCouponDTO);
+    public Coupon convertResponseToEntity(@RequestBody CouponResponseDTO couponResponseDTO) {
+        return couponService.convertResponseToEntity(couponResponseDTO);
     }
 }

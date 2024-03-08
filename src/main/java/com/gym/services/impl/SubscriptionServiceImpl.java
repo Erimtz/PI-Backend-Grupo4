@@ -1,4 +1,4 @@
-package com.gym.services;
+package com.gym.services.impl;
 
 import com.gym.dto.SubscriptionDTO;
 import com.gym.entities.Account;
@@ -6,8 +6,8 @@ import com.gym.entities.StoreSubscription;
 import com.gym.entities.Subscription;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.SubscriptionRepository;
+import com.gym.services.SubscriptionService;
 import jakarta.transaction.Transactional;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

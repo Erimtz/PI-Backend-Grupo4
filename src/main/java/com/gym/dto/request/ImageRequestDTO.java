@@ -1,4 +1,4 @@
-package com.gym.dto;
+package com.gym.dto.request;
 
 import com.gym.entities.Product;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RequestImageDTO {
+public class ImageRequestDTO {
 
     private Long id;
     @NotNull

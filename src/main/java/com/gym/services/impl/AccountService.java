@@ -1,4 +1,4 @@
-package com.gym.services;
+package com.gym.services.impl;
 
 import com.gym.dto.AccountDTO;
 import com.gym.dto.response.AccountDetailsDTO;
@@ -14,6 +14,7 @@ import com.gym.repositories.RankRepository;
 import com.gym.security.configuration.jwt.JwtUtils;
 import com.gym.security.entities.UserEntity;
 import com.gym.security.repositories.UserRepository;
+import com.gym.services.SubscriptionService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

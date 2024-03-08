@@ -1,29 +1,27 @@
 package com.gym.services;
 
 import com.gym.dto.*;
+import com.gym.dto.request.CouponCreateDTO;
+import com.gym.dto.request.CouponUpdateDTO;
 import com.gym.entities.Coupon;
-import com.gym.entities.Purchase;
-import com.gym.entities.Subscription;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CouponService {
 
-    List<ResponseCouponDTO> getAllCoupons();
-    ResponseCouponDTO getCouponById(Long id);
-    ResponseCouponDTO createCoupon(CreateCouponDTO createCouponDTO);
+    List<CouponResponseDTO> getAllCoupons();
+    CouponResponseDTO getCouponById(Long id);
+    CouponResponseDTO createCoupon(CouponCreateDTO couponCreateDTO);
 //    Coupon createCouponByPurchase(Purchase purchase);
-    ResponseCouponDTO updateCoupon(UpdateCouponDTO updateCouponDTO);
+    CouponResponseDTO updateCoupon(CouponUpdateDTO couponUpdateDTO);
     void deleteCouponById(Long id);
-    List<ResponseCouponDTO> getBySpentTrue();
-    List<ResponseCouponDTO> getBySpentFalse();
-    List<ResponseCouponDTO> getExpiredCoupons();
-    List<ResponseCouponDTO> getCurrentCoupons();
+    List<CouponResponseDTO> getBySpentTrue();
+    List<CouponResponseDTO> getBySpentFalse();
+    List<CouponResponseDTO> getExpiredCoupons();
+    List<CouponResponseDTO> getCurrentCoupons();
     void markCouponAsSpent(Long couponId);
     boolean isCouponSpent(Long couponId);
     boolean isCouponExpired(Long couponId);
-    public Coupon convertResponseToEntity(ResponseCouponDTO responseCouponDTO);
+    public Coupon convertResponseToEntity(CouponResponseDTO couponResponseDTO);
 
 }

@@ -1,10 +1,11 @@
-package com.gym.services;
+package com.gym.services.impl;
 
 import com.gym.entities.Account;
 import com.gym.entities.Coupon;
 import com.gym.enums.ERank;
 import com.gym.exceptions.DatabaseOperationException;
 import com.gym.repositories.CouponRepository;
+import com.gym.services.CouponGenerationService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,7 +13,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 
 @Service
-public class CouponGenerationServiceImpl implements CouponGenerationService{
+public class CouponGenerationServiceImpl implements CouponGenerationService {
 
     private final CouponRepository couponRepository;
 

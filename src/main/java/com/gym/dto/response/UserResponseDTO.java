@@ -1,4 +1,4 @@
-package com.gym.dto;
+package com.gym.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
