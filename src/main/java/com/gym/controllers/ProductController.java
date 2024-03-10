@@ -1,10 +1,8 @@
 package com.gym.controllers;
 
-import com.gym.dto.ProductDTO;
-import com.gym.dto.request.ProductByCategoryRequestDTO;
+import com.gym.dto.request.ProductFiltersRequestDTO;
 import com.gym.dto.request.ProductRequestDTO;
 import com.gym.dto.response.ProductResponseDTO;
-import com.gym.entities.Product;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
@@ -86,9 +84,13 @@ public class ProductController {
     }
 
     @GetMapping("/filter/category/{categoryId}")
-    public ResponseEntity<?> getProductsByCategotyFiltered(@PathVariable(name = "categoryId") Long categoryId, @RequestBody ProductByCategoryRequestDTO request) {
+    public ResponseEntity<?> getProductsByCategotyFiltered(
+            @PathVariable(name = "categoryId") Long categoryId,
+            @RequestBody ProductFiltersRequestDTO request,
+            @RequestParam(name = "orderBy", required = false, defaultValue = "id") String orderBy,
+            @RequestParam(name = "orderDirection", required = false, defaultValue = "asc") String orderDirection) {
         try {
-            List<ProductResponseDTO> filteredProducts = productService.findProductsByCategoryAndFilters(categoryId, request);
+            List<ProductResponseDTO> filteredProducts = productService.findProductsByCategoryAndFilters(categoryId, request, orderBy, orderDirection);
             if (filteredProducts.isEmpty()) {
                 return new ResponseEntity<>("No se encontraron productos que coincidan con los criterios de búsqueda.", HttpStatus.NOT_FOUND);
             }
@@ -98,35 +100,65 @@ public class ProductController {
         }
     }
 
-    @Operation(summary = "Filtrar productos por nombre")
-    @GetMapping("/filterByName")
-    public ResponseEntity<List<ProductDTO>> filterProductsByName(@RequestParam(name = "name") String name) {
-        List<ProductDTO> productList = productService.getProductsByName(name);
-        return ResponseEntity.ok(productList);
+    @GetMapping("/search")
+    public ResponseEntity<?> searchProductsByName(@RequestParam(name = "product") String product) {
+        try {
+            List<ProductResponseDTO> foundProducts = productService.searchProductsByName(product);
+            if (foundProducts.isEmpty()) {
+                return new ResponseEntity<>("No se encontraron productos que coincidan con los criterios de búsqueda.", HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(foundProducts, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @Operation(summary = "Filtrar productos por rango de precio")
-    @GetMapping("/filterByPriceRange")
-    public ResponseEntity<List<ProductDTO>> filterProductsByPriceRange(
-            @RequestParam(name = "minPrice") Double minPrice,
-            @RequestParam(name = "maxPrice") Double maxPrice) {
-        List<ProductDTO> productList = productService.getProductsByPriceRange(minPrice, maxPrice);
-        return ResponseEntity.ok(productList);
+    @GetMapping("/filter/search")
+    public ResponseEntity<?> searchProductsByNameFiltered(
+            @RequestParam(name = "product") String product,
+            @RequestBody ProductFiltersRequestDTO request,
+            @RequestParam(name = "orderBy", defaultValue = "name") String orderBy,
+            @RequestParam(name = "orderDirection", defaultValue = "asc") String orderDirection) {
+        try {
+            List<ProductResponseDTO> filteredProducts = productService.searchProductsByNameAndFilters(product, request, orderBy, orderDirection);
+            if (filteredProducts.isEmpty()) {
+                return new ResponseEntity<>("No se encontraron productos que coincidan con los criterios de búsqueda.", HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(filteredProducts, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @Operation(summary = "Ordenar productos por precio ascendente")
-    @GetMapping("/sortByPriceAsc")
-    public ResponseEntity<List<ProductDTO>> sortProductsByPriceAsc() {
-        List<ProductDTO> productList = productService.getAllProductSortedByPriceAsc();
-        return ResponseEntity.ok(productList);
-    }
-
-    @Operation(summary = "Ordenar productos por precio descendente")
-    @GetMapping("/sortByPriceDesc")
-    public ResponseEntity<List<ProductDTO>> sortProductsByPriceDesc() {
-        List<ProductDTO> productList = productService.getAllProductSortedByPriceDesc();
-        return ResponseEntity.ok(productList);
-    }
+//    @Operation(summary = "Filtrar productos por nombre")
+//    @GetMapping("/filterByName")
+//    public ResponseEntity<List<ProductDTO>> filterProductsByName(@RequestParam(name = "name") String name) {
+//        List<ProductDTO> productList = productService.getProductsByName(name);
+//        return ResponseEntity.ok(productList);
+//    }
+//
+//    @Operation(summary = "Filtrar productos por rango de precio")
+//    @GetMapping("/filterByPriceRange")
+//    public ResponseEntity<List<ProductDTO>> filterProductsByPriceRange(
+//            @RequestParam(name = "minPrice") Double minPrice,
+//            @RequestParam(name = "maxPrice") Double maxPrice) {
+//        List<ProductDTO> productList = productService.getProductsByPriceRange(minPrice, maxPrice);
+//        return ResponseEntity.ok(productList);
+//    }
+//
+//    @Operation(summary = "Ordenar productos por precio ascendente")
+//    @GetMapping("/sortByPriceAsc")
+//    public ResponseEntity<List<ProductDTO>> sortProductsByPriceAsc() {
+//        List<ProductDTO> productList = productService.getAllProductSortedByPriceAsc();
+//        return ResponseEntity.ok(productList);
+//    }
+//
+//    @Operation(summary = "Ordenar productos por precio descendente")
+//    @GetMapping("/sortByPriceDesc")
+//    public ResponseEntity<List<ProductDTO>> sortProductsByPriceDesc() {
+//        List<ProductDTO> productList = productService.getAllProductSortedByPriceDesc();
+//        return ResponseEntity.ok(productList);
+//    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Agregar un producto")

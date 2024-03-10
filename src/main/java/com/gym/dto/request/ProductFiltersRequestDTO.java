@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductByCategoryRequestDTO {
+public class ProductFiltersRequestDTO {
 
     private Double minPrice;
     private Double maxPrice;
     private Boolean hasStock;
+
 }

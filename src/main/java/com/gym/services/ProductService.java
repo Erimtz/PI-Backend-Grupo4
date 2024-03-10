@@ -1,7 +1,6 @@
 package com.gym.services;
 
-import com.gym.dto.*;
-import com.gym.dto.request.ProductByCategoryRequestDTO;
+import com.gym.dto.request.ProductFiltersRequestDTO;
 import com.gym.dto.request.ProductRequestDTO;
 import com.gym.dto.response.ProductResponseDTO;
 import com.gym.entities.Product;
@@ -20,15 +19,19 @@ public interface ProductService {
     void deleteProductById(Long id);
 
     List<ProductResponseDTO> getProductsByCategory(Long categoryId);
-    List<ProductResponseDTO> findProductsByCategoryAndFilters(Long categoryId, ProductByCategoryRequestDTO request);
+    List<ProductResponseDTO> findProductsByCategoryAndFilters(Long categoryId, ProductFiltersRequestDTO request, String orderBy, String orderDirection);
 
-    List<ProductDTO> getProductsByName(String name);
+    List<ProductResponseDTO> searchProductsByName(String searchTerm);
 
-    List<ProductDTO> getProductsByPriceRange(Double minPrice, Double maxPrice);
+    List<ProductResponseDTO> searchProductsByNameAndFilters(String searchTerm, ProductFiltersRequestDTO request, String orderBy, String orderDirection);
 
-    List<ProductDTO> getAllProductSortedByPriceAsc();
-
-    List<ProductDTO> getAllProductSortedByPriceDesc();
+//    List<ProductDTO> getProductsByName(String name);
+//
+//    List<ProductDTO> getProductsByPriceRange(Double minPrice, Double maxPrice);
+//
+//    List<ProductDTO> getAllProductSortedByPriceAsc();
+//
+//    List<ProductDTO> getAllProductSortedByPriceDesc();
 
     ProductResponseDTO convertToDto(Product product);
 }

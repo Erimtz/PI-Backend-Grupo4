@@ -1,7 +1,7 @@
 package com.gym.services.impl;
 
-import com.gym.dto.ProductDTO;
-import com.gym.dto.request.ProductByCategoryRequestDTO;
+import com.gym.configuration.LevenshteinDistance;
+import com.gym.dto.request.ProductFiltersRequestDTO;
 import com.gym.dto.request.ProductRequestDTO;
 import com.gym.dto.response.ImageResponseDTO;
 import com.gym.dto.response.ProductResponseDTO;
@@ -135,7 +135,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDTO> findProductsByCategoryAndFilters(Long categoryId, ProductByCategoryRequestDTO request) {
+    public List<ProductResponseDTO> findProductsByCategoryAndFilters(Long categoryId, ProductFiltersRequestDTO request, String orderBy, String orderDirection) {
         if (categoryId == null) {
             throw new IllegalArgumentException("El ID de categoría no puede ser nulo.");
         }
@@ -143,7 +143,9 @@ public class ProductServiceImpl implements ProductService {
                 categoryId,
                 request.getMinPrice(),
                 request.getMaxPrice(),
-                request.getHasStock()
+                request.getHasStock(),
+                orderBy,
+                orderDirection
         );
         return products.stream()
                 .map(this::convertToDto)
@@ -151,27 +153,62 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDTO> getProductsByName(String name) {
-        List<Product> productList = productRepository.findByName(name);
-        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+    public List<ProductResponseDTO> searchProductsByName(String searchTerm) {
+        List<Product> searchedProducts = productRepository.findProductsByName(searchTerm);
+        List<Product> sortedProducts = searchedProducts.stream()
+                .sorted(Comparator.comparingInt(product -> LevenshteinDistance.calculateDistance(searchTerm, product.getName())))
+                .collect(Collectors.toList());
+        List<ProductResponseDTO> productResponseDTOs = sortedProducts.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        return productResponseDTOs;
     }
+
     @Override
-    public List<ProductDTO> getProductsByPriceRange(Double minPrice, Double maxPrice) {
-        List<Product> productList = productRepository.findByPriceBetween(minPrice, maxPrice);
-        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+    public List<ProductResponseDTO> searchProductsByNameAndFilters(String searchTerm, ProductFiltersRequestDTO request, String orderBy, String orderDirection) {
+        List<Product> products = productRepository.findProductsByNameAndFilters(
+                searchTerm,
+                request.getMinPrice(),
+                request.getMaxPrice(),
+                request.getHasStock(),
+                orderBy,
+                orderDirection
+        );
+        List<Product> sortedProducts;
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            sortedProducts = products.stream()
+                    .sorted(Comparator.comparingInt(product -> LevenshteinDistance.calculateDistance(searchTerm, product.getName())))
+                    .collect(Collectors.toList());
+        } else {
+            sortedProducts = products;
+        }
+        return sortedProducts.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
-    @Override
-    public List<ProductDTO> getAllProductSortedByPriceAsc() {
-        List<Product> productList = productRepository.findAll();
-        productList.sort(Comparator.comparing(Product::getPrice));
-        return productList.stream().map(Product::toDto).collect(Collectors.toList());
-    }
-    @Override
-    public List<ProductDTO> getAllProductSortedByPriceDesc() {
-        List<Product> productList = productRepository.findAll();
-        productList.sort(Comparator.comparing(Product::getPrice).reversed());
-        return productList.stream().map(Product::toDto).collect(Collectors.toList());
-    }
+
+//    @Override
+//    public List<ProductDTO> getProductsByName(String name) {
+//        List<Product> productList = productRepository.findByName(name);
+//        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+//    }
+//    @Override
+//    public List<ProductDTO> getProductsByPriceRange(Double minPrice, Double maxPrice) {
+//        List<Product> productList = productRepository.findByPriceBetween(minPrice, maxPrice);
+//        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+//    }
+//    @Override
+//    public List<ProductDTO> getAllProductSortedByPriceAsc() {
+//        List<Product> productList = productRepository.findAll();
+//        productList.sort(Comparator.comparing(Product::getPrice));
+//        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+//    }
+//    @Override
+//    public List<ProductDTO> getAllProductSortedByPriceDesc() {
+//        List<Product> productList = productRepository.findAll();
+//        productList.sort(Comparator.comparing(Product::getPrice).reversed());
+//        return productList.stream().map(Product::toDto).collect(Collectors.toList());
+//    }
 
     @Override
     public ProductResponseDTO convertToDto(Product product) {
