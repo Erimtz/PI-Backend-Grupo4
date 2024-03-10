@@ -17,4 +17,14 @@ public class TestRolesController {
     public String accessUser(){
         return "Hola, has accedido con rol de USER";
     }
+
+    @GetMapping("/hello")
+    public String hello(){
+        return "Hello World Not Secured";
+    }
+
+    @GetMapping("/helloSecured")
+    public String helloSecured(){
+        return "Hello World Secured";
+    }
 }

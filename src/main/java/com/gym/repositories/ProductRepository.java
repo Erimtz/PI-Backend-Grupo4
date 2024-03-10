@@ -18,4 +18,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.images WHERE p.id = :productId")
     Optional<Product> findByIdWithImages(@Param("productId") Long productId);
+
+    @Query("SELECT p FROM Product p WHERE " +
+            "p.category.id = :categoryId " +
+            "AND (:minPrice IS NULL OR p.price >= :minPrice) " +
+            "AND (:maxPrice IS NULL OR p.price <= :maxPrice) " +
+            "AND (:hasStock IS NULL OR (:hasStock = true AND p.stock > 0) OR (:hasStock = false AND p.stock <= 0))")
+    List<Product> findProductsByCategoryAndFilters(Long categoryId, Double minPrice, Double maxPrice, Boolean hasStock);
 }

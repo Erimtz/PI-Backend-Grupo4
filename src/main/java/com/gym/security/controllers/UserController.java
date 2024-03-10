@@ -1,5 +1,6 @@
 package com.gym.security.controllers;
 
+import com.gym.exceptions.EmptyUserListException;
 import com.gym.exceptions.UnauthorizedException;
 import com.gym.exceptions.UserNotFoundException;
 import com.gym.security.controllers.request.ChangePasswordDTO;
@@ -18,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -27,16 +30,6 @@ public class UserController {
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
-    }
-
-    @GetMapping("/hello")
-    public String hello(){
-        return "Hello World Not Secured";
-    }
-
-    @GetMapping("/helloSecured")
-    public String helloSecured(){
-        return "Hello World Secured";
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -71,6 +64,28 @@ public class UserController {
             return ResponseEntity.ok(responseUserDTO);
         } catch (UserNotFoundException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<ResponseUserDTO>> getAllUsers() {
+        List<ResponseUserDTO> users;
+        try {
+            users = userService.getAllUsers();
+        } catch (EmptyUserListException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<ResponseUserDTO> getUserById(@PathVariable Long id) {
+        try {
+            ResponseUserDTO user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 

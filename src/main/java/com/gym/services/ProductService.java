@@ -1,6 +1,7 @@
 package com.gym.services;
 
 import com.gym.dto.*;
+import com.gym.dto.request.ProductByCategoryRequestDTO;
 import com.gym.dto.request.ProductRequestDTO;
 import com.gym.dto.response.ProductResponseDTO;
 import com.gym.entities.Product;
@@ -18,7 +19,8 @@ public interface ProductService {
     Product updateStockPurchase(Long productId, Long subtractStock);
     void deleteProductById(Long id);
 
-    ProductDTO getProductsByCategory(Long categoryId);
+    List<ProductResponseDTO> getProductsByCategory(Long categoryId);
+    List<ProductResponseDTO> findProductsByCategoryAndFilters(Long categoryId, ProductByCategoryRequestDTO request);
 
     List<ProductDTO> getProductsByName(String name);
 

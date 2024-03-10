@@ -12,12 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 public class UserProfileDTO {
 
-//    private String username;
-//    private String firstName;
-//    private String lastName;
-//    private String email;
-//    private List<String> roles;
-
     private Long id;
     private String username;
     private String rol;

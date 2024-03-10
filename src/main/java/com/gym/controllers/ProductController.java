@@ -1,6 +1,7 @@
 package com.gym.controllers;
 
 import com.gym.dto.ProductDTO;
+import com.gym.dto.request.ProductByCategoryRequestDTO;
 import com.gym.dto.request.ProductRequestDTO;
 import com.gym.dto.response.ProductResponseDTO;
 import com.gym.entities.Product;
@@ -73,10 +74,28 @@ public class ProductController {
         }
     }
 
-    @Operation(summary = "Traer el producto de categoria")
-    @GetMapping("/category={category_id}")
-    public ResponseEntity<ProductDTO> getProductByCategory(@PathVariable(name = "category_id") Long category_id) throws ResourceNotFoundException{
-        return new ResponseEntity<>(productService.getProductsByCategory(category_id),HttpStatus.OK);
+    @Operation(summary = "Traer todos los productos por categoria")
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<?> getProductsByCategory(@PathVariable(name = "categoryId") Long categoryId) {
+        try {
+            List<ProductResponseDTO> products = productService.getProductsByCategory(categoryId);
+            return new ResponseEntity<>(products, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/filter/category/{categoryId}")
+    public ResponseEntity<?> getProductsByCategotyFiltered(@PathVariable(name = "categoryId") Long categoryId, @RequestBody ProductByCategoryRequestDTO request) {
+        try {
+            List<ProductResponseDTO> filteredProducts = productService.findProductsByCategoryAndFilters(categoryId, request);
+            if (filteredProducts.isEmpty()) {
+                return new ResponseEntity<>("No se encontraron productos que coincidan con los criterios de búsqueda.", HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(filteredProducts, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Operation(summary = "Filtrar productos por nombre")
@@ -148,7 +167,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Eliminar un producto por ID")
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteProductById(@PathVariable Long id) throws ResourceNotFoundException {
         productService.deleteProductById(id);
         return new ResponseEntity<>("Producto eliminado correctamente", HttpStatus.OK);

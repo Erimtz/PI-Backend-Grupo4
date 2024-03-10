@@ -82,6 +82,25 @@ public class UserService {
         return userProfileDTO;
     }
 
+    public ResponseUserDTO getUserById(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado con ID: " + userId));
+        return convertToUserDto(user);
+    }
+
+    public List<ResponseUserDTO> getAllUsers() {
+        Iterable<UserEntity> usersIterable = userRepository.findAll();
+        List<ResponseUserDTO> responseUserDTOList = new ArrayList<>();
+        for (UserEntity user : usersIterable) {
+            ResponseUserDTO responseUserDTO = convertToUserDto(user);
+            responseUserDTOList.add(responseUserDTO);
+        }
+        if (responseUserDTOList.isEmpty()) {
+            throw new EmptyUserListException("La lista de usuarios está vacía.");
+        }
+        return responseUserDTOList;
+    }
+
     public UserEntity createAdminUser(CreateUserDTO createUserDTO) {
 
         if (userRepository.existsByEmail(createUserDTO.getEmail())) {
@@ -167,7 +186,7 @@ public class UserService {
 
         ResponseUserDTO responseUserDTO = convertToDto(savedAccount);
 
-        emailService.sendEmailNewUser(responseUserDTO);
+//        emailService.sendEmailNewUser(responseUserDTO);
 
         return responseUserDTO;
     }
@@ -337,5 +356,25 @@ public class UserService {
         });
 
         return userProfileDTO;
+    }
+
+    private ResponseUserDTO convertToUserDto(UserEntity user) {
+        return new ResponseUserDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                null, // No hay accountId en UserEntity, así que se deja como null
+                determineRole(user.getRoles())
+        );
+    }
+
+    private String determineRole(Set<RoleEntity> roles) {
+        return roles.stream()
+                .map(RoleEntity::getName)
+                .findFirst()
+                .map(ERole::toString)
+                .orElse(null);
     }
 }

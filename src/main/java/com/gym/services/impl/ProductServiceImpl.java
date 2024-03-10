@@ -1,6 +1,7 @@
 package com.gym.services.impl;
 
 import com.gym.dto.ProductDTO;
+import com.gym.dto.request.ProductByCategoryRequestDTO;
 import com.gym.dto.request.ProductRequestDTO;
 import com.gym.dto.response.ImageResponseDTO;
 import com.gym.dto.response.ProductResponseDTO;
@@ -111,28 +112,42 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProductById(Long id) {
-        if (!productRepository.existsById(id)) {
+        Optional<Product> productOptional = productRepository.findById(id);
+        if (productOptional.isEmpty()) {
             throw new ResourceNotFoundException("Product with ID " + id + " not found");
+        }
+        Product product = productOptional.get();
+        Set<Image> images = product.getImages();
+
+        if (!images.isEmpty()) {
+            imageRepository.deleteAll(images);
         }
         productRepository.deleteById(id);
     }
 
     @Override
-    public ProductDTO getProductsByCategory(Long category_id) throws ResourceNotFoundException {
-
-        List<Product> productList = null;
-        List<ProductDTO> productsDTOList;
-
-        Optional<Category> searchedCategory = categoryRepository.findById(category_id);
-        if (searchedCategory.isPresent()){
-            productList =productRepository.getProductsByCategory(category_id);
-        }else {
-            throw new ResourceNotFoundException("The category with id " + category_id + " has not been found.");
+    public List<ProductResponseDTO> getProductsByCategory(Long categoryId) throws ResourceNotFoundException {
+        List<Product> products = productRepository.getProductsByCategory(categoryId);
+        if (products.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron productos para la categoría con ID: " + categoryId);
         }
+        return convertToDtoList(products);
+    }
 
-        productsDTOList= productList.stream().map(p -> p.toDto()).collect(Collectors.toList());
-        return (ProductDTO) productsDTOList;
-
+    @Override
+    public List<ProductResponseDTO> findProductsByCategoryAndFilters(Long categoryId, ProductByCategoryRequestDTO request) {
+        if (categoryId == null) {
+            throw new IllegalArgumentException("El ID de categoría no puede ser nulo.");
+        }
+        List<Product> products = productRepository.findProductsByCategoryAndFilters(
+                categoryId,
+                request.getMinPrice(),
+                request.getMaxPrice(),
+                request.getHasStock()
+        );
+        return products.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -181,6 +196,10 @@ public class ProductServiceImpl implements ProductService {
         productResponseDTO.setImages(imageResponseDTOs);
 
         return productResponseDTO;
+    }
+
+    public List<ProductResponseDTO> convertToDtoList(List<Product> productList) {
+        return productList.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     private ImageResponseDTO convertImageToDto(Image image) {
