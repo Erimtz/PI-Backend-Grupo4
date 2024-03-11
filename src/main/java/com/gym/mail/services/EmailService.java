@@ -5,7 +5,7 @@ import com.gym.security.controllers.response.ResponseUserDTO;
 
 import java.io.File;
 
-public interface IEmailService {
+public interface EmailService {
 
     void sendEmail(String[] toUsers, String subject, String message);
     void sendEmailWithFile(String[] toUsers, String subject, String message, File file);

@@ -25,13 +25,5 @@ public interface ProductService {
 
     List<ProductResponseDTO> searchProductsByNameAndFilters(String searchTerm, ProductFiltersRequestDTO request, String orderBy, String orderDirection);
 
-//    List<ProductDTO> getProductsByName(String name);
-//
-//    List<ProductDTO> getProductsByPriceRange(Double minPrice, Double maxPrice);
-//
-//    List<ProductDTO> getAllProductSortedByPriceAsc();
-//
-//    List<ProductDTO> getAllProductSortedByPriceDesc();
-
     ProductResponseDTO convertToDto(Product product);
 }

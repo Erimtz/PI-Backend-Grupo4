@@ -25,5 +25,4 @@ public class CouponUpdateDTO {
     private Boolean spent;
     @NotNull
     private Account account;
-
 }

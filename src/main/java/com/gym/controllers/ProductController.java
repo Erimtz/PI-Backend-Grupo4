@@ -130,36 +130,6 @@ public class ProductController {
         }
     }
 
-//    @Operation(summary = "Filtrar productos por nombre")
-//    @GetMapping("/filterByName")
-//    public ResponseEntity<List<ProductDTO>> filterProductsByName(@RequestParam(name = "name") String name) {
-//        List<ProductDTO> productList = productService.getProductsByName(name);
-//        return ResponseEntity.ok(productList);
-//    }
-//
-//    @Operation(summary = "Filtrar productos por rango de precio")
-//    @GetMapping("/filterByPriceRange")
-//    public ResponseEntity<List<ProductDTO>> filterProductsByPriceRange(
-//            @RequestParam(name = "minPrice") Double minPrice,
-//            @RequestParam(name = "maxPrice") Double maxPrice) {
-//        List<ProductDTO> productList = productService.getProductsByPriceRange(minPrice, maxPrice);
-//        return ResponseEntity.ok(productList);
-//    }
-//
-//    @Operation(summary = "Ordenar productos por precio ascendente")
-//    @GetMapping("/sortByPriceAsc")
-//    public ResponseEntity<List<ProductDTO>> sortProductsByPriceAsc() {
-//        List<ProductDTO> productList = productService.getAllProductSortedByPriceAsc();
-//        return ResponseEntity.ok(productList);
-//    }
-//
-//    @Operation(summary = "Ordenar productos por precio descendente")
-//    @GetMapping("/sortByPriceDesc")
-//    public ResponseEntity<List<ProductDTO>> sortProductsByPriceDesc() {
-//        List<ProductDTO> productList = productService.getAllProductSortedByPriceDesc();
-//        return ResponseEntity.ok(productList);
-//    }
-
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Agregar un producto")
     @PostMapping("/create")

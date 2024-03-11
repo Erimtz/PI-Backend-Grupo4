@@ -38,4 +38,8 @@ public class Coupon {
     @ManyToOne(targetEntity = Purchase.class)
     @JoinColumn(name = "purchase_id")
     private Purchase purchase;
+
+    public Boolean isSpent() {
+        return spent;
+    }
 }

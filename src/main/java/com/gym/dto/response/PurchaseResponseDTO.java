@@ -1,6 +1,5 @@
 package com.gym.dto.response;
 
-import com.gym.entities.Coupon;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

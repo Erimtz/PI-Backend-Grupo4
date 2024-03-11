@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class EmailServiceImpl implements IEmailService{
+public class EmailServiceImpl implements EmailService {
 
     @Value("${spring.mail.username}")
     private String emailAccount;

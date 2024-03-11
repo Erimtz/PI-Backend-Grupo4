@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -52,11 +51,4 @@ public class Purchase {
                 ", couponsApplied=" + couponsApplied +
                 '}';
     }
-
-    // ESTO ES UNA BURRADA PROVISORIA PARA QUE NO DE ERROR //////////////////
-    /////////////////////////////////////////////////////////////////////////
-//    public BigDecimal calculateTotalAmount(){
-//        return new BigDecimal(1);
-//    }
-    /////////////////////////////////////////////////////////////////////////
 }

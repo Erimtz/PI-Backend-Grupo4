@@ -16,7 +16,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountCreateDTO {
-//    private String username;
 
     private UserEntity user;
     private List<Transfer> transfers;

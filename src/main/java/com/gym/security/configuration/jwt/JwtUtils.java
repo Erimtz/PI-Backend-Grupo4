@@ -115,6 +115,11 @@ public class JwtUtils {
         }
     }
 
+    public boolean isUserAdmin(String token) {
+        String role = getClaim(token, claims -> claims.get("role", String.class));
+        return role != null && role.equals("ADMIN");
+    }
+
     public String refreshExpiredToken(String expiredToken) {
         if (isTokenNearExpiration(expiredToken)) {
             String username = getUsernameFromToken(expiredToken);

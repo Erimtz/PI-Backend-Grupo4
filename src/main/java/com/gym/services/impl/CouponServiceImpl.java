@@ -7,12 +7,16 @@ import com.gym.entities.Account;
 import com.gym.entities.Coupon;
 import com.gym.exceptions.DatabaseOperationException;
 import com.gym.exceptions.ResourceNotFoundException;
+import com.gym.exceptions.UnauthorizedException;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.CouponRepository;
+//import com.gym.security.configuration.utils.AccessValidationUtils;
 import com.gym.services.CouponService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +30,7 @@ public class CouponServiceImpl implements CouponService {
     private static final Logger logger = LoggerFactory.getLogger(CouponServiceImpl.class);
     private final CouponRepository couponRepository;
     private final AccountRepository accountRepository;
+//    private final AccessValidationUtils accessValidationUtils;
 
     @Override
     public List<CouponResponseDTO> getAllCoupons() {
@@ -61,34 +66,6 @@ public class CouponServiceImpl implements CouponService {
             throw new DatabaseOperationException("Error occurred while saving coupon", e);
         }
     }
-
-//    public Coupon createCouponByPurchase(Purchase purchase){
-//        try {
-//            Account account = purchase.getAccount();
-//            if (account == null) {
-//                throw new IllegalArgumentException("The purchase is not associated with any account.");
-//            }
-//
-//            ERank rank = account.getRank().getName();
-//            Coupon coupon;
-//
-//            if (rank == ERank.BRONZE) {
-//                coupon = createBronzeCoupon(purchase);
-//            } else if (rank == ERank.SILVER) {
-//                coupon = createSilverCoupon(purchase);
-//            } else if (rank == ERank.GOLD) {
-//                coupon = createGoldCoupon(purchase);
-//            } else if (rank == ERank.PLATINUM) {
-//                coupon = createPlatinumCoupon(purchase);
-//            } else {
-//                throw new IllegalArgumentException("Invalid account rank: " + rank);
-//            }
-//
-//            return coupon;
-//        } catch (Exception e) {
-//            throw new DatabaseOperationException("Error occurred while creating coupon", e);
-//        }
-//    }
 
     @Override
     public CouponResponseDTO updateCoupon(CouponUpdateDTO couponUpdateDTO) {
@@ -176,133 +153,18 @@ public class CouponServiceImpl implements CouponService {
         return couponRepository.isCouponExpired(couponId);
     }
 
-//    private Coupon createBronzeCoupon(Purchase purchase) {
-//        try {
-//            LocalDate currentDate = LocalDate.now();
-//
-//            BigDecimal totalPurchaseAmount = BigDecimal.valueOf(purchaseService.calculateTotal(purchase));
-////            BigDecimal totalPurchaseAmount = purchase.calculateTotalAmount(); // Hay que crear el metodo en purchase, esta en purchase y da 1 pero tiene que ir en el futuro service
-//
-//            LocalDate dueDate;
-//            if (totalPurchaseAmount.compareTo(new BigDecimal("50")) < 0) {
-//                dueDate = currentDate.plusDays(7);
-//            } else if (totalPurchaseAmount.compareTo(new BigDecimal("500")) >= 0) {
-//                dueDate = currentDate.plusDays(28);
-//            } else {
-//                dueDate = currentDate.plusDays(14);
-//            }
-//
-//            BigDecimal couponAmount = totalPurchaseAmount.multiply(new BigDecimal("0.05"));
-//
-//            Coupon coupon = Coupon.builder()
-//                    .issueDate(currentDate)
-//                    .dueDate(dueDate)
-//                    .amount(couponAmount.doubleValue())
-//                    .spent(false)
-//                    .account(purchase.getAccount())
-//                    .build();
-//
-//            return couponRepository.save(coupon);
-//        } catch (Exception e) {
-//            throw new DatabaseOperationException("Error occurred while creating bronze coupon", e);
-//        }
-//    }
-//
-//    private Coupon createSilverCoupon(Purchase purchase) {
-//        try {
-//            LocalDate currentDate = LocalDate.now();
-//
-//            BigDecimal totalPurchaseAmount = BigDecimal.valueOf(purchaseService.calculateTotal(purchase));
-////            BigDecimal totalPurchaseAmount = purchase.calculateTotalAmount(); // Hay que crear el metodo en purchase, esta en purchase y da 1 pero tiene que ir en el futuro service
-//
-//            LocalDate dueDate;
-//            if (totalPurchaseAmount.compareTo(new BigDecimal("50")) < 0) {
-//                dueDate = currentDate.plusDays(7);
-//            } else if (totalPurchaseAmount.compareTo(new BigDecimal("500")) >= 0) {
-//                dueDate = currentDate.plusDays(28);
-//            } else {
-//                dueDate = currentDate.plusDays(14);
-//            }
-//
-//            BigDecimal couponAmount = totalPurchaseAmount.multiply(new BigDecimal("0.07"));
-//
-//            Coupon coupon = Coupon.builder()
-//                    .issueDate(currentDate)
-//                    .dueDate(dueDate)
-//                    .amount(couponAmount.doubleValue())
-//                    .spent(false)
-//                    .account(purchase.getAccount())
-//                    .build();
-//
-//            return couponRepository.save(coupon);
-//        } catch (Exception e) {
-//            throw new DatabaseOperationException("Error occurred while creating silver coupon", e);
-//        }
-//    }
-//
-//    private Coupon createGoldCoupon(Purchase purchase) {
-//        try {
-//            LocalDate currentDate = LocalDate.now();
-//
-//            BigDecimal totalPurchaseAmount = BigDecimal.valueOf(purchaseService.calculateTotal(purchase));
-////            BigDecimal totalPurchaseAmount = purchase.calculateTotalAmount(); // Hay que crear el metodo en purchase, esta en purchase y da 1 pero tiene que ir en el futuro service
-//
-//            LocalDate dueDate;
-//            if (totalPurchaseAmount.compareTo(new BigDecimal("50")) < 0) {
-//                dueDate = currentDate.plusDays(14);
-//            } else if (totalPurchaseAmount.compareTo(new BigDecimal("500")) >= 0) {
-//                dueDate = currentDate.plusDays(63);
-//            } else {
-//                dueDate = currentDate.plusDays(28);
-//            }
-//
-//            BigDecimal couponAmount = totalPurchaseAmount.multiply(new BigDecimal("0.08"));
-//
-//            Coupon coupon = Coupon.builder()
-//                    .issueDate(currentDate)
-//                    .dueDate(dueDate)
-//                    .amount(couponAmount.doubleValue())
-//                    .spent(false)
-//                    .account(purchase.getAccount())
-//                    .build();
-//
-//            return couponRepository.save(coupon);
-//        } catch (Exception e) {
-//            throw new DatabaseOperationException("Error occurred while creating gold coupon", e);
-//        }
-//    }
-//
-//    private Coupon createPlatinumCoupon(Purchase purchase) {
-//        try {
-//            LocalDate currentDate = LocalDate.now();
-//
-//            BigDecimal totalPurchaseAmount = BigDecimal.valueOf(purchaseService.calculateTotal(purchase));
-////            BigDecimal totalPurchaseAmount = purchase.calculateTotalAmount(); // Hay que crear el metodo en purchase, esta en purchase y da 1 pero tiene que ir en el futuro service
-//
-//            LocalDate dueDate;
-//            if (totalPurchaseAmount.compareTo(new BigDecimal("50")) < 0) {
-//                dueDate = currentDate.plusDays(14);
-//            } else if (totalPurchaseAmount.compareTo(new BigDecimal("500")) >= 0) {
-//                dueDate = currentDate.plusDays(63);
-//            } else {
-//                dueDate = currentDate.plusDays(28);
-//            }
-//
-//            BigDecimal couponAmount = totalPurchaseAmount.multiply(new BigDecimal("0.10"));
-//
-//            Coupon coupon = Coupon.builder()
-//                    .issueDate(currentDate)
-//                    .dueDate(dueDate)
-//                    .amount(couponAmount.doubleValue())
-//                    .spent(false)
-//                    .account(purchase.getAccount())
-//                    .build();
-//
-//            return couponRepository.save(coupon);
-//        } catch (Exception e) {
-//            throw new DatabaseOperationException("Error occurred while creating platinum coupon", e);
-//        }
-//    }
+    @Override
+    public List<CouponResponseDTO> getValidCouponsByAccount(Long accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("Account with ID " + accountId + " not found"));
+
+        List<Coupon> validCoupons = account.getCouponList().stream()
+                .filter(coupon -> !coupon.isSpent() && coupon.getDueDate().isAfter(LocalDate.now()))
+                .collect(Collectors.toList());
+        return validCoupons.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
 
     private CouponResponseDTO convertToDto(Coupon coupon) {
         return new CouponResponseDTO(
@@ -318,7 +180,6 @@ public class CouponServiceImpl implements CouponService {
     public Coupon convertResponseToEntity(CouponResponseDTO couponResponseDTO) {
         Account account = accountRepository.findByUserId(couponResponseDTO.getAccountId())
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró la cuenta asociada al cupón"));
-
         Coupon coupon = new Coupon();
         coupon.setId(couponResponseDTO.getId());
         coupon.setIssueDate(couponResponseDTO.getIssueDate());
@@ -326,8 +187,6 @@ public class CouponServiceImpl implements CouponService {
         coupon.setAmount(couponResponseDTO.getAmount());
         coupon.setSpent(couponResponseDTO.getSpent());
         coupon.setAccount(account);
-
         return coupon;
     }
-
 }

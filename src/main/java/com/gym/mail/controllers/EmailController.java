@@ -5,7 +5,7 @@ import com.gym.dto.response.Message;
 import com.gym.mail.domain.EmailValuesDTO;
 import com.gym.mail.domain.EmailDTO;
 import com.gym.mail.domain.EmailFileDTO;
-import com.gym.mail.services.IEmailService;
+import com.gym.mail.services.EmailService;
 import com.gym.security.controllers.request.ResetPasswordDTO;
 import com.gym.security.entities.UserEntity;
 import com.gym.security.repositories.UserRepository;
@@ -35,7 +35,7 @@ import java.util.UUID;
 public class EmailController {
 
     @Autowired
-    private IEmailService emailService;
+    private EmailService emailService;
     @Autowired
     private UserService userService;
     @Autowired

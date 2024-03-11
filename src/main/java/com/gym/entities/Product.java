@@ -1,6 +1,5 @@
 package com.gym.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gym.dto.ProductDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

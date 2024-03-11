@@ -4,11 +4,15 @@ import com.gym.dto.*;
 import com.gym.dto.request.CouponCreateDTO;
 import com.gym.dto.request.CouponUpdateDTO;
 import com.gym.entities.Coupon;
+import com.gym.exceptions.ResourceNotFoundException;
+import com.gym.exceptions.UnauthorizedException;
 import com.gym.services.CouponService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -87,6 +91,20 @@ public class CouponController {
     public ResponseEntity<List<CouponResponseDTO>> getAllCurrentCoupons() {
         List<CouponResponseDTO> couponDTOS = couponService.getCurrentCoupons();
         return ResponseEntity.ok(couponDTOS);
+    }
+
+    @GetMapping("/valid-coupons/{accountId}")
+    public ResponseEntity<List<CouponResponseDTO>> getValidCouponsByAccount(@PathVariable Long accountId) {
+        try {
+            List<CouponResponseDTO> validCoupons = couponService.getValidCouponsByAccount(accountId);
+            return ResponseEntity.ok(validCoupons);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PreAuthorize("hasRole('ADMIN')")

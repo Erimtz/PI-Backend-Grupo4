@@ -4,7 +4,7 @@ import com.gym.dto.response.Message;
 import com.gym.entities.*;
 import com.gym.enums.ERank;
 import com.gym.exceptions.*;
-import com.gym.mail.services.IEmailService;
+import com.gym.mail.services.EmailService;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.RankRepository;
 import com.gym.repositories.SubscriptionRepository;
@@ -42,11 +42,11 @@ public class UserService {
     private final AccountService accountService;
     private final RankRepository rankRepository;
     private final SubscriptionRepository subscriptionRepository;
-    private final IEmailService emailService;
+    private final EmailService emailService;
 
     @Autowired
     public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils, AccountRepository accountRepository,
-                       AccountService accountService, RankRepository rankRepository, SubscriptionRepository subscriptionRepository, IEmailService emailService) {
+                       AccountService accountService, RankRepository rankRepository, SubscriptionRepository subscriptionRepository, EmailService emailService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;

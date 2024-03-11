@@ -187,29 +187,6 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-//    @Override
-//    public List<ProductDTO> getProductsByName(String name) {
-//        List<Product> productList = productRepository.findByName(name);
-//        return productList.stream().map(Product::toDto).collect(Collectors.toList());
-//    }
-//    @Override
-//    public List<ProductDTO> getProductsByPriceRange(Double minPrice, Double maxPrice) {
-//        List<Product> productList = productRepository.findByPriceBetween(minPrice, maxPrice);
-//        return productList.stream().map(Product::toDto).collect(Collectors.toList());
-//    }
-//    @Override
-//    public List<ProductDTO> getAllProductSortedByPriceAsc() {
-//        List<Product> productList = productRepository.findAll();
-//        productList.sort(Comparator.comparing(Product::getPrice));
-//        return productList.stream().map(Product::toDto).collect(Collectors.toList());
-//    }
-//    @Override
-//    public List<ProductDTO> getAllProductSortedByPriceDesc() {
-//        List<Product> productList = productRepository.findAll();
-//        productList.sort(Comparator.comparing(Product::getPrice).reversed());
-//        return productList.stream().map(Product::toDto).collect(Collectors.toList());
-//    }
-
     @Override
     public ProductResponseDTO convertToDto(Product product) {
         Set<ImageResponseDTO> imageResponseDTOs = product.getImages().stream()
@@ -218,7 +195,6 @@ public class ProductServiceImpl implements ProductService {
                     imageResponseDTO.setId(image.getId());
                     imageResponseDTO.setTitle(image.getTitle());
                     imageResponseDTO.setUrl(image.getUrl());
-                    // No establecer la referencia al producto para evitar la referencia circular
                     return imageResponseDTO;
                 })
                 .collect(Collectors.toSet());
