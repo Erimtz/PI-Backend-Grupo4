@@ -222,22 +222,6 @@ public class PurchaseServiceImpl implements PurchaseService {
         return new PurchaseResponseDTO(detailDTOs, subscriptionPrice, total, couponsResponseDTO, discount, totalAfterDiscounts);
     }
 
-//    private void updateSubscriptionIfExpired(Account account, String token) {
-//        // Obtener la suscripción actual del usuario
-//        Optional<Subscription> subscriptionOptional = subscriptionService.getSubscriptionByAccountId(account.getId());
-//
-//        if (subscriptionOptional.isPresent()) {
-//            Subscription subscription = subscriptionOptional.get();
-//            StoreSubscription storeSubscription = getStoreSubscriptionForPurchase(requestDTO); // Implementa este método según sea necesario
-//
-//            // Verificar si la suscripción actual está vencida
-//            if (subscription.getEndDate().isBefore(LocalDate.now())) {
-//                // Actualizar la suscripción
-//                subscriptionService.updateSubscriptionPurchase(storeSubscription, token);
-//            }
-//        }
-//    }
-
     private void addCouponsToPurchase(PurchaseRequestDTO requestDTO, Purchase purchase) {
         List<Long> couponIds = requestDTO.getCouponsIds();
         if (couponIds != null && !couponIds.isEmpty()) {

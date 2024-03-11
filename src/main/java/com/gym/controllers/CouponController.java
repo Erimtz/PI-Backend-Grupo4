@@ -6,6 +6,7 @@ import com.gym.dto.request.CouponUpdateDTO;
 import com.gym.entities.Coupon;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.exceptions.UnauthorizedException;
+import com.gym.security.configuration.utils.AccountTokenUtils;
 import com.gym.services.CouponService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,10 +26,12 @@ import java.util.List;
 public class CouponController {
 
     private final CouponService couponService;
+    private final AccountTokenUtils accountTokenUtils;
 
     @Autowired
-    public CouponController(CouponService couponService) {
+    public CouponController(CouponService couponService, AccountTokenUtils accountTokenUtils) {
         this.couponService = couponService;
+        this.accountTokenUtils = accountTokenUtils;
     }
 
     @GetMapping("/get-all")
@@ -94,14 +97,17 @@ public class CouponController {
     }
 
     @GetMapping("/valid-coupons/{accountId}")
-    public ResponseEntity<List<CouponResponseDTO>> getValidCouponsByAccount(@PathVariable Long accountId) {
+    public ResponseEntity<List<CouponResponseDTO>> getValidCouponsByAccount(@PathVariable Long accountId, HttpServletRequest request) {
         try {
-            List<CouponResponseDTO> validCoupons = couponService.getValidCouponsByAccount(accountId);
+            boolean hasAccess = accountTokenUtils.hasAccessToAccount(request, accountId);
+            if (!hasAccess) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            List<CouponResponseDTO> validCoupons = couponService.getValidCouponsByAccount(accountId, request);
             return ResponseEntity.ok(validCoupons);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
-        } catch (UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

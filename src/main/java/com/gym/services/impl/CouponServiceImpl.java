@@ -11,6 +11,7 @@ import com.gym.exceptions.UnauthorizedException;
 import com.gym.repositories.AccountRepository;
 import com.gym.repositories.CouponRepository;
 //import com.gym.security.configuration.utils.AccessValidationUtils;
+import com.gym.security.configuration.utils.AccountTokenUtils;
 import com.gym.services.CouponService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class CouponServiceImpl implements CouponService {
     private static final Logger logger = LoggerFactory.getLogger(CouponServiceImpl.class);
     private final CouponRepository couponRepository;
     private final AccountRepository accountRepository;
+    private final AccountTokenUtils accountTokenUtils;
 //    private final AccessValidationUtils accessValidationUtils;
 
     @Override
@@ -154,16 +156,23 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public List<CouponResponseDTO> getValidCouponsByAccount(Long accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException("Account with ID " + accountId + " not found"));
-
-        List<Coupon> validCoupons = account.getCouponList().stream()
-                .filter(coupon -> !coupon.isSpent() && coupon.getDueDate().isAfter(LocalDate.now()))
-                .collect(Collectors.toList());
-        return validCoupons.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+    public List<CouponResponseDTO> getValidCouponsByAccount(Long accountId, HttpServletRequest request) {
+        try {
+            boolean hasAccess = accountTokenUtils.hasAccessToAccount(request, accountId);
+            if (!hasAccess) {
+                throw new UnauthorizedException("Acceso denegado a los cupones de la cuenta con ID " + accountId);
+            }
+            List<Coupon> accountCoupons = couponRepository.findByAccountId(accountId);
+            List<Coupon> validCoupons = accountCoupons.stream()
+                    .filter(coupon -> !coupon.isSpent() && coupon.getDueDate().isAfter(LocalDate.now()))
+                    .collect(Collectors.toList());
+            return validCoupons.stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     private CouponResponseDTO convertToDto(Coupon coupon) {
