@@ -9,11 +9,16 @@ import com.gym.entities.*;
 import com.gym.exceptions.CouponDiscountExceededException;
 import com.gym.exceptions.InsufficientCreditException;
 import com.gym.exceptions.ResourceNotFoundException;
+import com.gym.exceptions.UnauthorizedException;
 import com.gym.repositories.ProductRepository;
+import com.gym.repositories.PurchaseDetailRepository;
 import com.gym.repositories.PurchaseRepository;
+import com.gym.security.configuration.utils.AccountTokenUtils;
 import com.gym.services.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,6 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -37,6 +43,8 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final CouponService couponService;
     private final CouponGenerationService couponGenerationService;
     private final SubscriptionService subscriptionService;
+    private final AccountTokenUtils accountTokenUtils;
+    private final PurchaseDetailRepository purchaseDetailRepository;
     private static final Logger logger = LoggerFactory.getLogger(CouponServiceImpl.class);
 
     public PurchaseServiceImpl(PurchaseRepository purchaseRepository,
@@ -46,7 +54,9 @@ public class PurchaseServiceImpl implements PurchaseService {
                                StoreSubscriptionService storeSubscriptionService,
                                CouponService couponService,
                                @Lazy CouponGenerationService couponGenerationService,
-                               SubscriptionService subscriptionService) {
+                               SubscriptionService subscriptionService,
+                               AccountTokenUtils accountTokenUtils,
+                               PurchaseDetailRepository purchaseDetailRepository) {
         this.purchaseRepository = purchaseRepository;
         this.productRepository = productRepository;
         this.productService = productService;
@@ -55,22 +65,15 @@ public class PurchaseServiceImpl implements PurchaseService {
         this.couponService = couponService;
         this.couponGenerationService = couponGenerationService;
         this.subscriptionService = subscriptionService;
+        this.accountTokenUtils = accountTokenUtils;
+        this.purchaseDetailRepository = purchaseDetailRepository;
     }
 
     public PurchaseResponseDTO createPurchase(PurchaseRequestDTO requestDTO, String token) {
-        // Obtener la cuenta del usuario a partir del token
         Account account = getAccountFromToken(token);
-
-        // Construir la compra con los detalles proporcionados en la solicitud
         Purchase purchase = buildPurchase(requestDTO, account);
-
-        // Agregar los cupones a la compra
         addCouponsToPurchase(requestDTO, purchase);
-
-        // Calcular totales y descuentos, y guardar la compra
         calculateAndSavePurchaseTotals(purchase, token);
-
-        // Construir y devolver la respuesta de la compra
         return buildPurchaseResponse(purchase);
     }
 
@@ -119,6 +122,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 detail.setProduct(updatedProduct);
                 detail.setQuantity(detailDTO.getQuantity());
                 purchaseDetails.add(detail);
+
+                purchaseDetailRepository.save(detail);
             }
             purchase.setPurchaseDetails(purchaseDetails);
         }
@@ -147,6 +152,14 @@ public class PurchaseServiceImpl implements PurchaseService {
             accountService.sustractFromCreditBalance(getAccountFromToken(token), totalAfterDiscountsBigDecimal);
 
             purchase = purchaseRepository.save(purchase);
+
+            if (purchase.getPurchaseDetails() != null) {
+                for (PurchaseDetail detail : purchase.getPurchaseDetails()) {
+                    detail.setPurchase(purchase);
+                }
+            }
+            purchaseDetailRepository.saveAll(purchase.getPurchaseDetails());
+
             couponGenerationService.createCouponByPurchase(getAccountFromToken(token), BigDecimal.valueOf(total));
         } else {
             throw new InsufficientCreditException("El saldo de crédito de la cuenta es insuficiente para realizar la compra");
@@ -156,12 +169,9 @@ public class PurchaseServiceImpl implements PurchaseService {
         Subscription personalSubscription = subscriptionService.getSubscriptionByAccountId(account.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No se pudo obtener la suscripcion con ID: " + account.getId()));
         if (personalSubscription != null && isSubscriptionExpired(personalSubscription)) {
-            // Si está vencida, obtener la suscripción de la tienda comprada
             StoreSubscription storeSubscription = purchase.getStoreSubscription();
             if (storeSubscription != null) {
-                // Actualizar la suscripción personal del usuario con los detalles de la suscripción de la tienda
                 subscriptionService.updateSubscriptionPurchase(storeSubscription, token);
-                // Guardar la suscripción personal actualizada
                 accountService.updateSubscription(account);
             } else {
                 logger.warn("User's personal subscription is expired, but no store subscription found for purchase with ID {}", purchase.getId());
@@ -202,16 +212,16 @@ public class PurchaseServiceImpl implements PurchaseService {
                         PurchaseDetailResponseDTO detailDTO = new PurchaseDetailResponseDTO();
                         detailDTO.setProductName(detail.getProduct().getName());
                         detailDTO.setQuantity(detail.getQuantity());
-                        detailDTO.setSubtotal(calculateSubtotal(detail));
+                        detailDTO.setSubtotal(Math.round(calculateSubtotal(detail)*100d)/100d);
                         return detailDTO;
                     })
                     .collect(Collectors.toList());
         }
         Double subscriptionPrice = purchase.getStoreSubscription() != null ? purchase.getStoreSubscription().getPrice() : 0;
-        Double total = calculateTotal(purchase);
-        Double discount = calculateDiscount(purchase);
+        Double total = Math.round(calculateTotal(purchase)*100d)/100d;
+        Double discount = Math.round(calculateDiscount(purchase)*100d)/100d;
         Double totalAfterDiscounts = total - discount;
-        totalAfterDiscounts = Math.round(totalAfterDiscounts * 100.0) / 100.0;
+        totalAfterDiscounts = Math.round(totalAfterDiscounts * 100.0d) / 100.0d;
 
         List<com.gym.dto.response.CouponResponseDTO> couponsResponseDTO = new ArrayList<>();
         if (purchase.getCouponsApplied() != null) {
@@ -252,6 +262,72 @@ public class PurchaseServiceImpl implements PurchaseService {
                 }
             }
             purchase.setCouponsApplied(appliedCoupons);
+        }
+    }
+
+    public List<PurchaseResponseDTO> getPurchasesByAccount(Long accountId, HttpServletRequest request){
+        try {
+            boolean hasAccess = accountTokenUtils.hasAccessToAccount(request, accountId);
+            if (!hasAccess) {
+                throw new UnauthorizedException("Access denied to purchases for account with ID " + accountId);
+            }
+            List<Purchase> accountPurchases = purchaseRepository.findByAccountId(accountId);
+            if (accountPurchases.isEmpty()) {
+                throw new ResourceNotFoundException("No purchases found for account with ID " + accountId);
+            }
+
+            List<PurchaseResponseDTO> purchaseResponseDTOs = new ArrayList<>();
+            for (Purchase purchase : accountPurchases) {
+                List<PurchaseDetailResponseDTO> purchaseDetailResponseDTOs = new ArrayList<>();
+                double total = 0.0;
+                double discount = 0.0;
+
+                for (PurchaseDetail purchaseDetail : purchase.getPurchaseDetails()) {
+                    double subtotal = Math.round(purchaseDetail.getProduct().getPrice() * purchaseDetail.getQuantity()*100d)/100d;
+                    purchaseDetailResponseDTOs.add(new PurchaseDetailResponseDTO(
+                            purchaseDetail.getProduct().getName(),
+                            purchaseDetail.getQuantity(),
+                            subtotal
+                    ));
+                    total += subtotal;
+                }
+
+                StoreSubscription storeSubscription = purchase.getStoreSubscription();
+                if (storeSubscription != null) {
+                    total += storeSubscription.getPrice();
+                }
+
+                List<com.gym.dto.response.CouponResponseDTO> couponResponseDTOs = new ArrayList<>();
+                for (Coupon coupon : purchase.getCouponsApplied()) {
+                    couponResponseDTOs.add( new com.gym.dto.response.CouponResponseDTO(
+                            coupon.getId(),
+                            coupon.getAmount()
+                    ));
+                    discount += coupon.getAmount();
+                }
+
+                double totalAfterDiscounts = total - discount;
+
+
+
+                PurchaseResponseDTO purchaseResponseDTO = new PurchaseResponseDTO(
+                        purchaseDetailResponseDTOs,
+                        storeSubscription != null ? storeSubscription.getPrice() : null,
+                        Math.round(total*100)/100d,
+                        couponResponseDTOs,
+                        Math.round(discount*100)/100d,
+                        Math.round(totalAfterDiscounts*100)/100d
+                );
+                purchaseResponseDTOs.add(purchaseResponseDTO);
+            }
+
+            return purchaseResponseDTOs;
+        } catch (UnauthorizedException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error occurred", e);
         }
     }
 }

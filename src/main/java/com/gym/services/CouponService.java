@@ -24,8 +24,5 @@ public interface CouponService {
     boolean isCouponExpired(Long couponId);
     public Coupon convertResponseToEntity(CouponResponseDTO couponResponseDTO);
 
-
-//    List<CouponResponseDTO> getValidCouponsByAccount(Long accountId);
-//    List<CouponResponseDTO> getValidCouponsByAccount(Long accountId, String token);
     List<CouponResponseDTO> getValidCouponsByAccount(Long accountId, HttpServletRequest request);
 }
