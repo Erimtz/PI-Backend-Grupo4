@@ -64,7 +64,6 @@ public class ImageServiceImpl implements ImageService {
         } catch (Exception e) {
             throw new DatabaseOperationException("Error occurred while saving image", e);
         }
-
     }
 
     @Override
