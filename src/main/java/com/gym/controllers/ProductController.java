@@ -50,6 +50,11 @@ public class ProductController {
 
         return ResponseEntity.ok(productService.getAllProducts());
     }
+    @Operation(summary = "Traer 8 productos aleatorios")
+    @GetMapping("/random")
+    public List<ProductResponseDTO> getRandomProducts() {
+        return productService.getRandomProducts();
+    }
 
     @Operation(summary = "Traer el producto por ID")
     @GetMapping("/get/{id}")
@@ -92,7 +97,7 @@ public class ProductController {
         try {
             List<ProductResponseDTO> filteredProducts = productService.findProductsByCategoryAndFilters(categoryId, request, orderBy, orderDirection);
             if (filteredProducts.isEmpty()) {
-                return new ResponseEntity<>("No se encontraron productos que coincidan con los criterios de búsqueda.", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>("No products found matching the search criteria.", HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(filteredProducts, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
@@ -105,7 +110,7 @@ public class ProductController {
         try {
             List<ProductResponseDTO> foundProducts = productService.searchProductsByName(product);
             if (foundProducts.isEmpty()) {
-                return new ResponseEntity<>("No se encontraron productos que coincidan con los criterios de búsqueda.", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>("No products found matching the search criteria.", HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(foundProducts, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
@@ -122,7 +127,7 @@ public class ProductController {
         try {
             List<ProductResponseDTO> filteredProducts = productService.searchProductsByNameAndFilters(product, request, orderBy, orderDirection);
             if (filteredProducts.isEmpty()) {
-                return new ResponseEntity<>("No se encontraron productos que coincidan con los criterios de búsqueda.", HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>("No products found matching the search criteria.", HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<>(filteredProducts, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
@@ -153,10 +158,10 @@ public class ProductController {
     public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestBody ProductRequestDTO productRequestDTO){
         try {
             if (productId == null) {
-                return ResponseEntity.badRequest().body("Product ID cannot be null");
+                return ResponseEntity.badRequest().body("Product ID cannot be null.");
             }
             if (!productId.equals(productRequestDTO.getId())) {
-                return ResponseEntity.badRequest().body("Product ID in path variable does not match ID in request body");
+                return ResponseEntity.badRequest().body("Product ID in path variable does not match ID in request body.");
             }
             ProductResponseDTO updatedProduct = productService.updateProduct(productRequestDTO);
             return ResponseEntity.ok(updatedProduct);
@@ -164,7 +169,7 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update product");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update product.");
         }
     }
 
@@ -172,6 +177,6 @@ public class ProductController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteProductById(@PathVariable Long id) throws ResourceNotFoundException {
         productService.deleteProductById(id);
-        return new ResponseEntity<>("Producto eliminado correctamente", HttpStatus.OK);
+        return new ResponseEntity<>("Product disposed correctly.", HttpStatus.OK);
     }
 }

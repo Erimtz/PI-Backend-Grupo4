@@ -26,4 +26,6 @@ public interface ProductService {
     List<ProductResponseDTO> searchProductsByNameAndFilters(String searchTerm, ProductFiltersRequestDTO request, String orderBy, String orderDirection);
 
     ProductResponseDTO convertToDto(Product product);
+
+    List<ProductResponseDTO> getRandomProducts();
 }
