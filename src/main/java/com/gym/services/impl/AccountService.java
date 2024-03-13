@@ -140,6 +140,8 @@ public class AccountService {
         accountRepository.save(account);
     }
 
+
+
     public Account getAccountFromToken(String token) {
         if (token == null || !token.startsWith("Bearer ")) {
             throw new UnauthorizedException("No se encontró un token de autorización válido.");

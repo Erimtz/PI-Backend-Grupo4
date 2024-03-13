@@ -1,12 +1,16 @@
 package com.gym.services.impl;
 
 import com.gym.dto.SubscriptionDTO;
+import com.gym.dto.response.SubscriptionResponseDTO;
 import com.gym.entities.Account;
 import com.gym.entities.StoreSubscription;
 import com.gym.entities.Subscription;
 import com.gym.exceptions.ResourceNotFoundException;
+import com.gym.exceptions.UnauthorizedException;
 import com.gym.repositories.SubscriptionRepository;
+import com.gym.security.configuration.utils.AccountTokenUtils;
 import com.gym.services.SubscriptionService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,24 +32,45 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Autowired
     @Lazy
     private AccountService accountService;
+    @Autowired
+    private final AccountTokenUtils accountTokenUtils;
 
-    public List<Subscription> getAllSubscriptions(){
-        return subscriptionRepository.findAll();
+    public List<SubscriptionResponseDTO> getAllSubscriptions() {
+        List<Subscription> subscriptions = subscriptionRepository.findAll();
+        if (subscriptions.isEmpty()) {
+            throw new NoSuchElementException("No subscriptions available");
+        }
+        return subscriptions.stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Subscription> getAllExpiredSubscriptions() {
-        return subscriptionRepository.findExpiredSubscriptions();
+    public List<SubscriptionResponseDTO> getAllExpiredSubscriptions() {
+        List<Subscription> subscriptions = subscriptionRepository.findExpiredSubscriptions();
+        if (subscriptions.isEmpty()) {
+            throw new NoSuchElementException("No subscriptions available");
+        }
+        return subscriptions.stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Subscription> getAllActiveSubscriptions() {
-        return subscriptionRepository.findActiveSubscriptions();
+    public List<SubscriptionResponseDTO> getAllActiveSubscriptions() {
+        List<Subscription> subscriptions = subscriptionRepository.findActiveSubscriptions();
+        if (subscriptions.isEmpty()) {
+            throw new NoSuchElementException("No subscriptions available");
+        }
+        return subscriptions.stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public Optional<Subscription> getSubscriptionById(Long id) {
-        return subscriptionRepository.findById(id);
+    public SubscriptionResponseDTO getSubscriptionById(Long id) {
+        Subscription subscription = subscriptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Subscription with ID: " + id + " not found"));
+        return toResponseDTO(subscription);
     }
 
     @Override
@@ -106,6 +132,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     @Transactional
+    public Subscription updateAutomaticRenewal(Long accountId, boolean automaticRenewal, HttpServletRequest request) {
+        if (!accountTokenUtils.hasAccessToAccount(request, accountId)) {
+            throw new UnauthorizedException("No tiene permiso para modificar esta suscripción.");
+        }
+        Subscription subscription = subscriptionRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException("No se pudo obtener la suscripcion con ID de cuenta: " + accountId));
+        subscription.setAutomaticRenewal(automaticRenewal);
+        return subscriptionRepository.save(subscription);
+    }
+
+    @Override
+    @Transactional
     public Subscription updateSubscriptionPurchase(StoreSubscription storeSubscription, String token) {
         Account account = accountService.getAccountFromToken(token);
         if (account == null) {
@@ -132,5 +170,55 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             subscriptionRepository.deleteById(id);
         }
         throw new NoSuchElementException("Subscription with ID " + id + " not found");
+    }
+
+//    public List<SubscriptionResponseDTO> renewExpiredSubscriptions() {
+//        List<Subscription> expiredSubscriptions = subscriptionRepository.findExpiredSubscriptions();
+//
+//
+//        List<Subscription> autoRenewalSubscriptions = expiredSubscriptions.stream()
+//                .filter(Subscription::getAutomaticRenewal)
+//                .collect(Collectors.toList());
+//
+//        for (Subscription subscription : autoRenewalSubscriptions) {
+//            renewSubscription(subscription);
+//        }
+//
+//        return autoRenewalSubscriptions.stream()
+//                .map(this::toResponseDTO)
+//                .collect(Collectors.toList());
+//    }
+//
+//    private void renewSubscription(Subscription subscription) {
+//
+//        PurchaseResponseDTO purchaseResponse = purchaseService.createPurchaseForSubscriptionRenewal(subscription);
+//
+//
+//        updateSubscriptionWithPurchaseData(subscription, purchaseResponse);
+//    }
+//
+//    private void updateSubscriptionWithPurchaseData(Subscription subscription, PurchaseResponseDTO purchaseResponse) {
+//
+//    }
+
+    public SubscriptionResponseDTO toResponseDTO(Subscription subscription) {
+        SubscriptionResponseDTO dto = new SubscriptionResponseDTO();
+        dto.setSubscriptionId(subscription.getId());
+        dto.setAccountId(subscription.getAccount().getId());
+        dto.setDocument(subscription.getAccount().getDocument());
+        dto.setName(subscription.getName());
+        dto.setPrice(subscription.getPrice());
+        dto.setImageUrl(subscription.getImageUrl());
+        dto.setStartDate(subscription.getStartDate());
+        dto.setEndDate(subscription.getEndDate());
+        dto.setIsExpired(isSubscriptionExpired(subscription));
+        dto.setPlanType(subscription.getPlanType());
+        dto.setAutomaticRenewal(subscription.getAutomaticRenewal());
+        return dto;
+    }
+
+    private boolean isSubscriptionExpired(Subscription subscription) {
+        LocalDate currentDate = LocalDate.now();
+        return subscription.getEndDate().isBefore(currentDate);
     }
 }
