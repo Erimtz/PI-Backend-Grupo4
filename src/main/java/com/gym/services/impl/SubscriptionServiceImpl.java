@@ -1,14 +1,18 @@
 package com.gym.services.impl;
 
 import com.gym.dto.SubscriptionDTO;
+import com.gym.dto.request.PurchaseRequestDTO;
 import com.gym.dto.response.SubscriptionResponseDTO;
 import com.gym.entities.Account;
+import com.gym.entities.Purchase;
 import com.gym.entities.StoreSubscription;
 import com.gym.entities.Subscription;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.exceptions.UnauthorizedException;
+import com.gym.repositories.StoreSubscriptionRepository;
 import com.gym.repositories.SubscriptionRepository;
 import com.gym.security.configuration.utils.AccountTokenUtils;
+import com.gym.services.PurchaseService;
 import com.gym.services.SubscriptionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -24,11 +28,17 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Autowired
     private SubscriptionRepository subscriptionRepository;
+    @Autowired
+    private StoreSubscriptionRepository storeSubscriptionRepository;
+    @Lazy
+    @Autowired
+    private PurchaseService purchaseService;
     @Autowired
     @Lazy
     private AccountService accountService;
@@ -172,34 +182,32 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         throw new NoSuchElementException("Subscription with ID " + id + " not found");
     }
 
-//    public List<SubscriptionResponseDTO> renewExpiredSubscriptions() {
-//        List<Subscription> expiredSubscriptions = subscriptionRepository.findExpiredSubscriptions();
-//
-//
-//        List<Subscription> autoRenewalSubscriptions = expiredSubscriptions.stream()
-//                .filter(Subscription::getAutomaticRenewal)
-//                .collect(Collectors.toList());
-//
-//        for (Subscription subscription : autoRenewalSubscriptions) {
-//            renewSubscription(subscription);
-//        }
-//
-//        return autoRenewalSubscriptions.stream()
-//                .map(this::toResponseDTO)
-//                .collect(Collectors.toList());
-//    }
-//
-//    private void renewSubscription(Subscription subscription) {
-//
-//        PurchaseResponseDTO purchaseResponse = purchaseService.createPurchaseForSubscriptionRenewal(subscription);
-//
-//
-//        updateSubscriptionWithPurchaseData(subscription, purchaseResponse);
-//    }
-//
-//    private void updateSubscriptionWithPurchaseData(Subscription subscription, PurchaseResponseDTO purchaseResponse) {
-//
-//    }
+    @Override
+    public List<SubscriptionResponseDTO> renewExpiredSubscriptions(String token) {
+        List<Subscription> expiredSubscriptions = subscriptionRepository.findExpiredSubscriptions();
+        List<Subscription> autoRenewalSubscriptions = expiredSubscriptions.stream()
+                .filter(Subscription::getAutomaticRenewal)
+                .collect(Collectors.toList());
+
+        for (Subscription subscription : autoRenewalSubscriptions) {
+            renewSubscription(subscription, token);
+        }
+        return autoRenewalSubscriptions.stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    private void renewSubscription(Subscription subscription, String token) {
+
+        StoreSubscription storeSubscription = storeSubscriptionRepository.findByName(subscription.getName());
+        if (subscription.getPrice() > 0) {
+            PurchaseRequestDTO purchaseRequestDTO = new PurchaseRequestDTO();
+            purchaseRequestDTO.setAccountId(subscription.getAccount().getId());
+            purchaseRequestDTO.setStoreSubscriptionId(storeSubscription.getId());
+            purchaseService.createPurchase(purchaseRequestDTO, token);
+        }
+    }
+
 
     public SubscriptionResponseDTO toResponseDTO(Subscription subscription) {
         SubscriptionResponseDTO dto = new SubscriptionResponseDTO();

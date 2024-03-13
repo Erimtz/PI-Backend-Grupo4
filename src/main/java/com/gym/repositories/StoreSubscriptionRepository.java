@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StoreSubscriptionRepository extends JpaRepository<StoreSubscription, Long> {
+
+    StoreSubscription findByName(String name);
 }

@@ -125,6 +125,13 @@ public class SubscriptionController {
         }
     }
 
+    @GetMapping("/renew-expired")
+    public ResponseEntity<List<SubscriptionResponseDTO>> renewExpiredSubscriptions(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        List<SubscriptionResponseDTO> renewedSubscriptions = subscriptionService.renewExpiredSubscriptions(token);
+        return ResponseEntity.status(HttpStatus.OK).body(renewedSubscriptions);
+    }
+
     @DeleteMapping("/delete/{id}") // no se va a usar, se va a borrar cuendo se borre un usuario
     public ResponseEntity<?> deleteSubscription(@PathVariable Long id){
         if (id!=null){

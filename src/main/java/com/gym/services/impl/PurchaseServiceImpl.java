@@ -3,9 +3,11 @@ package com.gym.services.impl;
 import com.gym.dto.CouponResponseDTO;
 import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
+import com.gym.dto.response.AccountDetailsDTO;
 import com.gym.dto.response.PurchaseDetailResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.entities.*;
+import com.gym.enums.ERank;
 import com.gym.exceptions.CouponDiscountExceededException;
 import com.gym.exceptions.InsufficientCreditException;
 import com.gym.exceptions.ResourceNotFoundException;
@@ -13,6 +15,7 @@ import com.gym.exceptions.UnauthorizedException;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseDetailRepository;
 import com.gym.repositories.PurchaseRepository;
+import com.gym.repositories.RankRepository;
 import com.gym.security.configuration.utils.AccountTokenUtils;
 import com.gym.services.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,6 +48,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final SubscriptionService subscriptionService;
     private final AccountTokenUtils accountTokenUtils;
     private final PurchaseDetailRepository purchaseDetailRepository;
+    private final RankRepository rankRepository;
     private static final Logger logger = LoggerFactory.getLogger(CouponServiceImpl.class);
 
     public PurchaseServiceImpl(PurchaseRepository purchaseRepository,
@@ -56,7 +60,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                                @Lazy CouponGenerationService couponGenerationService,
                                SubscriptionService subscriptionService,
                                AccountTokenUtils accountTokenUtils,
-                               PurchaseDetailRepository purchaseDetailRepository) {
+                               PurchaseDetailRepository purchaseDetailRepository,
+                               RankRepository rankRepository) {
         this.purchaseRepository = purchaseRepository;
         this.productRepository = productRepository;
         this.productService = productService;
@@ -67,10 +72,12 @@ public class PurchaseServiceImpl implements PurchaseService {
         this.subscriptionService = subscriptionService;
         this.accountTokenUtils = accountTokenUtils;
         this.purchaseDetailRepository = purchaseDetailRepository;
+        this.rankRepository = rankRepository;
     }
 
     public PurchaseResponseDTO createPurchase(PurchaseRequestDTO requestDTO, String token) {
-        Account account = getAccountFromToken(token);
+//        Account account = getAccountFromToken(token);
+        Account account = accountService.getAccountById(requestDTO.getAccountId());
         Purchase purchase = buildPurchase(requestDTO, account);
         addCouponsToPurchase(requestDTO, purchase);
         calculateAndSavePurchaseTotals(purchase, token);

@@ -20,6 +20,7 @@ public interface SubscriptionService {
     Subscription createSubscription(Account account);
     Subscription updateSubscription(SubscriptionDTO subscriptionDTO);
     Subscription updateAutomaticRenewal(Long accountId, boolean automaticRenewal, HttpServletRequest request);
+    List<SubscriptionResponseDTO> renewExpiredSubscriptions(String token);
     Subscription updateSubscriptionPurchase(StoreSubscription storeSubscription, String token);
     void deleteSubscriptionById(Long id);
 }

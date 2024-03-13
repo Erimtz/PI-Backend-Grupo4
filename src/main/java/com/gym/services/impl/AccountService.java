@@ -91,6 +91,16 @@ public class AccountService {
         }
     }
 
+    public Account getAccountById(Long id){
+        Optional<Account> optionalAccount = accountRepository.findById(id);
+        if (optionalAccount.isPresent()) {
+            Account account = optionalAccount.get();
+            return account;
+        } else {
+            throw new ResourceNotFoundException("Account not found with ID: " + id);
+        }
+    }
+
     public BigDecimal getAccountCreditBalance(Account account) {
         Boolean accountExists = accountRepository.existsById(account.getId());
         if (accountExists) {
