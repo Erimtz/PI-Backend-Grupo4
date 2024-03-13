@@ -113,6 +113,23 @@ public class CouponController {
         }
     }
 
+    @GetMapping("/account/{accountId}")
+    public ResponseEntity<List<CouponResponseDTO>> getCouponsByAccount(@PathVariable Long accountId, HttpServletRequest request) {
+        try {
+            boolean hasAccess = accountTokenUtils.hasAccessToAccount(request, accountId);
+            if (!hasAccess) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            List<CouponResponseDTO> validCoupons = couponService.getCouponsByAccount(accountId, request);
+            return ResponseEntity.ok(validCoupons);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/convert-response-to-entity")
     public Coupon convertResponseToEntity(@RequestBody CouponResponseDTO couponResponseDTO) {

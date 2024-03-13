@@ -14,9 +14,11 @@ import com.gym.services.CategoryService;
 import com.gym.services.ImageService;
 import com.gym.services.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -96,6 +98,22 @@ public class ImageServiceImpl implements ImageService {
             throw new ResourceNotFoundException("Image with ID " + id + " not found");
         }
         imageRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ImageResponseDTO> getImagesByProduct(Long productId){
+        try {
+            List<Image> productImages = imageRepository.findAllByProductId(productId);
+            if (productImages.isEmpty()) {
+                throw new NoSuchElementException("The product has no images");
+            }
+            return productImages.stream()
+                    .map(this::convertToResponseDto)
+                    .collect(Collectors.toList());
+        } catch (DataAccessResourceFailureException e) {
+            e.printStackTrace();
+            throw new DataAccessResourceFailureException("Error accessing database resources", e);
+        }
     }
 
     @Override

@@ -175,6 +175,26 @@ public class CouponServiceImpl implements CouponService {
         }
     }
 
+    @Override
+    public List<CouponResponseDTO> getCouponsByAccount(Long accountId, HttpServletRequest request) {
+        try {
+            boolean hasAccess = accountTokenUtils.hasAccessToAccount(request, accountId);
+            if (!hasAccess) {
+                throw new UnauthorizedException("Acceso denegado a los cupones de la cuenta con ID " + accountId);
+            }
+            List<Coupon> accountCoupons = couponRepository.findByAccountId(accountId);
+            List<Coupon> validCoupons = accountCoupons.stream()
+                    .toList();
+            return validCoupons.stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+
     private CouponResponseDTO convertToDto(Coupon coupon) {
         return new CouponResponseDTO(
                 coupon.getId(),

@@ -13,6 +13,7 @@ public interface ImageService {
     ImageResponseDTO createImage(ImageRequestDTO imageRequestDTO);
     ImageResponseDTO updateImage(ImageRequestDTO imageRequestDTO);
     void deleteImageById(Long id);
+    List<ImageResponseDTO> getImagesByProduct(Long productId);
     ImageResponseDTO convertToResponseDto(Image image);
     ImageRequestDTO convertToRequestDto(Image image);
 

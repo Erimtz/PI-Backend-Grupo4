@@ -11,6 +11,7 @@ import com.gym.services.ImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,6 +60,18 @@ public class ImageController {
     public ResponseEntity<ImageResponseDTO> getImageById(@PathVariable Long id) {
         ImageResponseDTO imageDTO = imageService.getImageById(id);
         return ResponseEntity.ok(imageDTO);
+    }
+
+    @GetMapping("/products/{productId}")
+    public ResponseEntity<List<ImageResponseDTO>> getImagesByProduct(@PathVariable Long productId) {
+        try {
+            List<ImageResponseDTO> images = imageService.getImagesByProduct(productId);
+            return ResponseEntity.ok(images);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (DataAccessException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
