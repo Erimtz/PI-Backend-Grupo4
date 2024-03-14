@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -11,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PurchaseResponseDTO {
     private Long id;
+    private LocalDate purchaseDate;
     private List<PurchaseDetailResponseDTO> purchaseDetails;
     private Double subscriptionPrice;
     private Double total;

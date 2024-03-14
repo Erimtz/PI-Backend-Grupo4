@@ -1,6 +1,7 @@
 package com.gym.services.impl;
 
 import com.gym.dto.CouponResponseDTO;
+import com.gym.dto.request.DateRangeDTO;
 import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
 import com.gym.dto.response.AccountDetailsDTO;
@@ -8,10 +9,7 @@ import com.gym.dto.response.PurchaseDetailResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.entities.*;
 import com.gym.enums.ERank;
-import com.gym.exceptions.CouponDiscountExceededException;
-import com.gym.exceptions.InsufficientCreditException;
-import com.gym.exceptions.ResourceNotFoundException;
-import com.gym.exceptions.UnauthorizedException;
+import com.gym.exceptions.*;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseDetailRepository;
 import com.gym.repositories.PurchaseRepository;
@@ -237,7 +235,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                     .collect(Collectors.toList());
         }
         Long purchaseId = purchase.getId();
-        return new PurchaseResponseDTO(purchaseId, detailDTOs, subscriptionPrice, total, couponsResponseDTO, discount, totalAfterDiscounts);
+        LocalDate purchaseDate = purchase.getPurchaseDate();
+        return new PurchaseResponseDTO(purchaseId, purchaseDate, detailDTOs, subscriptionPrice, total, couponsResponseDTO, discount, totalAfterDiscounts);
     }
 
     private void addCouponsToPurchase(PurchaseRequestDTO requestDTO, Purchase purchase) {
@@ -318,6 +317,7 @@ public class PurchaseServiceImpl implements PurchaseService {
 
                 PurchaseResponseDTO purchaseResponseDTO = new PurchaseResponseDTO(
                         purchase.getId(),
+                        purchase.getPurchaseDate(),
                         purchaseDetailResponseDTOs,
                         storeSubscription != null ? storeSubscription.getPrice() : null,
                         Math.round(total*100)/100d,
@@ -355,7 +355,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         } catch (UnauthorizedException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", e);
         }
     }
 
@@ -364,10 +364,10 @@ public class PurchaseServiceImpl implements PurchaseService {
         try {
             boolean hasAccess = accountTokenUtils.hasAccessToAccount(request, id);
             if (!hasAccess) {
-                throw new UnauthorizedException("Acceso denegado a la compra con ID " + id);
+                throw new UnauthorizedException("Access denied to purchase with ID " + id);
             }
             Purchase purchase = purchaseRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Compra no encontrada con ID: " + id));
+                    .orElseThrow(() -> new ResourceNotFoundException("Purchase with ID: " + id + " not found"));
             PurchaseResponseDTO purchaseResponseDTO = buildPurchaseResponse(purchase);
 
             return purchaseResponseDTO;
@@ -376,7 +376,51 @@ public class PurchaseServiceImpl implements PurchaseService {
         } catch (ResourceNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", e);
         }
     }
+
+    @Override
+    public List<PurchaseResponseDTO> getAllPurchasesByDateRange(DateRangeDTO dateRangeDTO) {
+        try {
+            LocalDate startDate = dateRangeDTO.getStartDate();
+            LocalDate endDate = dateRangeDTO.getEndDate();
+            List<Purchase> purchasesInRange = purchaseRepository.findAllByPurchaseDateBetween(startDate, endDate);
+            List<PurchaseResponseDTO> purchaseResponseDTOs = purchasesInRange.stream()
+                    .map(this::buildPurchaseResponse)
+                    .collect(Collectors.toList());
+            return purchaseResponseDTOs;
+        } catch (Exception e) {
+            throw new ServiceException("Error occurred while retrieving purchases by date range", e);
+        }
+    }
+
+    @Override
+    public Double getTotalAfterDiscountsSumByDateRange(DateRangeDTO dateRangeDTO) {
+        List<PurchaseResponseDTO> purchases = getAllPurchasesByDateRange(dateRangeDTO);
+        return purchases.stream()
+                .mapToDouble(PurchaseResponseDTO::getTotalAfterDiscounts)
+                .sum();
+    }
+
+    @Override
+    public Long getPurchasesCountByDateRange(DateRangeDTO dateRangeDTO) {
+        List<PurchaseResponseDTO> purchases = getAllPurchasesByDateRange(dateRangeDTO);
+        return purchases.stream()
+                .mapToDouble(PurchaseResponseDTO::getTotalAfterDiscounts)
+                .count();
+    }
+
+    @Override
+    public Double getPurchasesAverageByDateRange(DateRangeDTO dateRangeDTO) {
+        List<PurchaseResponseDTO> purchases = getAllPurchasesByDateRange(dateRangeDTO);
+        return purchases.stream()
+                .mapToDouble(PurchaseResponseDTO::getTotalAfterDiscounts)
+                .average().orElseThrow(ArithmeticException::new);
+    }
+
+//    @Override
+//    public Double getSumTotalAfterDiscountsByDateRange(DateRangeDTO dateRangeDTO) {
+//
+//    }
 }
