@@ -236,7 +236,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                     .map(coupon -> new com.gym.dto.response.CouponResponseDTO(coupon.getId(), coupon.getAmount()))
                     .collect(Collectors.toList());
         }
-        return new PurchaseResponseDTO(detailDTOs, subscriptionPrice, total, couponsResponseDTO, discount, totalAfterDiscounts);
+        Long purchaseId = purchase.getId();
+        return new PurchaseResponseDTO(purchaseId, detailDTOs, subscriptionPrice, total, couponsResponseDTO, discount, totalAfterDiscounts);
     }
 
     private void addCouponsToPurchase(PurchaseRequestDTO requestDTO, Purchase purchase) {
@@ -315,9 +316,8 @@ public class PurchaseServiceImpl implements PurchaseService {
 
                 double totalAfterDiscounts = total - discount;
 
-
-
                 PurchaseResponseDTO purchaseResponseDTO = new PurchaseResponseDTO(
+                        purchase.getId(),
                         purchaseDetailResponseDTOs,
                         storeSubscription != null ? storeSubscription.getPrice() : null,
                         Math.round(total*100)/100d,
@@ -335,6 +335,48 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error occurred", e);
+        }
+    }
+
+    @Override
+    public List<PurchaseResponseDTO> getAllPurchases(HttpServletRequest request) {
+        try {
+            boolean isAdmin = accountTokenUtils.isAdminFromToken(request);
+
+            List<Purchase> allPurchases;
+            if (isAdmin) {
+                allPurchases = purchaseRepository.findAll();
+            } else {
+                throw new UnauthorizedException("No tienes permiso para acceder a todas las compras.");
+            }
+            return allPurchases.stream()
+                    .map(this::buildPurchaseResponse)
+                    .collect(Collectors.toList());
+        } catch (UnauthorizedException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", e);
+        }
+    }
+
+    @Override
+    public PurchaseResponseDTO getPurchaseById(Long id, HttpServletRequest request) {
+        try {
+            boolean hasAccess = accountTokenUtils.hasAccessToAccount(request, id);
+            if (!hasAccess) {
+                throw new UnauthorizedException("Acceso denegado a la compra con ID " + id);
+            }
+            Purchase purchase = purchaseRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Compra no encontrada con ID: " + id));
+            PurchaseResponseDTO purchaseResponseDTO = buildPurchaseResponse(purchase);
+
+            return purchaseResponseDTO;
+        } catch (UnauthorizedException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage(), e);
+        } catch (ResourceNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", e);
         }
     }
 }

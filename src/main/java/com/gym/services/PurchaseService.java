@@ -18,4 +18,6 @@ public interface PurchaseService {
     List<PurchaseResponseDTO> getPurchasesByAccount(Long accountId, HttpServletRequest request);
 //    PurchaseRequestDTO updatePurchase(PurchaseRequestDTO purchaseDTO);
 //    void deletePurchaseById(Long id);
+    List<PurchaseResponseDTO> getAllPurchases(HttpServletRequest request);
+    PurchaseResponseDTO getPurchaseById(Long id, HttpServletRequest request);
 }

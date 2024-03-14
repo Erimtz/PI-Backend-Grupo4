@@ -34,4 +34,11 @@ public class StoreSubscription {
     @JsonIgnore
     private List<Purchase> purchases;
 
+    @Override
+    public String toString() {
+        return "StoreSubscription{" +
+                "id=" + id +
+                ", price=" + price +
+                '}';
+    }
 }

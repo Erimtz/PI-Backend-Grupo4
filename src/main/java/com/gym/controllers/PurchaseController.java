@@ -2,10 +2,7 @@ package com.gym.controllers;
 
 import com.gym.dto.request.PurchaseRequestDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
-import com.gym.exceptions.CouponDiscountExceededException;
-import com.gym.exceptions.InsufficientCreditException;
-import com.gym.exceptions.NotEnoughStockException;
-import com.gym.exceptions.UnauthorizedException;
+import com.gym.exceptions.*;
 import com.gym.security.configuration.utils.AccountTokenUtils;
 import com.gym.services.PurchaseService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -59,6 +57,28 @@ public class PurchaseController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<PurchaseResponseDTO>> getAllPurchases(HttpServletRequest request) {
+        try {
+            List<PurchaseResponseDTO> purchaseResponseDTOs = purchaseService.getAllPurchases(request);
+            return ResponseEntity.ok(purchaseResponseDTOs);
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<PurchaseResponseDTO> getPurchaseById(@PathVariable Long id, HttpServletRequest request) {
+        try {
+            PurchaseResponseDTO purchaseResponseDTO = purchaseService.getPurchaseById(id, request);
+            return ResponseEntity.ok(purchaseResponseDTO);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor", e);
         }
     }
 }

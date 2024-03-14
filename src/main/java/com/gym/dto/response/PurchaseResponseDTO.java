@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PurchaseResponseDTO {
+    private Long id;
     private List<PurchaseDetailResponseDTO> purchaseDetails;
     private Double subscriptionPrice;
     private Double total;
