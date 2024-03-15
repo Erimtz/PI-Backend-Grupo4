@@ -131,6 +131,12 @@ public class SubscriptionController {
         }
     }
 
+    @GetMapping("/active-subscription")
+    public ResponseEntity<Double> getActiveSubscriptionRatio() {
+        double ratio = subscriptionService.calculateActiveSubscriptionRatio();
+        return ResponseEntity.ok(ratio);
+    }
+
     @DeleteMapping("/delete/{id}") // no se va a usar, se va a borrar cuendo se borre un usuario
     public ResponseEntity<?> deleteSubscription(@PathVariable Long id){
         if (id!=null){

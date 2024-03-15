@@ -18,5 +18,8 @@ public interface SubscriptionService {
     Subscription createSubscription(Account account);
     Subscription updateSubscription(SubscriptionDTO subscriptionDTO);
     Subscription updateSubscriptionPurchase(StoreSubscription storeSubscription, String token);
+
+    double calculateActiveSubscriptionRatio();
+
     void deleteSubscriptionById(Long id);
 }
