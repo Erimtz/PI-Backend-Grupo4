@@ -5,6 +5,7 @@ import com.gym.dto.request.DateRangeDTO;
 import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
 import com.gym.dto.response.AccountDetailsDTO;
+import com.gym.dto.response.AccountPurchaseDTO;
 import com.gym.dto.response.PurchaseDetailResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.entities.*;
@@ -209,7 +210,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         return discount;
     }
 
-    private PurchaseResponseDTO buildPurchaseResponse(Purchase purchase) {
+    @Override
+    public PurchaseResponseDTO buildPurchaseResponse(Purchase purchase) {
         List<PurchaseDetailResponseDTO> detailDTOs = new ArrayList<>();
         if (purchase.getPurchaseDetails() != null) {
             detailDTOs = purchase.getPurchaseDetails().stream()
@@ -419,8 +421,23 @@ public class PurchaseServiceImpl implements PurchaseService {
                 .average().orElseThrow(ArithmeticException::new);
     }
 
-//    @Override
-//    public Double getSumTotalAfterDiscountsByDateRange(DateRangeDTO dateRangeDTO) {
-//
-//    }
+    @Override
+    public Double calculateAveragePurchaseAmountPerUser() {
+        try {
+            List<AccountPurchaseDTO> accountsWithPurchases = accountService.getAllAccountsWithPurchasesDTO();
+            double totalSpent = accountsWithPurchases.stream()
+                    .mapToDouble(account -> account.getPurchases().stream()
+                            .mapToDouble(PurchaseResponseDTO::getTotalAfterDiscounts)
+                            .sum())
+                    .sum();
+            int totalUserAccounts = accountsWithPurchases.size();
+            if (totalUserAccounts > 0) {
+                return totalSpent / totalUserAccounts;
+            } else {
+                throw new NoAccountsException("There are no registered user accounts.");
+            }
+        } catch (Exception e) {
+            throw new PurchaseServiceException("Error calculating the average spending per user account.", e);
+        }
+    }
 }

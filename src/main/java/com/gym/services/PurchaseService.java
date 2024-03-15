@@ -28,4 +28,6 @@ public interface PurchaseService {
     Double getTotalAfterDiscountsSumByDateRange(DateRangeDTO dateRangeDTO);
     Long getPurchasesCountByDateRange(DateRangeDTO dateRangeDTO);
     Double getPurchasesAverageByDateRange(DateRangeDTO dateRangeDTO);
+    PurchaseResponseDTO buildPurchaseResponse(Purchase purchase);
+    Double calculateAveragePurchaseAmountPerUser();
 }

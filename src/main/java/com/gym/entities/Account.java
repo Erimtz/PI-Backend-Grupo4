@@ -73,32 +73,6 @@ public class Account {
                 '}';
     }
 
-//    @ToString.Exclude
-//    private UserEntity user;
-
-//    @Override
-//    public String toString() {
-//        return "Account{" +
-//                "id=" + id +
-//                ", document='" + document + '\'' +
-//                ", user=" + (user != null ? user.getId() : null) +
-//                ", creditBalance=" + creditBalance +
-//                ", rank=" + rank +
-//                ", couponList=" + couponList +
-//                ", transferList=" + transferList +
-//                '}';
-//    }
-
-//    @Override
-//    public String toString() {
-//        return "Account{" +
-//                "id=" + id +
-//                ", document='" + document + '\'' +
-//                ", userId=" + (user != null ? user.getId() : null) +
-//                ", username=" + (user != null ? user.getUsername() : null) +
-//                // Puedes incluir otras propiedades relevantes de UserEntity aquí
-//                '}';
-//    }
 
     //    @OneToMany(targetEntity = PaymentMethod.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
 //    private List<PaymentMethod> paymentMethodSet;

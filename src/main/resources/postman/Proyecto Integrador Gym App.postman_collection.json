@@ -58,7 +58,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/user/create/user",
+							"raw": "http://localhost:8080/user/create-user",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -66,8 +66,7 @@
 							"port": "8080",
 							"path": [
 								"user",
-								"create",
-								"user"
+								"create-user"
 							]
 						}
 					},
@@ -492,6 +491,42 @@
 			]
 		},
 		{
+			"name": "Account",
+			"item": [
+				{
+					"name": "Get All Accounts With Purchases",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ1NDY2MSwiZXhwIjoxNzEwNTQxMDYxfQ.uiSk_9KzprmFpNe0gSbtpC4bYmQUFLyHz_hkH8VdO2I",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/account/get-all-with-purchases",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"account",
+								"get-all-with-purchases"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Mail",
 			"item": [
 				{
@@ -799,6 +834,74 @@
 							"path": [
 								"subscription",
 								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Automatic Renewal",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MTAzNDgwNzQsImV4cCI6MTcxMDQzNDQ3NH0.3OvNPSnjz0dpMlprWt5amjq_S3nPoKGxSniRAbSk8QQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/subscription/account/1/updateAutomaticRenewal?automaticRenewal=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"subscription",
+								"account",
+								"1",
+								"updateAutomaticRenewal"
+							],
+							"query": [
+								{
+									"key": "automaticRenewal",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Renew Expired Subscriptions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDM2MzgyNSwiZXhwIjoxNzEwNDUwMjI1fQ.fmoHL3ro6Hl80zfTvC1EuvO2RRz0t9xgCOxejwnMNCs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/subscription/renew-expired",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"subscription",
+								"renew-expired"
 							]
 						}
 					},
@@ -1275,69 +1378,24 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Producto ainda mais",
-			"item": [
-				{
-					"name": "Login",
-					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"username\":\"ale\",\r\n    \"password\":\"123456\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/login",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"login"
-							]
-						}
-					},
-					"response": []
 				},
 				{
-					"name": "Create Coupon",
+					"name": "Get Coupons By Account Id",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUiLCJpYXQiOjE3MDk1ODEwMDAsImV4cCI6MTcwOTY2NzQwMH0.aZFiBUvBPxxZKIwHB2-IB2UINeTsK6tdQRDqpXW2nGk",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhbGUyIiwiaWF0IjoxNzEwMTg1MTQ3LCJleHAiOjE3MTAyNzE1NDd9.tCc8HmCPS9S3UUo4acQYSnxOo97CgP79X3C45enZcjA",
 									"type": "string"
 								}
 							]
 						},
-						"method": "POST",
+						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"issueDate\": \"2024-02-26\",\r\n    \"dueDate\": \"2024-03-26\",\r\n    \"amount\": \"200.00\",\r\n    \"spent\": false,\r\n    \"account\": {\r\n        \"id\": 1\r\n    }\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "http://localhost:8080/coupon/create",
+							"raw": "http://localhost:8080/coupon/valid-coupons/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1345,46 +1403,8 @@
 							"port": "8080",
 							"path": [
 								"coupon",
-								"create"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Store Subscription",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwOTc2NjMzNCwiZXhwIjoxNzA5ODUyNzM0fQ.82UW2BJVVUfZ6N29hWf2BWKUkcJdL8lYsKv-ffaJk70",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Mensual\",\r\n    \"price\": 100.0,\r\n    \"description\": \"Basic month subscription\",\r\n    \"imageUrl\": \"www.google.com\",\r\n    \"planType\": \"Individual\",\r\n    \"durationDays\": 30\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/store-subscription/create",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"store-subscription",
-								"create"
+								"valid-coupons",
+								"1"
 							]
 						}
 					},
@@ -1429,6 +1449,304 @@
 							"path": [
 								"api",
 								"purchases"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Purchases By Account Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDIyNTYzOSwiZXhwIjoxNzEwMzEyMDM5fQ.87T5GPMrtk5e4sVeafW8TUpnrAl0EOED_l3K8_bOElY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/purchases/account/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"purchases",
+								"account",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Purchases",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQzMjYyMywiZXhwIjoxNzEwNTE5MDIzfQ.q_nCjM1OxPK_ORtyPzr1NVibFZsqViY-d3IC-W2jCdU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/purchases/get-all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"purchases",
+								"get-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Purchase By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQzMjYyMywiZXhwIjoxNzEwNTE5MDIzfQ.q_nCjM1OxPK_ORtyPzr1NVibFZsqViY-d3IC-W2jCdU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/purchases/get/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"purchases",
+								"get",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Purchases By Date Range",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ0NTIwNywiZXhwIjoxNzEwNTMxNjA3fQ.FiHlWf8r7qLsIOm6i3yQKLR1hdFyZFCfvCRosYJysLE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startDate\": \"2024-03-12\",\r\n    \"endDate\": \"2024-03-24\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/purchases/getByDateRange",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"purchases",
+								"getByDateRange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Total Purchases Amount By Date Range",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ0NTIwNywiZXhwIjoxNzEwNTMxNjA3fQ.FiHlWf8r7qLsIOm6i3yQKLR1hdFyZFCfvCRosYJysLE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startDate\": \"2024-03-12\",\r\n    \"endDate\": \"2024-03-24\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/purchases/getTotalByDateRange",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"purchases",
+								"getTotalByDateRange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Purchases Count By Date Range",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ0NTIwNywiZXhwIjoxNzEwNTMxNjA3fQ.FiHlWf8r7qLsIOm6i3yQKLR1hdFyZFCfvCRosYJysLE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startDate\": \"2024-03-12\",\r\n    \"endDate\": \"2024-03-24\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/purchases/getCountByDateRange",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"purchases",
+								"getCountByDateRange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Purchases Average By Date Range",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ0NTIwNywiZXhwIjoxNzEwNTMxNjA3fQ.FiHlWf8r7qLsIOm6i3yQKLR1hdFyZFCfvCRosYJysLE",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startDate\": \"2024-03-12\",\r\n    \"endDate\": \"2024-03-24\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/purchases/getAverageByDateRange",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"purchases",
+								"getAverageByDateRange"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Average Purchase Amount Per User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/purchases/average-purchase-amount-per-user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"purchases",
+								"average-purchase-amount-per-user"
 							]
 						}
 					},
@@ -1888,6 +2206,147 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get All Categories",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/category/get-all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"category",
+								"get-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/category/get/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"category",
+								"get",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Cuidado Personal\",\r\n    \"description\": \"Productos para el cuidado personal y la salud\",\r\n    \"imageUrl\": \"http://www.google.com/image.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/category/update/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"category",
+								"update",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/category/delete/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"category",
+								"delete",
+								"1"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1929,6 +2388,253 @@
 							"path": [
 								"image",
 								"upload",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Images",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/image/get-all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"image",
+								"get-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Image By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/image/get/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"image",
+								"get",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Images By Product Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/image/product/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"image",
+								"product",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save Image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Example\",\r\n    \"url\": \"http://www.google.com/image.jpg\",\r\n    \"product\": {\r\n        \"id\": 1\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/image/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"image",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Example2\",\r\n    \"url\": \"http://www.google.com/image2.jpg\",\r\n    \"product\": {\r\n        \"id\": 2\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/image/update/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"image",
+								"update",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcxMDQ4MjI0MCwiZXhwIjoxNzEwNTY4NjQwfQ.ut0nUbMe65J6y3z8JudTMFS_7A28wvHXXyQ4gmdCobo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/image/delete/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"image",
+								"delete",
 								"1"
 							]
 						}

@@ -2,7 +2,10 @@ package com.gym.services.impl;
 
 import com.gym.dto.AccountDTO;
 import com.gym.dto.response.AccountDetailsDTO;
+import com.gym.dto.response.AccountPurchaseDTO;
+import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.entities.Account;
+import com.gym.entities.Purchase;
 import com.gym.enums.ERank;
 import com.gym.entities.Rank;
 import com.gym.entities.Subscription;
@@ -14,14 +17,19 @@ import com.gym.repositories.RankRepository;
 import com.gym.security.configuration.jwt.JwtUtils;
 import com.gym.security.entities.UserEntity;
 import com.gym.security.repositories.UserRepository;
+import com.gym.services.PurchaseService;
 import com.gym.services.SubscriptionService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class AccountService {
@@ -34,6 +42,9 @@ public class AccountService {
     private JwtUtils jwtUtils;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    @Lazy
+    private PurchaseService purchaseService;
 
     public AccountService(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
@@ -150,8 +161,6 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-
-
     public Account getAccountFromToken(String token) {
         if (token == null || !token.startsWith("Bearer ")) {
             throw new UnauthorizedException("No se encontró un token de autorización válido.");
@@ -169,5 +178,36 @@ public class AccountService {
         UserEntity user = optionalUser.get();
         return accountRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Cuenta no encontrada para el usuario: " + user.getId()));
+    }
+
+
+
+    public List<AccountPurchaseDTO> getAllAccountsWithPurchasesDTO() {
+        Iterable<Account> accountIterable = accountRepository.findAll();
+        List<Account> accounts = new ArrayList<>();
+        accountIterable.forEach(accounts::add);
+        return accounts.stream()
+                .map(this::mapToAccountPurchaseDTO)
+                .collect(Collectors.toList());
+    }
+
+    private AccountPurchaseDTO mapToAccountPurchaseDTO(Account account) {
+        return new AccountPurchaseDTO(
+                account.getId(),
+                account.getUser().getId(),
+                account.getCreditBalance(),
+                account.getRank().getName().name(),
+                mapPurchasesToDTO(account.getPurchaseList())
+        );
+    }
+
+    private List<PurchaseResponseDTO> mapPurchasesToDTO(List<Purchase> purchases) {
+        return purchases.stream()
+                .map(this::mapToPurchaseDTO)
+                .collect(Collectors.toList());
+    }
+
+    private PurchaseResponseDTO mapToPurchaseDTO(Purchase purchase) {
+        return purchaseService.buildPurchaseResponse(purchase);
     }
 }

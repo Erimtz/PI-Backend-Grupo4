@@ -125,4 +125,15 @@ public class PurchaseController {
         }
     }
 
+    @GetMapping("/average-purchase-amount-per-user")
+    public ResponseEntity<Double> calculateAveragePurchaseAmountPerUser() {
+        try {
+            Double averagePurchaseAmountPerUser = purchaseService.calculateAveragePurchaseAmountPerUser();
+            return ResponseEntity.ok(averagePurchaseAmountPerUser);
+        } catch (NoAccountsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }

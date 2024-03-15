@@ -62,7 +62,7 @@ public class ImageController {
         return ResponseEntity.ok(imageDTO);
     }
 
-    @GetMapping("/products/{productId}")
+    @GetMapping("/product/{productId}")
     public ResponseEntity<List<ImageResponseDTO>> getImagesByProduct(@PathVariable Long productId) {
         try {
             List<ImageResponseDTO> images = imageService.getImagesByProduct(productId);
