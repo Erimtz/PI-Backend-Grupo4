@@ -198,4 +198,16 @@ public class CouponServiceImpl implements CouponService {
         coupon.setAccount(account);
         return coupon;
     }
+
+    @Override
+    public double calculateCouponEffectiveness() {
+        long totalCouponsCreated = couponRepository.count();
+        long totalCouponsUsed = couponRepository.countBySpentTrue();
+
+        if(totalCouponsCreated == 0) {
+            return 0; // Evita dividir por cero
+        }
+
+        return ((double) totalCouponsUsed / totalCouponsCreated) * 100;
+    }
 }

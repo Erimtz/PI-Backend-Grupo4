@@ -113,6 +113,12 @@ public class CouponController {
         }
     }
 
+    @GetMapping("/effectiveness")
+    public ResponseEntity<Double> calculateCouponEffectiveness() {
+        double effectiveness = couponService.calculateCouponEffectiveness();
+        return ResponseEntity.ok(effectiveness);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/convert-response-to-entity")
     public Coupon convertResponseToEntity(@RequestBody CouponResponseDTO couponResponseDTO) {

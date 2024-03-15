@@ -23,4 +23,6 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM Coupon s WHERE s.id = :couponId AND s.dueDate < CURRENT_DATE()")
     boolean isCouponExpired(Long couponId);
     List<Coupon> findByAccountId(Long accountId);
+
+    long countBySpentTrue();
 }
