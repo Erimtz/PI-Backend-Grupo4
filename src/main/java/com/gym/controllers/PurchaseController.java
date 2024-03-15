@@ -2,7 +2,10 @@ package com.gym.controllers;
 
 import com.gym.dto.request.DateRangeDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
+import com.gym.dto.response.ProductAmountResponseDTO;
+import com.gym.dto.response.ProductSalesResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
+import com.gym.entities.Product;
 import com.gym.exceptions.*;
 import com.gym.security.configuration.utils.AccountTokenUtils;
 import com.gym.services.PurchaseService;
@@ -14,9 +17,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.LinkedHashMap;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/purchases")
@@ -131,6 +137,36 @@ public class PurchaseController {
             Double averagePurchaseAmountPerUser = purchaseService.calculateAveragePurchaseAmountPerUser();
             return ResponseEntity.ok(averagePurchaseAmountPerUser);
         } catch (NoAccountsException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/units-sold-by-product")
+    public ResponseEntity<List<ProductSalesResponseDTO>> getProductsByUnitsSold() {
+        try {
+            List<ProductSalesResponseDTO> products = purchaseService.getUnitsSoldByProduct();
+            if (products.isEmpty()) {
+                throw new NoDataFoundException("No products found");
+            }
+            return ResponseEntity.ok(products);
+        } catch (NoDataFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/total-sales-by-product")
+    public ResponseEntity<List<ProductAmountResponseDTO>> getSalesByProduct() {
+        try {
+            List<ProductAmountResponseDTO> salesByProduct = purchaseService.getSalesByProduct();
+            if (salesByProduct.isEmpty()) {
+                throw new NoDataFoundException("No sales found");
+            }
+            return ResponseEntity.ok(salesByProduct);
+        } catch (NoDataFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

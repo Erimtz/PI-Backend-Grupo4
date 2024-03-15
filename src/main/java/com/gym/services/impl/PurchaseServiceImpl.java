@@ -4,10 +4,7 @@ import com.gym.dto.CouponResponseDTO;
 import com.gym.dto.request.DateRangeDTO;
 import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
-import com.gym.dto.response.AccountDetailsDTO;
-import com.gym.dto.response.AccountPurchaseDTO;
-import com.gym.dto.response.PurchaseDetailResponseDTO;
-import com.gym.dto.response.PurchaseResponseDTO;
+import com.gym.dto.response.*;
 import com.gym.entities.*;
 import com.gym.enums.ERank;
 import com.gym.exceptions.*;
@@ -25,8 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -439,5 +435,80 @@ public class PurchaseServiceImpl implements PurchaseService {
         } catch (Exception e) {
             throw new PurchaseServiceException("Error calculating the average spending per user account.", e);
         }
+    }
+
+    @Override
+    public List<ProductSalesResponseDTO> getUnitsSoldByProduct() {
+        Map<Product, Integer> totalUnitsSoldByProduct = calculateTotalUnitsSoldByProduct();
+        if (totalUnitsSoldByProduct.isEmpty()) {
+            throw new NoDataFoundException("No units sold data available.");
+        }
+        List<ProductSalesResponseDTO> productSalesResponseDTOList = new ArrayList<>();
+
+        totalUnitsSoldByProduct.forEach((product, unitsSold) -> {
+            ProductSalesResponseDTO dto = new ProductSalesResponseDTO();
+            dto.setId(product.getId());
+            dto.setName(product.getName());
+            dto.setUnitsSold(unitsSold);
+            dto.setPrice(product.getPrice());
+            dto.setCategoryId(product.getCategory().getId());
+            productSalesResponseDTOList.add(dto);
+        });
+
+        productSalesResponseDTOList.sort(Comparator.comparing(ProductSalesResponseDTO::getUnitsSold).reversed());
+        return productSalesResponseDTOList;
+    }
+
+    @Override
+    public List<ProductAmountResponseDTO> getSalesByProduct() {
+        Map<Product, Double> totalSalesByProduct = calculateTotalSalesByProduct();
+        if (totalSalesByProduct.isEmpty()) {
+            throw new NoDataFoundException("No sales data available.");
+        }
+        List<ProductAmountResponseDTO> productAmountResponseDTOList = new ArrayList<>();
+
+        totalSalesByProduct.forEach((product, totalSales) -> {
+            ProductAmountResponseDTO dto = new ProductAmountResponseDTO();
+            dto.setId(product.getId());
+            dto.setName(product.getName());
+            dto.setTotalSales(totalSales);
+            dto.setPrice(product.getPrice());
+            dto.setCategoryId(product.getCategory().getId());
+            productAmountResponseDTOList.add(dto);
+        });
+
+        productAmountResponseDTOList.sort(Comparator.comparing(ProductAmountResponseDTO::getTotalSales).reversed());
+        return productAmountResponseDTOList;
+    }
+
+    private Map<Product, Integer> calculateTotalUnitsSoldByProduct() {
+        Map<Product, Integer> totalUnitsSoldByProduct = new HashMap<>();
+        List<Purchase> purchases = purchaseRepository.findAll();
+
+        for (Purchase purchase : purchases) {
+            List<PurchaseDetail> purchaseDetails = purchase.getPurchaseDetails();
+            for (PurchaseDetail purchaseDetail : purchaseDetails) {
+                Product product = purchaseDetail.getProduct();
+                Integer quantitySold = purchaseDetail.getQuantity();
+                totalUnitsSoldByProduct.put(product, totalUnitsSoldByProduct.getOrDefault(product, 0) + quantitySold);
+            }
+        }
+        return totalUnitsSoldByProduct;
+    }
+
+    private Map<Product, Double> calculateTotalSalesByProduct() {
+        Map<Product, Double> totalSalesByProduct = new HashMap<>();
+        List<Purchase> purchases = purchaseRepository.findAll();
+
+        for (Purchase purchase : purchases) {
+            List<PurchaseDetail> purchaseDetails = purchase.getPurchaseDetails();
+            for (PurchaseDetail purchaseDetail : purchaseDetails) {
+                Product product = purchaseDetail.getProduct();
+                Integer quantitySold = purchaseDetail.getQuantity();
+                Double subtotal = product.getPrice() * quantitySold;
+                totalSalesByProduct.put(product, totalSalesByProduct.getOrDefault(product, 0.0) + subtotal);
+            }
+        }
+        return totalSalesByProduct;
     }
 }
