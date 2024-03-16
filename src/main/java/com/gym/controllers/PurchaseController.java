@@ -12,10 +12,12 @@ import com.gym.services.PurchaseService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import org.springframework.web.server.ResponseStatusException;
 import java.util.LinkedHashMap;
 
@@ -51,6 +53,16 @@ public class PurchaseController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/sales/by-category")
+    public ResponseEntity<Map<String, Double>> getSalesByCategory(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        Map<String, Double> salesByCategory = purchaseService.calculateSalesByCategory(startDate, endDate);
+        return new ResponseEntity<>(salesByCategory, HttpStatus.OK);
     }
 
     @GetMapping("/account/{accountId}")

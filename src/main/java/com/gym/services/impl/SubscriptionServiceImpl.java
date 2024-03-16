@@ -11,6 +11,7 @@ import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.exceptions.UnauthorizedException;
 import com.gym.repositories.StoreSubscriptionRepository;
 import com.gym.repositories.SubscriptionRepository;
+import com.gym.security.repositories.UserRepository;
 import com.gym.security.configuration.utils.AccountTokenUtils;
 import com.gym.services.PurchaseService;
 import com.gym.services.SubscriptionService;
@@ -42,6 +43,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Autowired
     @Lazy
     private AccountService accountService;
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private final AccountTokenUtils accountTokenUtils;
 
@@ -173,6 +176,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             return subscriptionRepository.save(subscription);
     }
 
+    @Override
+    public double calculateActiveSubscriptionRatio() {
+        List<Subscription> activeSubscriptions = subscriptionRepository.findActiveSubscriptions();
+        long totalUsers = userRepository.count();
+
+        if (totalUsers == 0) {
+            return 0.0; // Evitar la división por cero
+        }
+
+        int activeSubscriptionCount = activeSubscriptions.size();
+        return (double) activeSubscriptionCount / totalUsers;
+    }
     @Override
     public void deleteSubscriptionById(Long id) {
         Optional<Subscription> subscriptionOptional = subscriptionRepository.findById(id);

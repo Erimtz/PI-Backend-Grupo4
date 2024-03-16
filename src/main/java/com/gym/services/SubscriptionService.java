@@ -22,5 +22,8 @@ public interface SubscriptionService {
     Subscription updateAutomaticRenewal(Long accountId, boolean automaticRenewal, HttpServletRequest request);
     List<SubscriptionResponseDTO> renewExpiredSubscriptions(String token);
     Subscription updateSubscriptionPurchase(StoreSubscription storeSubscription, String token);
+
+    double calculateActiveSubscriptionRatio();
+
     void deleteSubscriptionById(Long id);
 }

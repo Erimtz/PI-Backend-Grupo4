@@ -113,6 +113,12 @@ public class CouponController {
         }
     }
 
+    @GetMapping("/effectiveness")
+    public ResponseEntity<Double> calculateCouponEffectiveness() {
+        double effectiveness = couponService.calculateCouponEffectiveness();
+        return ResponseEntity.ok(effectiveness);
+    }
+
     @GetMapping("/account/{accountId}")
     public ResponseEntity<List<CouponResponseDTO>> getCouponsByAccount(@PathVariable Long accountId, HttpServletRequest request) {
         try {

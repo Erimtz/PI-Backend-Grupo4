@@ -25,4 +25,6 @@ public interface CouponService {
     public Coupon convertResponseToEntity(CouponResponseDTO couponResponseDTO);
     List<CouponResponseDTO> getValidCouponsByAccount(Long accountId, HttpServletRequest request);
     List<CouponResponseDTO> getCouponsByAccount(Long accountId, HttpServletRequest request);
+
+    double calculateCouponEffectiveness();
 }

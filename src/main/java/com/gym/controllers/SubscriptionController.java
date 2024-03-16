@@ -102,6 +102,12 @@ public class SubscriptionController {
         }
     }
 
+    @GetMapping("/active-subscription")
+    public ResponseEntity<Double> getActiveSubscriptionRatio() {
+        double ratio = subscriptionService.calculateActiveSubscriptionRatio();
+        return ResponseEntity.ok(ratio);
+    }
+
     @PutMapping("/account/{accountId}/updateAutomaticRenewal")
     public ResponseEntity<String> updateSubscriptionAutomaticRenewal(@PathVariable Long accountId,
                                                                      @RequestParam boolean automaticRenewal,

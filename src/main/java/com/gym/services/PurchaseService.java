@@ -8,11 +8,13 @@ import com.gym.dto.response.ProductSalesResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.entities.Product;
 import com.gym.entities.Purchase;
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
+import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.List;
+
 
 public interface PurchaseService {
 
@@ -22,6 +24,8 @@ public interface PurchaseService {
     Double calculateTotal(Purchase purchase);
 
     List<PurchaseResponseDTO> getPurchasesByAccount(Long accountId, HttpServletRequest request);
+
+    Map<String, Double> calculateSalesByCategory(LocalDate startDate, LocalDate endDate);
 //    PurchaseRequestDTO updatePurchase(PurchaseRequestDTO purchaseDTO);
 //    void deletePurchaseById(Long id);
     List<PurchaseResponseDTO> getAllPurchases(HttpServletRequest request);

@@ -22,7 +22,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -268,6 +271,23 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
             purchase.setCouponsApplied(appliedCoupons);
         }
+    }
+
+    public Map<String, Double> calculateSalesByCategory(LocalDate startDate, LocalDate endDate) {
+        List<Purchase> purchases = purchaseRepository.findAllByPurchaseDateBetween(startDate, endDate);
+        Map<String, Double> salesByCategory = new HashMap<>();
+
+        for (Purchase purchase : purchases) {
+            List<PurchaseDetail> purchaseDetails = purchase.getPurchaseDetails();
+            for (PurchaseDetail detail : purchaseDetails) {
+                Product product = detail.getProduct();
+                String category = product.getCategory().getName(); // Obtiene el nombre de la categoría del producto
+                Double subtotal = calculateSubtotal(detail);
+                salesByCategory.put(category, salesByCategory.getOrDefault(category, 0.0) + subtotal);
+            }
+        }
+
+        return salesByCategory;
     }
 
     public List<PurchaseResponseDTO> getPurchasesByAccount(Long accountId, HttpServletRequest request){
