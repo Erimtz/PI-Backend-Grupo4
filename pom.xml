@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.2</version>
+		<version>3.2.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.gym</groupId>
@@ -89,15 +89,10 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.hibernate.validator</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>6.2.0.Final</version>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<version>1.11.1000</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.amazonaws</groupId>-->
-<!--			<artifactId>aws-java-sdk</artifactId>-->
-<!--			<version>1.12.21</version>-->
-<!--		</dependency>-->
 	</dependencies>
 
 	<build>

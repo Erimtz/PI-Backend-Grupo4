@@ -64,6 +64,12 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
     }
 
+    @Override
+    public Product getProductEntityById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
+    }
+
     public Optional<ProductResponseDTO> getProductByIdWithImages(Long id) {
         return productRepository.findById(id)
                 .map(this::convertToDto);

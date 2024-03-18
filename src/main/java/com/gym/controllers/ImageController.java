@@ -1,14 +1,19 @@
 package com.gym.controllers;
 
 import com.gym.dto.request.ImageRequestDTO;
+import com.gym.dto.request.ImageS3RequestDTO;
 import com.gym.dto.response.ImageResponseDTO;
 import com.gym.entities.Image;
 import com.gym.entities.Product;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
 //import com.gym.services.AWSS3Service;
+//import com.gym.s3.services.StorageService;
+import com.gym.s3.services.StorageService;
 import com.gym.services.ImageService;
+import com.gym.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -27,7 +32,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 @Validated
 @RestController
@@ -37,15 +41,17 @@ public class ImageController {
 
     private final ImageService imageService;
     private final ProductRepository productRepository;
+    private final ProductService productService;
     private final ImageRepository imageRepository;
-//    private final AWSS3Service awss3Service;
+    private final StorageService storageService;
 
     @Autowired
-    public ImageController(ImageService imageService, ProductRepository productRepository, ImageRepository imageRepository/*, AWSS3Service awss3Service*/) {
+    public ImageController(ImageService imageService, ProductRepository productRepository, ImageRepository imageRepository, StorageService storageService, ProductService productService) {
         this.imageService = imageService;
         this.productRepository = productRepository;
         this.imageRepository = imageRepository;
-//        this.awss3Service = awss3Service;
+        this.storageService = storageService;
+        this.productService = productService;
     }
 
     @Operation(summary = "Traer todas las imagenes")
@@ -101,6 +107,7 @@ public class ImageController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload/{productId}")
+    @Transactional
     public ResponseEntity<String> uploadImage(@PathVariable Long productId, @RequestParam("file") MultipartFile file) {
         try {
             if (productId == null) {
@@ -142,50 +149,26 @@ public class ImageController {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/upload/s3/{productId}")
+    public ResponseEntity<String> uploadImageS3(@PathVariable Long productId, @RequestParam("file") MultipartFile file) {
+        try {
+            if (productId == null) {
+                return ResponseEntity.badRequest().body("Product ID cannot be null");
+            }
+            String uploadedFileName = storageService.uploadFile(file);
 
-//    @PostMapping("/uploadS3/{productId}")
-//    public ResponseEntity<String> uploadImageS3(@PathVariable Long productId, @RequestParam("file") MultipartFile file) {
-//        try {
-//            if (productId == null) {
-//                return ResponseEntity.badRequest().body("Product ID cannot be null");
-//            }
-//
-//            if (file.isEmpty()) {
-//                return ResponseEntity.badRequest().body("File is empty");
-//            }
-//
-//            String s3FileName = awss3Service.uploadImage(file);
-//
-//
-//            String s3Url = "URL del archivo en S3";
-//
-//            Optional<Product> productOptional = productRepository.findByIdWithImages(productId);
-//            if (productOptional.isEmpty()) {
-//                return ResponseEntity.badRequest().body("Product with ID " + productId + " not found");
-//            }
-//            Product product = productOptional.get();
-//
-//            Image image = new Image();
-//            image.setTitle(s3FileName);
-//            image.setUrl(s3Url);
-//            image.setProduct(product);
-//
-//            ImageResponseDTO savedImageDTO = imageService.createImage(imageService.convertToRequestDto(image));
-//
-//            Image savedImage = new Image();
-//            savedImage.setId(savedImageDTO.getId());
-//            savedImage.setTitle(savedImageDTO.getTitle());
-//            savedImage.setUrl(savedImageDTO.getUrl());
-//            savedImage.setProduct(productRepository.findById(savedImageDTO.getProductId()).get());
-//
-//            product.addImage(savedImage);
-//            productRepository.save(product);
-//
-//            return ResponseEntity.ok("Image uploaded successfully");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image");
-//        }
-//    }
+            ImageS3RequestDTO imageRequestDTO = new ImageS3RequestDTO();
+            imageRequestDTO.setTitle(uploadedFileName);
+            imageRequestDTO.setUrl(storageService.getFileUrl(uploadedFileName));
+            imageRequestDTO.setProductId(productId);
+
+            ImageResponseDTO imageResponseDTO = imageService.createImageS3(imageRequestDTO);
+
+            return ResponseEntity.ok("Image uploaded successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image");
+        }
+    }
 }

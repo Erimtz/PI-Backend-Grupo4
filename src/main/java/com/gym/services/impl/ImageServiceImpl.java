@@ -1,7 +1,9 @@
 package com.gym.services.impl;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.gym.dto.*;
 import com.gym.dto.request.ImageRequestDTO;
+import com.gym.dto.request.ImageS3RequestDTO;
 import com.gym.dto.response.ImageResponseDTO;
 import com.gym.dto.response.ProductResponseDTO;
 import com.gym.entities.Category;
@@ -10,11 +12,13 @@ import com.gym.entities.Product;
 import com.gym.exceptions.DatabaseOperationException;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
+import com.gym.repositories.ProductRepository;
 import com.gym.services.CategoryService;
 import com.gym.services.ImageService;
 import com.gym.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +33,7 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
     private final ProductService productService;
     private final CategoryService categoryService;
+    private final ProductRepository productRepository;
 
     @Override
     public List<ImageResponseDTO> getAllImages() {
@@ -61,6 +66,36 @@ public class ImageServiceImpl implements ImageService {
                     .product(imageRequestDTO.getProduct())
                     .build();
             Image savedImage = imageRepository.save(image);
+            image.setId(savedImage.getId());
+            return convertToResponseDto(image);
+        } catch (Exception e) {
+            throw new DatabaseOperationException("Error occurred while saving image", e);
+        }
+    }
+
+    @Override
+    public ImageResponseDTO createImageS3(ImageS3RequestDTO imageS3RequestDTO) {
+        try {
+            if (imageS3RequestDTO.getProductId() == null) {
+                throw new IllegalArgumentException("Product ID in RequestImageDTO is null");
+            }
+
+            Optional<Product> productOptional = productRepository.findByIdWithImages(imageS3RequestDTO.getProductId());
+            if (productOptional.isEmpty()) {
+                throw new NotFoundException("No se encontro el producto con ID: " + imageS3RequestDTO.getProductId());
+            }
+            Product product = productOptional.get();
+
+            Image image = Image.builder()
+                    .title(imageS3RequestDTO.getTitle())
+                    .url(imageS3RequestDTO.getUrl())
+                    .product(product)
+                    .build();
+            Image savedImage = imageRepository.save(image);
+
+            product.addImage(savedImage);
+            productRepository.save(product);
+
             image.setId(savedImage.getId());
             return convertToResponseDto(image);
         } catch (Exception e) {

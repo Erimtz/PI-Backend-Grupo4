@@ -1,8 +1,12 @@
 package com.gym.security.controllers.request;
 
+//import jakarta.validation.constraints.*;
+//import javax.validation.constraints.*;
+
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,17 +20,23 @@ import java.util.Set;
 public class CreateUserDTO {
     @Email
     @NotBlank
+    @NotNull
     private String email;
-    @Min(3)
+    @Size(min = 3, max = 30)
+    @NotBlank
+    @NotNull
     private String firstName;
-    @Min(3)
+    @Size(min = 3, max = 30)
     private String lastName;
     @NotBlank
-    @Min(3)
+    @NotNull
+    @Size(min = 3, max = 20)
     private String username;
     @NotBlank
-    @Min(6)
+    @NotNull
+    @Size(min = 6, max = 64)
     private String password;
     private Set<String> roles;
+    @NotNull
     private String document;
 }

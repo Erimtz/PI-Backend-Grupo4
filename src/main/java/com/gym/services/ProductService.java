@@ -12,6 +12,7 @@ public interface ProductService {
 
     List<ProductResponseDTO> getAllProducts();
     ProductResponseDTO getProductById(Long id);
+    Product getProductEntityById(Long id);
     Optional<ProductResponseDTO> getProductByIdWithImages(Long id);
     ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO);
     ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTO);

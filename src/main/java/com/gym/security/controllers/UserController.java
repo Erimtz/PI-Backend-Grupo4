@@ -17,13 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/user")
-@Valid
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -59,7 +60,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{username}")
-    public ResponseEntity<?> updateUser(@PathVariable String username, @Valid @RequestBody UpdateUserDTO updateUserDTO, @RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<?> updateUser(@PathVariable String username, @RequestBody @Valid UpdateUserDTO updateUserDTO, @RequestHeader("Authorization") String authorizationHeader) {
         try {
             ResponseUserDTO responseUserDTO = userService.updateUser(username, updateUserDTO, authorizationHeader);
             return ResponseEntity.ok(responseUserDTO);

@@ -21,6 +21,7 @@ import com.gym.security.repositories.RoleRepository;
 import com.gym.security.repositories.UserRepository;
 import com.gym.services.impl.AccountService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
