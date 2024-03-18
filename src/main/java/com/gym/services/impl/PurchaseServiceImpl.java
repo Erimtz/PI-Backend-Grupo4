@@ -270,21 +270,33 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
     }
 
-    public Map<String, Double> calculateSalesByCategory(LocalDate startDate, LocalDate endDate) {
-        List<Purchase> purchases = purchaseRepository.findAllByPurchaseDateBetween(startDate, endDate);
-        Map<String, Double> salesByCategory = new HashMap<>();
+    public List<PurchaseResponseDTO> calculateSalesByCategory(DateRangeDTO dateRangeDTO) {
+        try {
+            LocalDate startDate = dateRangeDTO.getStartDate();
+            LocalDate endDate = dateRangeDTO.getEndDate();
 
-        for (Purchase purchase : purchases) {
-            List<PurchaseDetail> purchaseDetails = purchase.getPurchaseDetails();
-            for (PurchaseDetail detail : purchaseDetails) {
-                Product product = detail.getProduct();
-                String category = product.getCategory().getName(); // Obtiene el nombre de la categoría del producto
-                Double subtotal = calculateSubtotal(detail);
-                salesByCategory.put(category, salesByCategory.getOrDefault(category, 0.0) + subtotal);
+            List<Purchase> purchases = purchaseRepository.findAllByPurchaseDateBetween(startDate, endDate);
+            Map<String, Double> salesByCategory = new HashMap<>();
+
+            for (Purchase purchase : purchases) {
+                List<PurchaseDetail> purchaseDetails = purchase.getPurchaseDetails();
+                for (PurchaseDetail detail : purchaseDetails) {
+                    Product product = detail.getProduct();
+                    String category = product.getCategory().getName(); // Obtiene el nombre de la categoría del producto
+                    Double subtotal = calculateSubtotal(detail);
+                    salesByCategory.put(category, salesByCategory.getOrDefault(category, 0.0) + subtotal);
+                }
             }
-        }
 
-        return salesByCategory;
+            List<PurchaseResponseDTO> responseDTOs = new ArrayList<>();
+            for (Map.Entry<String, Double> entry : salesByCategory.entrySet()) {
+                PurchaseResponseDTO responseDTO = new PurchaseResponseDTO();
+                responseDTOs.add(responseDTO);
+            }
+            return responseDTOs;
+        } catch (Exception e) {
+            throw new ServiceException("Error occurred while retrieving purchases by date range", e);
+        }
     }
 
     public List<PurchaseResponseDTO> getPurchasesByAccount(Long accountId, HttpServletRequest request){

@@ -57,11 +57,11 @@ public class PurchaseController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/sales/by-category")
-    public ResponseEntity<Map<String, Double>> getSalesByCategory(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    public ResponseEntity<?> getSalesByCategory(@RequestBody DateRangeDTO dateRangeDTO) {
+        LocalDate startDate = dateRangeDTO.getStartDate();
+        LocalDate endDate = dateRangeDTO.getEndDate();
 
-        Map<String, Double> salesByCategory = purchaseService.calculateSalesByCategory(startDate, endDate);
+        List<PurchaseResponseDTO> salesByCategory = purchaseService.calculateSalesByCategory(dateRangeDTO);
         return new ResponseEntity<>(salesByCategory, HttpStatus.OK);
     }
 
