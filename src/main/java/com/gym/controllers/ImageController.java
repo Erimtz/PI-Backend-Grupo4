@@ -5,6 +5,7 @@ import com.gym.dto.request.ImageS3RequestDTO;
 import com.gym.dto.response.ImageResponseDTO;
 import com.gym.entities.Image;
 import com.gym.entities.Product;
+import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
 //import com.gym.services.AWSS3Service;
@@ -101,8 +102,29 @@ public class ImageController {
     @Operation(summary = "Eliminar una imagen por ID")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteImageById(@PathVariable Long id) {
-        imageService.deleteImageById(id);
-        return ResponseEntity.noContent().build();
+//        imageService.deleteImageById(id);
+//        return ResponseEntity.noContent().build();
+        try {
+            ImageResponseDTO imageDTO = imageService.getImageById(id);
+            if (imageDTO == null) {
+                throw new ResourceNotFoundException("Image with ID " + id + " not found");
+            }
+
+            // Desvincular la imagen del producto si tiene un ID de producto válido
+            Long productId = imageDTO.getProductId();
+            if (productId != null) {
+                imageService.unlinkImageFromProduct(id); // Actualiza la relación producto-imagen
+            }
+
+            // Eliminar la imagen
+            imageService.deleteImageById(id);
+
+            return ResponseEntity.noContent().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PreAuthorize("hasRole('ADMIN')")

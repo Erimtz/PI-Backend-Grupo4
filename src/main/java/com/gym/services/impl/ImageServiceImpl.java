@@ -13,9 +13,11 @@ import com.gym.exceptions.DatabaseOperationException;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
+import com.gym.s3.services.StorageService;
 import com.gym.services.CategoryService;
 import com.gym.services.ImageService;
 import com.gym.services.ProductService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,7 @@ public class ImageServiceImpl implements ImageService {
     private final ProductService productService;
     private final CategoryService categoryService;
     private final ProductRepository productRepository;
+    private final StorageService storageService;
 
     @Override
     public List<ImageResponseDTO> getAllImages() {
@@ -128,10 +131,19 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
+    @Transactional
     public void deleteImageById(Long id) {
         if (!imageRepository.existsById(id)) {
             throw new ResourceNotFoundException("Image with ID " + id + " not found");
         }
+        Image image = imageRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Image with ID " + id + " not found"));
+
+        if (image.getProduct() != null) {
+            // Desvincular la imagen del producto
+            unlinkImageFromProduct(id);
+        }
+        storageService.deleteFile(image.getTitle());
         imageRepository.deleteById(id);
     }
 
@@ -149,6 +161,22 @@ public class ImageServiceImpl implements ImageService {
             e.printStackTrace();
             throw new DataAccessResourceFailureException("Error accessing database resources", e);
         }
+    }
+
+    @Override
+    public void unlinkImageFromProduct(Long imageId) {
+        Image image = imageRepository.findById(imageId)
+                .orElseThrow(() -> new ResourceNotFoundException("Image with ID " + imageId + " not found"));
+
+        Product product = image.getProduct();
+
+        if (product != null) {
+            product.removeImage(image);
+            productRepository.save(product);
+        }
+
+        image.setProduct(null);
+        imageRepository.save(image);
     }
 
     @Override

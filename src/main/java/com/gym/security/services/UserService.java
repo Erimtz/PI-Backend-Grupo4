@@ -245,6 +245,10 @@ public class UserService {
         String newPassword = changePasswordDTO.getNewPassword();
         String confirmPassword = changePasswordDTO.getConfirmPassword();
 
+        if (!currentPassword.equals(newPassword)) {
+            throw new BadRequestException("La nueva contraseña debe ser diferente a la contraseña actual");
+        }
+
         if (!newPassword.equals(confirmPassword)) {
             throw new BadRequestException("La nueva contraseña y la confirmación de la contraseña no coinciden");
         }

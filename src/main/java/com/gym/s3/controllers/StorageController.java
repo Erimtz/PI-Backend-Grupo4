@@ -3,10 +3,8 @@ package com.gym.s3.controllers;
 //import com.gym.s3.services.StorageService;
 import com.gym.s3.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -19,5 +17,11 @@ public class StorageController {
     @PostMapping("/upload")
     public String uploadFile(@RequestParam(value = "file") MultipartFile file) {
         return storageService.uploadFile(file);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteFile(@RequestParam(value = "fileName") String fileName) {
+        storageService.deleteFile(fileName);
+        return ResponseEntity.ok("File deleted successfully");
     }
 }

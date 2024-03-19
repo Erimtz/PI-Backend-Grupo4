@@ -63,4 +63,9 @@ public class Product {
         this.images.add(image);
         image.setProduct(this);
     }
+
+    public void removeImage(Image image) {
+        this.images.remove(image);
+        image.setProduct(null);
+    }
 }

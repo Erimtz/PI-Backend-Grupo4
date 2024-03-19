@@ -16,6 +16,7 @@ public interface ImageService {
     ImageResponseDTO updateImage(ImageRequestDTO imageRequestDTO);
     void deleteImageById(Long id);
     List<ImageResponseDTO> getImagesByProduct(Long productId);
+    void unlinkImageFromProduct(Long imageId);
     ImageResponseDTO convertToResponseDto(Image image);
     ImageRequestDTO convertToRequestDto(Image image);
 

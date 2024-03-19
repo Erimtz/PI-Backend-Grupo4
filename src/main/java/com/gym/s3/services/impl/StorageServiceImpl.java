@@ -1,6 +1,7 @@
 package com.gym.s3.services.impl;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.gym.s3.services.StorageService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,16 @@ public class StorageServiceImpl implements StorageService {
         return fileName;
     }
 
+    @Override
+    public String getFileUrl(String fileName) {
+        return s3Client.getUrl(bucketName, fileName).toString();
+    }
+
+    @Override
+    public void deleteFile(String fileName) {
+        s3Client.deleteObject(new DeleteObjectRequest(bucketName, fileName));
+    }
+
     private String generateFileName(MultipartFile file) {
         return System.currentTimeMillis() + "_" + file.getOriginalFilename();
     }
@@ -44,10 +55,5 @@ public class StorageServiceImpl implements StorageService {
             e.printStackTrace();
         }
         return convertedFile;
-    }
-
-    @Override
-    public String getFileUrl(String fileName) {
-        return s3Client.getUrl(bucketName, fileName).toString();
     }
 }
