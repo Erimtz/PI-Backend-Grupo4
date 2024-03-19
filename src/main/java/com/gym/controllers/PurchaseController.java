@@ -5,7 +5,13 @@ import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.exceptions.CouponDiscountExceededException;
 import com.gym.exceptions.InsufficientCreditException;
 import com.gym.exceptions.NotEnoughStockException;
+import com.gym.security.entities.UserEntity;
 import com.gym.services.PurchaseService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +30,18 @@ public class PurchaseController {
     private final PurchaseService purchaseService;
 
     @PreAuthorize("hasRole('USER')")
+    @Operation(summary = "Crear compra")
     @PostMapping
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Compra creada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Error de respuesta",content =
+            @Content),
+            @ApiResponse(responseCode = "400", description = "Error de parametros",content =
+            @Content),
+
+    })
     public ResponseEntity<?> createPurchase(@RequestBody PurchaseRequestDTO requestDTO, HttpServletRequest request) {
         try {
             String token = request.getHeader("Authorization");
