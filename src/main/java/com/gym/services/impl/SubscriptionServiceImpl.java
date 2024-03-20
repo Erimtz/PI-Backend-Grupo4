@@ -178,16 +178,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public double calculateActiveSubscriptionRatio() {
-        List<Subscription> activeSubscriptions = subscriptionRepository.findActiveSubscriptions();
-        long totalUsers = userRepository.count();
+        try{
+            List<Subscription> activeSubscriptions = subscriptionRepository.findActiveSubscriptions();
+            long totalUsers = accountService.count();
 
-        if (totalUsers == 0) {
-            return 0.0; // Evitar la división por cero
+            if (totalUsers == 0) {
+                return 0.0; // Evitar la división por cero
+            }
+
+            int activeSubscriptionCount = activeSubscriptions.size();
+            return (double) activeSubscriptionCount / totalUsers;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1.0; // Devuelve un valor predeterminado para indicar que ha ocurrido un error
         }
-
-        int activeSubscriptionCount = activeSubscriptions.size();
-        return (double) activeSubscriptionCount / totalUsers;
     }
+
     @Override
     public void deleteSubscriptionById(Long id) {
         Optional<Subscription> subscriptionOptional = subscriptionRepository.findById(id);

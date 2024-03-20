@@ -25,7 +25,7 @@ public interface PurchaseService {
 
     List<PurchaseResponseDTO> getPurchasesByAccount(Long accountId, HttpServletRequest request);
 
-    Map<String, Double> calculateSalesByCategory(LocalDate startDate, LocalDate endDate);
+    List<PurchaseResponseDTO> calculateSalesByCategory(DateRangeDTO dateRangeDTO);
 //    PurchaseRequestDTO updatePurchase(PurchaseRequestDTO purchaseDTO);
 //    void deletePurchaseById(Long id);
     List<PurchaseResponseDTO> getAllPurchases(HttpServletRequest request);

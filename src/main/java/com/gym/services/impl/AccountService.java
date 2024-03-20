@@ -210,4 +210,8 @@ public class AccountService {
     private PurchaseResponseDTO mapToPurchaseDTO(Purchase purchase) {
         return purchaseService.buildPurchaseResponse(purchase);
     }
+
+    public long count() {
+        return userRepository.count();
+    }
 }
