@@ -2,6 +2,7 @@ package com.gym.controllers;
 
 import com.gym.dto.request.DateRangeDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
+import com.gym.dto.response.CategorySalesResponseDTO;
 import com.gym.dto.response.ProductAmountResponseDTO;
 import com.gym.dto.response.ProductSalesResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
@@ -85,7 +86,7 @@ public class PurchaseController {
         LocalDate startDate = dateRangeDTO.getStartDate();
         LocalDate endDate = dateRangeDTO.getEndDate();
 
-        List<PurchaseResponseDTO> salesByCategory = purchaseService.calculateSalesByCategory(dateRangeDTO);
+        List<CategorySalesResponseDTO> salesByCategory = purchaseService.calculateSalesByCategory(dateRangeDTO);
         return new ResponseEntity<>(salesByCategory, HttpStatus.OK);
     }
 

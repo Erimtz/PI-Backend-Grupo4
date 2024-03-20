@@ -270,27 +270,33 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
     }
 
-    public List<PurchaseResponseDTO> calculateSalesByCategory(DateRangeDTO dateRangeDTO) { // Revisar para 20/3
+    public List<CategorySalesResponseDTO> calculateSalesByCategory(DateRangeDTO dateRangeDTO) { // Revisar para 20/3
         try {
             LocalDate startDate = dateRangeDTO.getStartDate();
             LocalDate endDate = dateRangeDTO.getEndDate();
 
             List<Purchase> purchases = purchaseRepository.findAllByPurchaseDateBetween(startDate, endDate);
-            Map<String, Double> salesByCategory = new HashMap<>();
+            Map<Category, Double> salesByCategory = new HashMap<>();
 
             for (Purchase purchase : purchases) {
                 List<PurchaseDetail> purchaseDetails = purchase.getPurchaseDetails();
                 for (PurchaseDetail detail : purchaseDetails) {
                     Product product = detail.getProduct();
-                    String category = product.getCategory().getName(); // Obtiene el nombre de la categoría del producto
+                    Category category = product.getCategory();
                     Double subtotal = calculateSubtotal(detail);
                     salesByCategory.put(category, salesByCategory.getOrDefault(category, 0.0) + subtotal);
                 }
             }
 
-            List<PurchaseResponseDTO> responseDTOs = new ArrayList<>();
-            for (Map.Entry<String, Double> entry : salesByCategory.entrySet()) {
-                PurchaseResponseDTO responseDTO = new PurchaseResponseDTO();
+            List<CategorySalesResponseDTO> responseDTOs = new ArrayList<>();
+            for (Map.Entry<Category, Double> entry : salesByCategory.entrySet()) {
+                Category category = entry.getKey();
+                CategorySalesResponseDTO responseDTO = new CategorySalesResponseDTO();
+                responseDTO.setIdCategory(category.getId());
+                responseDTO.setCategoryName(category.getName());
+                double total = entry.getValue();
+                total = Math.round(total * 10.0) / 10.0;
+                responseDTO.setTotal(total);
                 responseDTOs.add(responseDTO);
             }
             return responseDTOs;
@@ -298,6 +304,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             throw new ServiceException("Error occurred while retrieving purchases by date range", e);
         }
     }
+
 
     public List<PurchaseResponseDTO> getPurchasesByAccount(Long accountId, HttpServletRequest request){
         try {

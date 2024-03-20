@@ -3,6 +3,7 @@ package com.gym.services;
 import com.gym.dto.CouponResponseDTO;
 import com.gym.dto.request.DateRangeDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
+import com.gym.dto.response.CategorySalesResponseDTO;
 import com.gym.dto.response.ProductAmountResponseDTO;
 import com.gym.dto.response.ProductSalesResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
@@ -25,7 +26,7 @@ public interface PurchaseService {
 
     List<PurchaseResponseDTO> getPurchasesByAccount(Long accountId, HttpServletRequest request);
 
-    List<PurchaseResponseDTO> calculateSalesByCategory(DateRangeDTO dateRangeDTO);
+    List<CategorySalesResponseDTO> calculateSalesByCategory(DateRangeDTO dateRangeDTO);
 //    PurchaseRequestDTO updatePurchase(PurchaseRequestDTO purchaseDTO);
 //    void deletePurchaseById(Long id);
     List<PurchaseResponseDTO> getAllPurchases(HttpServletRequest request);
