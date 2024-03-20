@@ -3,11 +3,17 @@ package com.gym.controllers;
 import com.gym.dto.SubscriptionDTO;
 import com.gym.dto.response.SubscriptionResponseDTO;
 import com.gym.entities.Subscription;
+import com.gym.security.entities.UserEntity;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.exceptions.UnauthorizedException;
 import com.gym.security.configuration.utils.AccountTokenUtils;
 import com.gym.services.SubscriptionService;
 import jakarta.servlet.http.HttpServletRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +37,13 @@ public class SubscriptionController {
     @Autowired
     private AccountTokenUtils accountTokenUtils;
 
+   @Operation(summary = "Obtener todas las subcripciones")
     @GetMapping("/get-all")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Subscripciones obtenidas con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            })
+    })
     public ResponseEntity<?> getAllSubscriptions() {
         try {
             List<SubscriptionResponseDTO> subscriptionList = subscriptionService.getAllSubscriptions();
@@ -41,7 +53,13 @@ public class SubscriptionController {
         }
     }
 
+   @Operation(summary = "Obtener subscripciones expiradas")
     @GetMapping("/get-expired")
+   @ApiResponses(value = {
+           @ApiResponse(responseCode = "200", description = "Subscripciones obtenidas con exito", content = {
+                   @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+           }),
+           @ApiResponse(responseCode = "404", description = "No se encontraron suscripciones", content = @Content)
     public ResponseEntity<?> getAllExpiredSubscriptions(){
         try {
             List<SubscriptionResponseDTO> subscriptionList = subscriptionService.getAllExpiredSubscriptions();
@@ -51,7 +69,14 @@ public class SubscriptionController {
         }
     }
 
+   @Operation(summary = "Obtener subscripciones activas")
     @GetMapping("/get-active")
+   @ApiResponses(value = {
+           @ApiResponse(responseCode = "200", description = "Subscripciones obtenidas con exito", content = {
+                   @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+           }),
+           @ApiResponse(responseCode = "404", description = "No se encontraron suscripciones", content = @Content)
+   })
     public ResponseEntity<?> getAllActiveSubscriptions(){
         try {
             List<SubscriptionResponseDTO> subscriptionList = subscriptionService.getAllActiveSubscriptions();
@@ -65,13 +90,41 @@ public class SubscriptionController {
     public ResponseEntity<?> getSubscriptionById(@PathVariable Long id) {
         try {
             SubscriptionResponseDTO subscriptionDTO = subscriptionService.getSubscriptionById(id);
+   @Operation(summary = "Obtener subscripciones por id")
+   @GetMapping("/get/{id}")
+   @ApiResponses(value = {
+           @ApiResponse(responseCode = "200", description = "Subscripcion obtenida con exito", content = {
+                   @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+           })
+   })
+    public ResponseEntity<?> getSubscriptionById(@PathVariable Long id){
+        Optional<Subscription> subscriptionOptional = subscriptionService.getSubscriptionById(id);
+        if(subscriptionOptional.isPresent()){
+            Subscription subscription = subscriptionOptional.get();
+            SubscriptionDTO subscriptionDTO = SubscriptionDTO.builder()
+                    .id(subscription.getId())
+                    .name(subscription.getName())
+                    .price(subscription.getPrice())
+                    .imageUrl(subscription.getImageUrl())
+                    .startDate(subscription.getStartDate())
+                    .endDate(subscription.getEndDate())
+                    .planType(subscription.getPlanType())
+                    .automaticRenewal(subscription.getAutomaticRenewal())
+                    .account(subscription.getAccount())
+                    .build();
             return ResponseEntity.ok(subscriptionDTO);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Subscription with ID: " + id + " not found");
         }
     }
 
+    @Operation(summary = "Crear subscripcion")
     @PostMapping("/create") // no se va a usar, se va a crear cuando se cree un usuario
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Subscripciones creada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            })
+    })
     public ResponseEntity<?> createSubscription(@RequestBody SubscriptionDTO subscriptionDTO) throws URISyntaxException {
         if (subscriptionDTO.getName().isBlank() || subscriptionDTO.getPrice() == null || subscriptionDTO.getPrice() <= 0 || subscriptionDTO.getAccount() == null || subscriptionDTO.getPlanType() == null){
             return ResponseEntity.badRequest().build();
@@ -91,6 +144,15 @@ public class SubscriptionController {
         return ResponseEntity.created(new URI("subscription/create")).build();
     }
 
+    @Operation(summary = "Actualizar subscripcion")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Subscripciones actualizada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "subscripcion no encontrada",content =
+            @Content)
+
+    })
     @PutMapping("/update/{id}") // tampoco se usa
     public ResponseEntity<?> updateSubscription(@PathVariable Long id, @RequestBody SubscriptionDTO subscriptionDTO){
         subscriptionDTO.setId(id);

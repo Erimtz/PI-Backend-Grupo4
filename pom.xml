@@ -93,6 +93,7 @@
 			<artifactId>aws-java-sdk-s3</artifactId>
 			<version>1.11.1000</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -10,6 +10,11 @@ import com.gym.security.controllers.request.ResetPasswordDTO;
 import com.gym.security.entities.UserEntity;
 import com.gym.security.repositories.UserRepository;
 import com.gym.security.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +52,13 @@ public class EmailController {
     private String mailFrom;
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Recibir email")
     @PostMapping("/sendMessage")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Email recibido con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            })
+    })
     public ResponseEntity<?> receiveRequestEmail(@RequestBody EmailDTO emailDTO){
         System.out.println("Mensaje recibido"+ emailDTO);
 
@@ -61,7 +72,13 @@ public class EmailController {
     }
 
 //    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @Operation(summary = "Recibir email con archivo")
     @PostMapping("/sendMessageFile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Email con archivo recibido con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            })
+    })
     public ResponseEntity<?> receiveRequestEmailWithFile(@ModelAttribute EmailFileDTO emailFileDTO){
         try {
             String fileName = emailFileDTO.getFile().getOriginalFilename();
@@ -85,7 +102,15 @@ public class EmailController {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    @Operation(summary = "Recuperar email")
     @PostMapping("/send-mail-recover")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Correo obtenido con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado",content =
+            @Content)
+    })
     public ResponseEntity<?> sendEmailTemplate(@RequestBody EmailValuesDTO dto) {
         Optional<UserEntity> userOptional = userService.getByUsernameOrEmail(dto.getMailTo());
         if (!userOptional.isPresent())
@@ -106,7 +131,17 @@ public class EmailController {
         return new ResponseEntity<>("Te hemos enviado un correo", HttpStatus.OK);
     }
 
+    @Operation(summary = "Cambio de contraseña")
     @PostMapping("/change-password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Contraseña actualizada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado",content =
+            @Content),
+            @ApiResponse(responseCode = "400", description = "Error de parametros",content =
+            @Content)
+    })
     public ResponseEntity<?> changePassword(@Valid @RequestBody ResetPasswordDTO dto, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             return new ResponseEntity<>(new Message("Campos mal puestos"), HttpStatus.BAD_REQUEST);

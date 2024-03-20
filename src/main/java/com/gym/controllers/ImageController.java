@@ -8,12 +8,17 @@ import com.gym.entities.Product;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
+import com.gym.security.entities.UserEntity;
 //import com.gym.services.AWSS3Service;
 //import com.gym.s3.services.StorageService;
 import com.gym.s3.services.StorageService;
 import com.gym.services.ImageService;
 import com.gym.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +62,11 @@ public class ImageController {
 
     @Operation(summary = "Traer todas las imagenes")
     @GetMapping("/get-all")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagenes obtenidas con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            })
+    })
     public ResponseEntity<List<ImageResponseDTO>> getAllImages() {
         List<ImageResponseDTO> imageDTO = imageService.getAllImages();
         return ResponseEntity.ok(imageDTO);
@@ -64,6 +74,11 @@ public class ImageController {
 
     @Operation(summary = "Traer una imagen por ID")
     @GetMapping("/get/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagen obtenida con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            })
+    })
     public ResponseEntity<ImageResponseDTO> getImageById(@PathVariable Long id) {
         ImageResponseDTO imageDTO = imageService.getImageById(id);
         return ResponseEntity.ok(imageDTO);
@@ -84,6 +99,11 @@ public class ImageController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Agregar una imagen")
     @PostMapping("/create")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Imagen creada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            })
+    })
     public ResponseEntity<ImageResponseDTO> createImage(@Valid @RequestBody ImageRequestDTO imageRequestDTO) {
         ImageResponseDTO imageDTO = imageService.createImage(imageRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(imageDTO);
@@ -92,6 +112,11 @@ public class ImageController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar una imagen")
     @PutMapping("/update/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagen actualizada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            })
+    })
     public ResponseEntity<ImageResponseDTO> updateImage(@PathVariable Long id, @Valid @RequestBody ImageRequestDTO imageRequestDTO) {
         imageRequestDTO.setId(id);
         ImageResponseDTO imageDTO = imageService.updateImage(imageRequestDTO);
@@ -101,6 +126,11 @@ public class ImageController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar una imagen por ID")
     @DeleteMapping("/delete/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Imagen eliminada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            })
+    })
     public ResponseEntity<Void> deleteImageById(@PathVariable Long id) {
 //        imageService.deleteImageById(id);
 //        return ResponseEntity.noContent().build();
@@ -128,7 +158,15 @@ public class ImageController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Subir imagen")
     @PostMapping("/upload/{productId}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagen subida con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Error de parametro",content =
+            @Content),
+    })
     @Transactional
     public ResponseEntity<String> uploadImage(@PathVariable Long productId, @RequestParam("file") MultipartFile file) {
         try {
