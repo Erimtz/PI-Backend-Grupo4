@@ -3,6 +3,7 @@ package com.gym.controllers;
 import com.gym.dto.request.StoreSubscriptionCreateDTO;
 import com.gym.dto.response.StoreSubscriptionResponseDTO;
 import com.gym.dto.request.StoreSubscriptionUpdateDTO;
+import com.gym.entities.StoreSubscription;
 import com.gym.security.entities.UserEntity;
 import com.gym.services.StoreSubscriptionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +38,7 @@ public class StoreSubscriptionController {
     @GetMapping("/get-all")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Subscripciones obtenidas con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = StoreSubscription.class))
             })
     })
     public ResponseEntity<List<StoreSubscriptionResponseDTO>> getAllStoreSubscriptions() {
@@ -48,8 +49,8 @@ public class StoreSubscriptionController {
     @Operation(summary = "Traer subscripcion por ID")
     @GetMapping("/get/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Subscripcion obtenida con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            @ApiResponse(responseCode = "200", description = "Subscripción obtenida con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = StoreSubscription.class))
             })
     })
     public ResponseEntity<StoreSubscriptionResponseDTO> getStoreSubscriptionById(@PathVariable Long id) {
@@ -61,8 +62,8 @@ public class StoreSubscriptionController {
     @Operation(summary = "Crear subscripcion")
     @PostMapping("/create")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Subscripcion creada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            @ApiResponse(responseCode = "201", description = "Subscripción creada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = StoreSubscription.class))
             })
     })
     public ResponseEntity<StoreSubscriptionResponseDTO> createStoreSubscription(@Valid @RequestBody StoreSubscriptionCreateDTO storeSubscriptionCreateDTO) {
@@ -74,8 +75,8 @@ public class StoreSubscriptionController {
     @Operation(summary = "Actualizar subscripcion")
     @PutMapping("/update/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Subscripcion actualizada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            @ApiResponse(responseCode = "200", description = "Subscripción actualizada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = StoreSubscription.class))
             })
     })
     public ResponseEntity<StoreSubscriptionResponseDTO> updateStoreSubscription(@PathVariable Long id, @Valid @RequestBody StoreSubscriptionUpdateDTO storeSubscriptionUpdateDTO) {
@@ -88,8 +89,8 @@ public class StoreSubscriptionController {
     @Operation(summary = "Eliminar subscripcion por ID")
     @DeleteMapping("/delete/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Subscripcion eliminada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            @ApiResponse(responseCode = "204", description = "Subscripción eliminada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = StoreSubscription.class))
             })
     })
     public ResponseEntity<Void> deleteStoreSubscriptionById(@PathVariable Long id) {

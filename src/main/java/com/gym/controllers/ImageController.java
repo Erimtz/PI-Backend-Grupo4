@@ -64,7 +64,7 @@ public class ImageController {
     @GetMapping("/get-all")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Imagenes obtenidas con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
             })
     })
     public ResponseEntity<List<ImageResponseDTO>> getAllImages() {
@@ -76,7 +76,7 @@ public class ImageController {
     @GetMapping("/get/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Imagen obtenida con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
             })
     })
     public ResponseEntity<ImageResponseDTO> getImageById(@PathVariable Long id) {
@@ -84,6 +84,16 @@ public class ImageController {
         return ResponseEntity.ok(imageDTO);
     }
 
+    @Operation(summary = "Traer imágenes por producto")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imágenes obtenidas con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content =
+            @Content),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado",content =
+            @Content)
+    })
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<ImageResponseDTO>> getImagesByProduct(@PathVariable Long productId) {
         try {
@@ -101,7 +111,7 @@ public class ImageController {
     @PostMapping("/create")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Imagen creada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
             })
     })
     public ResponseEntity<ImageResponseDTO> createImage(@Valid @RequestBody ImageRequestDTO imageRequestDTO) {
@@ -114,7 +124,7 @@ public class ImageController {
     @PutMapping("/update/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Imagen actualizada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
             })
     })
     public ResponseEntity<ImageResponseDTO> updateImage(@PathVariable Long id, @Valid @RequestBody ImageRequestDTO imageRequestDTO) {
@@ -128,8 +138,12 @@ public class ImageController {
     @DeleteMapping("/delete/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Imagen eliminada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
-            })
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content =
+            @Content),
+            @ApiResponse(responseCode = "404", description = "Imagen no encontrada",content =
+            @Content)
     })
     public ResponseEntity<Void> deleteImageById(@PathVariable Long id) {
 //        imageService.deleteImageById(id);
@@ -158,13 +172,15 @@ public class ImageController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Subir imagen")
+    @Operation(summary = "Subir imagen al repositorio local")
     @PostMapping("/upload/{productId}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Imagen subida con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
             }),
-            @ApiResponse(responseCode = "400", description = "Error de parametro",content =
+            @ApiResponse(responseCode = "500", description = "El servidor no puede procesar la solicitud",content =
+            @Content),
+            @ApiResponse(responseCode = "400", description = "Ocurrió un error al procesar la solicitud",content =
             @Content),
     })
     @Transactional
@@ -211,6 +227,16 @@ public class ImageController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload/s3/{productId}")
+    @Operation(summary = "Subir imagen al bucket S3")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagen subida con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "El servidor no puede procesar la solicitud",content =
+            @Content),
+            @ApiResponse(responseCode = "400", description = "Ocurrió un error al procesar la solicitud",content =
+            @Content),
+    })
     public ResponseEntity<String> uploadImageS3(@PathVariable Long productId, @RequestParam("file") MultipartFile file) {
         try {
             if (productId == null) {

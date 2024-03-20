@@ -3,6 +3,7 @@ package com.gym.controllers;
 import com.gym.dto.request.ProductFiltersRequestDTO;
 import com.gym.dto.request.ProductRequestDTO;
 import com.gym.dto.response.ProductResponseDTO;
+import com.gym.entities.Product;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
@@ -49,7 +50,7 @@ public class ProductController {
     @GetMapping("/get-all")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
             })
     })
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts(){
@@ -70,30 +71,30 @@ public class ProductController {
     @GetMapping("/get/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Producto obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
-            })
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
+            }), @ApiResponse(responseCode = "404", description = "Suscripción no encontradas",content = @Content),
     })
-    public ResponseEntity<ProductResponseDTO> getProductById (@PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<?> getProductById (@PathVariable Long id) throws ResourceNotFoundException {
         ProductResponseDTO productResponseDTO = productService.getProductById(id);
         if (productResponseDTO !=null){
             return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);
         }
-        throw new ResourceNotFoundException("The product with id " + id + " has not been found.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró la suscripción asociada a la cuenta proporcionada.");
     }
 
     @Operation(summary = "Traer el producto por ID con imagenes")
     @GetMapping("/get-with-images/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Producto obtenido con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
-            })
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
+            @ApiResponse(responseCode = "404", description = "Suscripción no encontradas",content = @Content)
     })
-    public ResponseEntity<ProductResponseDTO> getProductByIdWithImages (@PathVariable Long id) throws ResourceNotFoundException {
+    public ResponseEntity<?> getProductByIdWithImages (@PathVariable Long id) throws ResourceNotFoundException {
         Optional<ProductResponseDTO> productResponseOptional  = productService.getProductByIdWithImages(id);
         if (productResponseOptional.isPresent()) {
             return new ResponseEntity<>(productResponseOptional.get(), HttpStatus.OK);
         } else {
-            throw new ResourceNotFoundException("The product with id " + id + " has not been found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró la suscripción asociada a la cuenta proporcionada.");
         }
     }
 
@@ -101,10 +102,8 @@ public class ProductController {
     @GetMapping("/category/{categoryId}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
-            }),
-            @ApiResponse(responseCode = "404", description = "Productos no encotrados",content =
-            @Content),
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
+            @ApiResponse(responseCode = "404", description = "Productos no encotrados",content = @Content),
     })
     public ResponseEntity<?> getProductsByCategory(@PathVariable(name = "categoryId") Long categoryId) {
         try {
@@ -119,12 +118,9 @@ public class ProductController {
     @GetMapping("/filter/category/{categoryId}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
-            }),
-            @ApiResponse(responseCode = "404", description = "Productos no encontrados",content =
-            @Content),
-            @ApiResponse(responseCode = "400", description = "Error de parametros",content =
-            @Content)
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
+            @ApiResponse(responseCode = "404", description = "Productos no encontrados",content = @Content),
+            @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
     })
     public ResponseEntity<?> getProductsByCategotyFiltered(
             @PathVariable(name = "categoryId") Long categoryId,
@@ -146,12 +142,9 @@ public class ProductController {
     @GetMapping("/search")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
-            }),
-            @ApiResponse(responseCode = "404", description = "Productos no encontrados",content =
-            @Content),
-            @ApiResponse(responseCode = "400", description = "Error de parametros",content =
-            @Content)
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
+            @ApiResponse(responseCode = "404", description = "Productos no encontrados",content = @Content),
+            @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
     })
     public ResponseEntity<?> searchProductsByName(@RequestParam(name = "product") String product) {
         try {
@@ -169,12 +162,9 @@ public class ProductController {
     @GetMapping("/filter/search")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
-            }),
-            @ApiResponse(responseCode = "404", description = "Productos no encontrados",content =
-            @Content),
-            @ApiResponse(responseCode = "400", description = "Error de parametros",content =
-            @Content)
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
+            @ApiResponse(responseCode = "404", description = "Productos no encontrados",content = @Content),
+            @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
     })
     public ResponseEntity<?> searchProductsByNameFiltered(
             @RequestParam(name = "product") String product,
@@ -197,12 +187,9 @@ public class ProductController {
     @PostMapping("/create")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Producto agregado con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
-            }),
-            @ApiResponse(responseCode = "500", description = "Error de respuesta",content =
-            @Content),
-            @ApiResponse(responseCode = "400", description = "Error de parametros",content =
-            @Content)
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
+            @ApiResponse(responseCode = "500", description = "Error de respuesta",content = @Content),
+            @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
     })
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequestDTO productRequest) {
         try {
@@ -223,7 +210,7 @@ public class ProductController {
     @PutMapping("/update/{productId}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Producto actualizado con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
             }),
             @ApiResponse(responseCode = "500", description = "Error de respuesta",content =
             @Content),
@@ -253,12 +240,17 @@ public class ProductController {
     @Operation(summary = "Eliminar un producto por ID")
     @DeleteMapping("/delete/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Producto eliminado con exito", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = UserEntity.class))
-            })
+            @ApiResponse(responseCode = "204", description = "Producto eliminado con exito", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado",content = @Content)
     })
-    public ResponseEntity<?> deleteProductById(@PathVariable Long id) throws ResourceNotFoundException {
-        productService.deleteProductById(id);
-        return new ResponseEntity<>("Product disposed correctly.", HttpStatus.OK);
+    public ResponseEntity<?> deleteProductById(@PathVariable Long id) {
+        try {
+            productService.deleteProductById(id);
+            return new ResponseEntity<>("Product disposed correctly.", HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>("No products found", HttpStatus.NOT_FOUND);
+        }
     }
 }

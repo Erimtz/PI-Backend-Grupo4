@@ -44,7 +44,7 @@ public class CouponController {
     @GetMapping("/get-all")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<List<CouponResponseDTO>> getAllCoupons() {
@@ -56,7 +56,7 @@ public class CouponController {
     @GetMapping("/get/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<CouponResponseDTO> getCouponById(@PathVariable Long id) {
@@ -69,7 +69,7 @@ public class CouponController {
     @PostMapping("/create")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Cupon creado con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<CouponResponseDTO> createCoupon(@Valid @RequestBody CouponCreateDTO couponCreateDTO) {
@@ -82,7 +82,7 @@ public class CouponController {
     @PutMapping("/update/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cupon actualizado con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<CouponResponseDTO> updateCoupon(@PathVariable Long id, @Valid @RequestBody CouponUpdateDTO couponUpdateDTO) {
@@ -96,7 +96,7 @@ public class CouponController {
     @DeleteMapping("/delete/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Cupones eliminado con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<Void> deleteCouponById(@PathVariable Long id) {
@@ -109,7 +109,7 @@ public class CouponController {
     @GetMapping("/get-all-spent")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<List<CouponResponseDTO>> getAllSpentCoupons() {
@@ -122,7 +122,7 @@ public class CouponController {
     @GetMapping("/get-all-not-spent")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<List<CouponResponseDTO>> getAllNotSpentCoupons() {
@@ -135,7 +135,7 @@ public class CouponController {
     @GetMapping("/get-all-expired")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<List<CouponResponseDTO>> getAllExpiredCoupons() {
@@ -148,7 +148,7 @@ public class CouponController {
     @GetMapping("/get-all-current")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<List<CouponResponseDTO>> getAllCurrentCoupons() {
@@ -160,13 +160,13 @@ public class CouponController {
     @GetMapping("/valid-coupons/{accountId}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             }),
-            @ApiResponse(responseCode = "403", description = "No autorizado",content =
+            @ApiResponse(responseCode = "403", description = "No está autorizado a acceder al recurso",content =
             @Content),
-            @ApiResponse(responseCode = "500", description = "Error de respuesta",content =
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content =
             @Content),
-            @ApiResponse(responseCode = "404", description = "Cupon no encontrado",content =
+            @ApiResponse(responseCode = "404", description = "Cupón no encontrado",content =
             @Content)
     })
     public ResponseEntity<List<CouponResponseDTO>> getValidCouponsByAccount(@PathVariable Long accountId, HttpServletRequest request) {
@@ -175,7 +175,6 @@ public class CouponController {
             if (!hasAccess) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-
             List<CouponResponseDTO> validCoupons = couponService.getValidCouponsByAccount(accountId, request);
             return ResponseEntity.ok(validCoupons);
         } catch (ResourceNotFoundException e) {
@@ -185,12 +184,29 @@ public class CouponController {
         }
     }
 
+    @Operation(summary = "Porcentaje de efectividad de los cupones")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Porcentaje obtenido sin errores", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))})
+    })
     @GetMapping("/effectiveness")
     public ResponseEntity<Double> calculateCouponEffectiveness() {
         double effectiveness = couponService.calculateCouponEffectiveness();
         return ResponseEntity.ok(effectiveness);
     }
 
+    @Operation(summary = "Traer cupones por cuenta de usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
+            }),
+            @ApiResponse(responseCode = "403", description = "No está autorizado a acceder al recurso",content =
+            @Content),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content =
+            @Content),
+            @ApiResponse(responseCode = "404", description = "Cupón no encontrado",content =
+            @Content)
+    })
     @GetMapping("/account/{accountId}")
     public ResponseEntity<List<CouponResponseDTO>> getCouponsByAccount(@PathVariable Long accountId, HttpServletRequest request) {
         try {
@@ -198,7 +214,6 @@ public class CouponController {
             if (!hasAccess) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-
             List<CouponResponseDTO> validCoupons = couponService.getCouponsByAccount(accountId, request);
             return ResponseEntity.ok(validCoupons);
         } catch (ResourceNotFoundException e) {
@@ -208,8 +223,8 @@ public class CouponController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/convert-response-to-entity")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    @PostMapping("/convert-response-to-entity")
     public Coupon convertResponseToEntity(@RequestBody CouponResponseDTO couponResponseDTO) {
         return couponService.convertResponseToEntity(couponResponseDTO);
     }

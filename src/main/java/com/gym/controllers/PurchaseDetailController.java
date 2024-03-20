@@ -28,7 +28,7 @@ public class PurchaseDetailController {
     @PostMapping
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Detalle de compra creado con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = PurchaseDetail.class))
             })
     })
     public ResponseEntity<PurchaseDetail> createPurchaseDetail(@RequestBody PurchaseDetailRequestDTO requestDTO) {

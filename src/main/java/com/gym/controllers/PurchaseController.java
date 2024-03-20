@@ -5,6 +5,8 @@ import com.gym.dto.request.PurchaseRequestDTO;
 import com.gym.dto.response.ProductAmountResponseDTO;
 import com.gym.dto.response.ProductSalesResponseDTO;
 import com.gym.dto.response.PurchaseResponseDTO;
+import com.gym.entities.Purchase;
+import com.gym.entities.Subscription;
 import com.gym.exceptions.CouponDiscountExceededException;
 import com.gym.exceptions.InsufficientCreditException;
 import com.gym.exceptions.NotEnoughStockException;
@@ -48,12 +50,9 @@ public class PurchaseController {
     @PostMapping
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Compra creada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
-            }),
-            @ApiResponse(responseCode = "500", description = "Error de respuesta",content =
-            @Content),
-            @ApiResponse(responseCode = "400", description = "Error de parametros",content =
-            @Content),
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "500", description = "Error de respuesta",content = @Content),
+            @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content),
 
     })
     public ResponseEntity<?> createPurchase(@RequestBody PurchaseRequestDTO requestDTO, HttpServletRequest request) {
@@ -75,6 +74,11 @@ public class PurchaseController {
         }
     }
 
+    @Operation(summary = "Obtener ventas por categoría") // Revisar para 20/3
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ventas obtenidas con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+    })
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/sales/by-category")
     public ResponseEntity<?> getSalesByCategory(@RequestBody DateRangeDTO dateRangeDTO) {
@@ -85,6 +89,13 @@ public class PurchaseController {
         return new ResponseEntity<>(salesByCategory, HttpStatus.OK);
     }
 
+    @Operation(summary = "Obtener compras por cuenta")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Compras obtenidas con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "403", description = "No tienes autorización para acceder al recurso",content = @Content),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
+    })
     @GetMapping("/account/{accountId}")
     public ResponseEntity<List<PurchaseResponseDTO>> getPurchasesByAccount(@PathVariable Long accountId, HttpServletRequest request) {
         try {
@@ -101,6 +112,13 @@ public class PurchaseController {
         }
     }
 
+    @Operation(summary = "Obtener todas las compras")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Compras obtenidas con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "403", description = "No tienes autorización para acceder al recurso",content = @Content),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
+    })
     @GetMapping("/get-all")
     public ResponseEntity<List<PurchaseResponseDTO>> getAllPurchases(HttpServletRequest request) {
         try {
@@ -113,6 +131,12 @@ public class PurchaseController {
         }
     }
 
+    @Operation(summary = "Obtener compra por ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Compra obtenida con éxito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
+    })
     @GetMapping("/get/{id}")
     public ResponseEntity<PurchaseResponseDTO> getPurchaseById(@PathVariable Long id, HttpServletRequest request) {
         try {
@@ -123,6 +147,12 @@ public class PurchaseController {
         }
     }
 
+    @Operation(summary = "Obtener compras por rango de fechas")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Compras obtenidas con éxito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
+    })
     @GetMapping("/getByDateRange")
     public ResponseEntity<List<PurchaseResponseDTO>> getPurchasesByDateRange(@Valid @RequestBody DateRangeDTO dateRangeDTO) {
         try {
@@ -133,6 +163,12 @@ public class PurchaseController {
         }
     }
 
+    @Operation(summary = "Obtener total de compras por rango de fechas")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Total de compras obtenido con éxito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
+    })
     @GetMapping("/getTotalByDateRange")
     public ResponseEntity<Double> getTotalAfterDiscountsSumByDateRange(@Valid @RequestBody DateRangeDTO dateRangeDTO) {
         try {
@@ -143,6 +179,12 @@ public class PurchaseController {
         }
     }
 
+    @Operation(summary = "Obtener cantidad de compras por rango de fechas")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cantidad de compras obtenidas con éxito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
+    })
     @GetMapping("/getCountByDateRange")
     public ResponseEntity<Long> getPurchasesCountByDateRange(@Valid @RequestBody DateRangeDTO dateRangeDTO) {
         try {
@@ -153,6 +195,12 @@ public class PurchaseController {
         }
     }
 
+    @Operation(summary = "Obtener promedio de compras por rango de fechas")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Promedio obtenido con éxito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
+    })
     @GetMapping("/getAverageByDateRange")
     public ResponseEntity<Double> getPurchasesAverageByDateRange(@Valid @RequestBody DateRangeDTO dateRangeDTO) {
         try {
@@ -163,6 +211,13 @@ public class PurchaseController {
         }
     }
 
+    @Operation(summary = "Promedio de gasto por compra de usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Compra obtenida con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "404", description = "Compras no encontradas",content = @Content),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
+    })
     @GetMapping("/average-purchase-amount-per-user")
     public ResponseEntity<Double> calculateAveragePurchaseAmountPerUser() {
         try {
@@ -175,6 +230,13 @@ public class PurchaseController {
         }
     }
 
+    @Operation(summary = "Unidades vendidas por producto")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Compra obtenida con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "404", description = "Compras no encontradas",content = @Content),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
+    })
     @GetMapping("/units-sold-by-product")
     public ResponseEntity<List<ProductSalesResponseDTO>> getProductsByUnitsSold() {
         try {
@@ -190,6 +252,13 @@ public class PurchaseController {
         }
     }
 
+    @Operation(summary = "Total de ventas por producto")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Compra obtenida con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+            @ApiResponse(responseCode = "404", description = "Compras no encontradas",content = @Content),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
+    })
     @GetMapping("/total-sales-by-product")
     public ResponseEntity<List<ProductAmountResponseDTO>> getSalesByProduct() {
         try {

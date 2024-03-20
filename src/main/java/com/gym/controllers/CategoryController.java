@@ -1,6 +1,7 @@
 package com.gym.controllers;
 
 import com.gym.dto.CategoryDTO;
+import com.gym.entities.Category;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.security.entities.UserEntity;
 import com.gym.services.CategoryService;
@@ -37,13 +38,9 @@ public class CategoryController {
     @GetMapping("/get-all")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categorias obtenidas con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
-            }),
-            @ApiResponse(responseCode = "204", description = "No content",content =
-            @Content),
-            @ApiResponse(responseCode = "500", description = "Error de respuesta",content =
-            @Content)
-    })
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Category.class))}),
+            @ApiResponse(responseCode = "204", description = "No content",content = @Content),
+            @ApiResponse(responseCode = "500", description = "Error de respuesta",content = @Content)})
     public ResponseEntity<?> getAllCategories() {
         try {
             List<CategoryDTO> categoriesDTO = categoryService.getAllCategories();
@@ -64,7 +61,7 @@ public class CategoryController {
     @GetMapping("/get/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categoria obtenida con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Category.class))
             }),
             @ApiResponse(responseCode = "404", description = "Categoria no encontrada",content =
             @Content),
@@ -89,8 +86,8 @@ public class CategoryController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Agregar una categoria")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Categoria creada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+            @ApiResponse(responseCode = "201", description = "Categoria creada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Category.class))
             }),
             @ApiResponse(responseCode = "500", description = "Error de respuesta",content =
             @Content),
@@ -117,7 +114,7 @@ public class CategoryController {
     @Operation(summary = "Actualizar una categoria")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categoria actualizada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Category.class))
             }),
             @ApiResponse(responseCode = "404", description = "Categoria no encontrada",content =
             @Content),
@@ -145,7 +142,7 @@ public class CategoryController {
     @Operation(summary = "Eliminar una categoria por ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Categoria eliminada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = UserEntity.class))
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Category.class))
             }),
             @ApiResponse(responseCode = "404", description = "Categoria no encontrada",content =
             @Content),

@@ -270,7 +270,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
     }
 
-    public List<PurchaseResponseDTO> calculateSalesByCategory(DateRangeDTO dateRangeDTO) {
+    public List<PurchaseResponseDTO> calculateSalesByCategory(DateRangeDTO dateRangeDTO) { // Revisar para 20/3
         try {
             LocalDate startDate = dateRangeDTO.getStartDate();
             LocalDate endDate = dateRangeDTO.getEndDate();
