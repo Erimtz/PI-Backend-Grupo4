@@ -1,17 +1,19 @@
 package com.gym.swagger;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition
 @Configuration
 public class SwaggerConfig {
-
 
     @Bean
     public OpenAPI api(){
@@ -20,5 +22,4 @@ public class SwaggerConfig {
                 .contact(new Contact().url("https://twitter.com/lightweightgym").email("lightweightgym@gmail.com").name("Grupo 4"))
                 .license(new License().name("Todos los derechos reservados").url("URL de license")).termsOfService("terms Of Service"));
     }
-
 }
