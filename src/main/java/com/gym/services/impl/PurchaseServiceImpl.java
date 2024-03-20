@@ -270,7 +270,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         }
     }
 
-    public List<CategorySalesResponseDTO> calculateSalesByCategory(DateRangeDTO dateRangeDTO) { // Revisar para 20/3
+    public List<CategorySalesResponseDTO> calculateSalesByCategory(DateRangeDTO dateRangeDTO) {
         try {
             LocalDate startDate = dateRangeDTO.getStartDate();
             LocalDate endDate = dateRangeDTO.getEndDate();
@@ -283,8 +283,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                 for (PurchaseDetail detail : purchaseDetails) {
                     Product product = detail.getProduct();
                     Category category = product.getCategory();
-                    Double subtotal = calculateSubtotal(detail);
-                    salesByCategory.put(category, salesByCategory.getOrDefault(category, 0.0) + subtotal);
+                    Double totalSales  = calculateSubtotal(detail);
+                    salesByCategory.put(category, salesByCategory.getOrDefault(category, 0.0) + totalSales );
                 }
             }
 

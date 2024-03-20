@@ -75,7 +75,7 @@ public class PurchaseController {
         }
     }
 
-    @Operation(summary = "Obtener ventas por categoría") // Revisar para 20/3
+    @Operation(summary = "Obtener ventas por categoría")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ventas obtenidas con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
