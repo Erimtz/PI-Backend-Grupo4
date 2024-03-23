@@ -31,6 +31,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 import java.time.LocalDate;
@@ -167,7 +169,7 @@ public class PurchaseController {
     @Operation(summary = "Obtener total de compras por rango de fechas")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Total de compras obtenido con éxito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Double.class))}),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
     @GetMapping("/getTotalByDateRange")
@@ -183,7 +185,7 @@ public class PurchaseController {
     @Operation(summary = "Obtener cantidad de compras por rango de fechas")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cantidad de compras obtenidas con éxito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Long.class))}),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
     @GetMapping("/getCountByDateRange")
@@ -215,7 +217,7 @@ public class PurchaseController {
     @Operation(summary = "Promedio de gasto por compra de usuario")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Compra obtenida con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Double.class))}),
             @ApiResponse(responseCode = "404", description = "Compras no encontradas",content = @Content),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })

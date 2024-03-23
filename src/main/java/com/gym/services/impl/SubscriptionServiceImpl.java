@@ -180,14 +180,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public double calculateActiveSubscriptionRatio() {
         try{
             List<Subscription> activeSubscriptions = subscriptionRepository.findActiveSubscriptions();
-            long totalUsers = accountService.count();
+            long totalUsers = subscriptionRepository.findAll().size();
+//            long totalUsers = accountService.getAllAccountsWithPurchasesDTO().size();
 
             if (totalUsers == 0) {
                 return 0.0; // Evitar la división por cero
             }
 
             int activeSubscriptionCount = activeSubscriptions.size();
-            return (double) activeSubscriptionCount / totalUsers;
+            return (double) activeSubscriptionCount * 100 / totalUsers;
         } catch (Exception e) {
             e.printStackTrace();
             return -1.0; // Devuelve un valor predeterminado para indicar que ha ocurrido un error
