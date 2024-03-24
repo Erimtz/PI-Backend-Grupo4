@@ -104,13 +104,11 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<PurchaseDetailRequestDTO> purchaseDetailDTOs = requestDTO.getPurchaseDetails();
 
         if (storeSubscriptionId == null && (purchaseDetailDTOs == null || purchaseDetailDTOs.isEmpty())) {
+//            logger.error("Debe proporcionar al menos una suscripción a la tienda o un detalle de compra");
             throw new IllegalArgumentException("Debe proporcionar al menos una suscripción a la tienda o un detalle de compra");
         }
 
-        if (storeSubscriptionId != null) {
-            StoreSubscription storeSubscription = storeSubscriptionService.convertToEntity(storeSubscriptionService.getStoreSubscriptionById(storeSubscriptionId));
-            purchase.setStoreSubscription(storeSubscription);
-        }
+
 
         if (purchaseDetailDTOs != null && !purchaseDetailDTOs.isEmpty()) {
             List<PurchaseDetail> purchaseDetails = new ArrayList<>();
@@ -129,6 +127,13 @@ public class PurchaseServiceImpl implements PurchaseService {
             }
             purchase.setPurchaseDetails(purchaseDetails);
         }
+
+        if (storeSubscriptionId != null) {
+            StoreSubscription storeSubscription = storeSubscriptionService.convertToEntity(storeSubscriptionService.getStoreSubscriptionById(storeSubscriptionId));
+            purchase.setStoreSubscription(storeSubscription);
+        }
+
+
         return purchase;
     }
 
@@ -160,7 +165,9 @@ public class PurchaseServiceImpl implements PurchaseService {
                     detail.setPurchase(purchase);
                 }
             }
-            purchaseDetailRepository.saveAll(purchase.getPurchaseDetails());
+            if (purchase.getPurchaseDetails() != null) {
+                purchaseDetailRepository.saveAll(purchase.getPurchaseDetails());
+            }
 
             couponGenerationService.createCouponByPurchase(getAccountFromToken(token), BigDecimal.valueOf(total));
         } else {
