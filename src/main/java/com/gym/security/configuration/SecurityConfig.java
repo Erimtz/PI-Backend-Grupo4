@@ -60,6 +60,7 @@ public class SecurityConfig {
                 .csrf(csrfConfigurer -> csrfConfigurer.disable())
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
                     authorizationManagerRequestMatcherRegistry.requestMatchers("/user/hello", "/user/create-user", "/password-reset/**", "/email/**").permitAll();
+                    authorizationManagerRequestMatcherRegistry.requestMatchers("/product/get-all", "/product/get/**", "/product/get-with-images/**", "/product/category/**", "/product/filter/**", "/product/search").permitAll();
                     authorizationManagerRequestMatcherRegistry.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
                     authorizationManagerRequestMatcherRegistry.anyRequest().authenticated();
                 })
