@@ -8,6 +8,7 @@ import com.gym.dto.response.*;
 import com.gym.entities.*;
 import com.gym.enums.ERank;
 import com.gym.exceptions.*;
+import com.gym.mail.services.EmailService;
 import com.gym.repositories.ProductRepository;
 import com.gym.repositories.PurchaseDetailRepository;
 import com.gym.repositories.PurchaseRepository;
@@ -44,6 +45,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private final AccountTokenUtils accountTokenUtils;
     private final PurchaseDetailRepository purchaseDetailRepository;
     private final RankRepository rankRepository;
+    private final EmailService emailService;
     private static final Logger logger = LoggerFactory.getLogger(CouponServiceImpl.class);
 
     public PurchaseServiceImpl(PurchaseRepository purchaseRepository,
@@ -56,7 +58,8 @@ public class PurchaseServiceImpl implements PurchaseService {
                                SubscriptionService subscriptionService,
                                AccountTokenUtils accountTokenUtils,
                                PurchaseDetailRepository purchaseDetailRepository,
-                               RankRepository rankRepository) {
+                               RankRepository rankRepository,
+                               EmailService emailService) {
         this.purchaseRepository = purchaseRepository;
         this.productRepository = productRepository;
         this.productService = productService;
@@ -68,6 +71,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         this.accountTokenUtils = accountTokenUtils;
         this.purchaseDetailRepository = purchaseDetailRepository;
         this.rankRepository = rankRepository;
+        this.emailService = emailService;
     }
 
     public PurchaseResponseDTO createPurchase(PurchaseRequestDTO requestDTO, String token) {
@@ -76,7 +80,14 @@ public class PurchaseServiceImpl implements PurchaseService {
         Purchase purchase = buildPurchase(requestDTO, account);
         addCouponsToPurchase(requestDTO, purchase);
         calculateAndSavePurchaseTotals(purchase, token);
-        return buildPurchaseResponse(purchase);
+
+        PurchaseResponseDTO purchaseResponse = buildPurchaseResponse(purchase);
+        try {
+            emailService.sendPurchaseConfirmationEmail(purchaseResponse, token);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return purchaseResponse;
     }
 
     private Double calculateSubtotal(PurchaseDetail purchaseDetail) {

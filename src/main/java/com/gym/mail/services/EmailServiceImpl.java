@@ -1,8 +1,15 @@
 package com.gym.mail.services;
 
 
+import com.gym.dto.response.PurchaseResponseDTO;
+import com.gym.exceptions.EmailNotRegisteredException;
+import com.gym.exceptions.InvalidTokenException;
+import com.gym.exceptions.UserNotFoundException;
 import com.gym.mail.domain.EmailValuesDTO;
+import com.gym.security.configuration.jwt.JwtUtils;
 import com.gym.security.controllers.response.ResponseUserDTO;
+import com.gym.security.entities.UserEntity;
+import com.gym.security.repositories.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +26,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -29,6 +37,10 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender mailSender;
     @Autowired
     private TemplateEngine templateEngine;
+    @Autowired
+    private JwtUtils jwtUtils;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public void sendEmail(String[] toUsers, String subject, String message) {
@@ -108,6 +120,49 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void sendPurchaseConfirmationEmail(PurchaseResponseDTO dto, String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        String username = jwtUtils.getUsernameFromToken(token);
+        if (username != null) {
+            Optional<UserEntity> userOptional = userRepository.findByUsername(username);
+            if (userOptional.isPresent()) {
+                UserEntity userEntity = userOptional.get();
+                String email = userEntity.getEmail();
+                String firstName = userEntity.getFirstName();
+                String lastName = userEntity.getLastName();
+                if (email != null) {
+                    MimeMessage message = mailSender.createMimeMessage();
+                    try {
+                        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+                        Context context = new Context();
+                        Map<String, Object> model = new HashMap<>();
+                        model.put("firstName", firstName);
+                        model.put("lastName", lastName);
+                        model.put("purchase", dto);
+                        context.setVariables(model);
+                        String htmlText = templateEngine.process("email-purchase", context);
+                        helper.setFrom(emailAccount);
+                        helper.setTo(email);
+                        helper.setSubject("Confirmación de compra en Lightweight");
+                        helper.setText(htmlText, true);
+                        mailSender.send(message);
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    throw new EmailNotRegisteredException("El usuario no tiene un correo electrónico registrado.");
+                }
+            } else {
+                throw new UserNotFoundException("El usuario no se encontró en la base de datos.");
+            }
+        } else {
+            throw new InvalidTokenException("El token JWT no es válido.");
         }
     }
 }

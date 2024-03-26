@@ -1,5 +1,6 @@
 package com.gym.mail.services;
 
+import com.gym.dto.response.PurchaseResponseDTO;
 import com.gym.mail.domain.EmailValuesDTO;
 import com.gym.security.controllers.response.ResponseUserDTO;
 
@@ -13,4 +14,6 @@ public interface EmailService {
     void sendEmailTemplate(EmailValuesDTO dto);
 
     void sendEmailNewUser(ResponseUserDTO dto);
+
+    void sendPurchaseConfirmationEmail(PurchaseResponseDTO dto, String token);
 }

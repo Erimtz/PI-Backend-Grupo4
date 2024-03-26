@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmación de compra en Lightweight</title>
+</head>
+<body>
+<h1>Confirmación de compra en Lightweight</h1>
+<p>Hola, [[${firstName}]] [[${lastName}]]</p>
+<p>¡Gracias por tu compra!</p>
+
+<h2>Detalles de la compra:</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Subtotal</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="detail : ${purchase.purchaseDetails}" th:if="${purchase.purchaseDetails.size() > 0}">
+        <td th:text="${detail.productName}"></td>
+        <td th:text="${detail.quantity}"></td>
+        <td th:text="${detail.subtotal}"></td>
+    </tr>
+    <tr th:if="${purchase.subscriptionPrice != 0}">
+        <td>Suscripción</td>
+        <td></td>
+        <td th:text="${purchase.subscriptionPrice}"></td>
+    </tr>
+    <tr th:if="${purchase.discount != 0}">
+        <td>Descuento</td>
+        <td></td>
+        <td th:text="'-' + ${purchase.discount}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<p>Total: [[${purchase.totalAfterDiscounts}]]</p>
+
+
+<p>¡Gracias por elegirnos y esperamos que disfrutes de tu compra en Lightweight!</p>
+<p>¡Felices compras!</p>
+<p>El equipo de Lightweight</p>
+</body>
+</html>
