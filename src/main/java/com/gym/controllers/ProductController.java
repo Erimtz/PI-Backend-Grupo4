@@ -47,12 +47,12 @@ public class ProductController {
     }
 
     @Operation(summary = "Traer todos los productos")
-    @GetMapping("/get-all")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
             })
     })
+    @GetMapping("/get-all")
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts(){
         var auth =  SecurityContextHolder.getContext().getAuthentication();
         System.out.println(auth.getPrincipal());
@@ -61,6 +61,7 @@ public class ProductController {
 
         return ResponseEntity.ok(productService.getAllProducts());
     }
+
     @Operation(summary = "Traer 8 productos aleatorios")
     @GetMapping("/random")
     public List<ProductResponseDTO> getRandomProducts() {
@@ -68,12 +69,12 @@ public class ProductController {
     }
 
     @Operation(summary = "Traer el producto por ID")
-    @GetMapping("/get/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Producto obtenidos con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
             }), @ApiResponse(responseCode = "404", description = "Suscripción no encontradas",content = @Content),
     })
+    @GetMapping("/get/{id}")
     public ResponseEntity<?> getProductById (@PathVariable Long id) throws ResourceNotFoundException {
         ProductResponseDTO productResponseDTO = productService.getProductById(id);
         if (productResponseDTO !=null){
@@ -83,12 +84,12 @@ public class ProductController {
     }
 
     @Operation(summary = "Traer el producto por ID con imagenes")
-    @GetMapping("/get-with-images/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Producto obtenido con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
             @ApiResponse(responseCode = "404", description = "Suscripción no encontradas",content = @Content)
     })
+    @GetMapping("/get-with-images/{id}")
     public ResponseEntity<?> getProductByIdWithImages (@PathVariable Long id) throws ResourceNotFoundException {
         Optional<ProductResponseDTO> productResponseOptional  = productService.getProductByIdWithImages(id);
         if (productResponseOptional.isPresent()) {
@@ -99,12 +100,12 @@ public class ProductController {
     }
 
     @Operation(summary = "Traer todos los productos por categoria")
-    @GetMapping("/category/{categoryId}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
             @ApiResponse(responseCode = "404", description = "Productos no encotrados",content = @Content),
     })
+    @GetMapping("/category/{categoryId}")
     public ResponseEntity<?> getProductsByCategory(@PathVariable(name = "categoryId") Long categoryId) {
         try {
             List<ProductResponseDTO> products = productService.getProductsByCategory(categoryId);
@@ -115,13 +116,13 @@ public class ProductController {
     }
 
     @Operation(summary = "Obtener productos por categoria")
-    @GetMapping("/filter/category/{categoryId}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
             @ApiResponse(responseCode = "404", description = "Productos no encontrados",content = @Content),
             @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
     })
+    @GetMapping("/filter/category/{categoryId}")
     public ResponseEntity<?> getProductsByCategotyFiltered(
             @PathVariable(name = "categoryId") Long categoryId,
             @RequestBody ProductFiltersRequestDTO request,
@@ -139,13 +140,13 @@ public class ProductController {
     }
 
     @Operation(summary = "Buscar productos por nombre")
-    @GetMapping("/search")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
             @ApiResponse(responseCode = "404", description = "Productos no encontrados",content = @Content),
             @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
     })
+    @GetMapping("/search")
     public ResponseEntity<?> searchProductsByName(@RequestParam(name = "product") String product) {
         try {
             List<ProductResponseDTO> foundProducts = productService.searchProductsByName(product);
@@ -159,13 +160,13 @@ public class ProductController {
     }
 
     @Operation(summary = "Buscar productos por nombre filtrado")
-    @GetMapping("/filter/search")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
             @ApiResponse(responseCode = "404", description = "Productos no encontrados",content = @Content),
             @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
     })
+    @GetMapping("/filter/search")
     public ResponseEntity<?> searchProductsByNameFiltered(
             @RequestParam(name = "product") String product,
             @RequestBody ProductFiltersRequestDTO request,
@@ -182,15 +183,15 @@ public class ProductController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Agregar un producto")
-    @PostMapping("/create")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Producto agregado con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
             @ApiResponse(responseCode = "500", description = "Error de respuesta",content = @Content),
             @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/create")
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequestDTO productRequest) {
         try {
             ProductResponseDTO productResponse = productService.createProduct(productRequest);
@@ -207,7 +208,6 @@ public class ProductController {
     }
 
     @Operation(summary = "Actualizar un producto")
-    @PutMapping("/update/{productId}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Producto actualizado con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
@@ -219,6 +219,8 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Producto no encontrado",content =
             @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/update/{productId}")
     public ResponseEntity<?> updateProduct(@PathVariable Long productId, @RequestBody ProductRequestDTO productRequestDTO){
         try {
             if (productId == null) {
@@ -238,13 +240,14 @@ public class ProductController {
     }
 
     @Operation(summary = "Eliminar un producto por ID")
-    @DeleteMapping("/delete/{id}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Producto eliminado con exito", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class))
             }),
             @ApiResponse(responseCode = "404", description = "Producto no encontrado",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteProductById(@PathVariable Long id) {
         try {
             productService.deleteProductById(id);

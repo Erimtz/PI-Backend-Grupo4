@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,14 +38,15 @@ public class SubscriptionController {
     @Autowired
     private AccountTokenUtils accountTokenUtils;
 
-   @Operation(summary = "Obtener todas las subcripciones")
-    @GetMapping("/get-all")
+    @Operation(summary = "Obtener todas las subcripciones")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Subscripciones obtenidas con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Subscription.class))
             }),
             @ApiResponse(responseCode = "404", description = "No se encontraron suscripciones", content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/get-all")
     public ResponseEntity<?> getAllSubscriptions() {
         try {
             List<SubscriptionResponseDTO> subscriptionList = subscriptionService.getAllSubscriptions();
@@ -55,13 +57,14 @@ public class SubscriptionController {
     }
 
    @Operation(summary = "Obtener subscripciones expiradas")
-   @GetMapping("/get-expired")
    @ApiResponses(value = {
            @ApiResponse(responseCode = "200", description = "Subscripciones obtenidas con exito", content = {
                    @Content(mediaType = "application/json",schema = @Schema(implementation = Subscription.class))
            }),
            @ApiResponse(responseCode = "404", description = "No se encontraron suscripciones", content = @Content)
    })
+   @PreAuthorize("hasRole('ADMIN')")
+   @GetMapping("/get-expired")
     public ResponseEntity<?> getAllExpiredSubscriptions(){
         try {
             List<SubscriptionResponseDTO> subscriptionList = subscriptionService.getAllExpiredSubscriptions();
@@ -72,13 +75,14 @@ public class SubscriptionController {
     }
 
    @Operation(summary = "Obtener subscripciones activas")
-    @GetMapping("/get-active")
    @ApiResponses(value = {
            @ApiResponse(responseCode = "200", description = "Subscripciones obtenidas con exito", content = {
                    @Content(mediaType = "application/json",schema = @Schema(implementation = Subscription.class))
            }),
            @ApiResponse(responseCode = "404", description = "No se encontraron suscripciones", content = @Content)
    })
+   @PreAuthorize("hasRole('ADMIN')")
+   @GetMapping("/get-active")
     public ResponseEntity<?> getAllActiveSubscriptions(){
         try {
             List<SubscriptionResponseDTO> subscriptionList = subscriptionService.getAllActiveSubscriptions();
@@ -154,6 +158,7 @@ public class SubscriptionController {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Subscription.class))}),
             @ApiResponse(responseCode = "400", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/active-subscription")
     public ResponseEntity<?> getActiveSubscriptionRatio() {
         try {
@@ -200,6 +205,7 @@ public class SubscriptionController {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Subscription.class))}),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/renew-expired")
     public ResponseEntity<?> renewExpiredSubscriptions(HttpServletRequest request) {
         try {

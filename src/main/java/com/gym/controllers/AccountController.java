@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +33,7 @@ public class AccountController {
             @ApiResponse(responseCode = "200", description = "Cuentas con sus compras obtenidas con exito", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Account.class))}),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud.",content = @Content)})
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get-all-with-purchases")
     public ResponseEntity<?> getAllAccountsWithPurchasesDTO() {
         try {

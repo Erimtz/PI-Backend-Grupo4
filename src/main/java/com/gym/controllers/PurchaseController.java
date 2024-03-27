@@ -2,10 +2,7 @@ package com.gym.controllers;
 
 import com.gym.dto.request.DateRangeDTO;
 import com.gym.dto.request.PurchaseRequestDTO;
-import com.gym.dto.response.CategorySalesResponseDTO;
-import com.gym.dto.response.ProductAmountResponseDTO;
-import com.gym.dto.response.ProductSalesResponseDTO;
-import com.gym.dto.response.PurchaseResponseDTO;
+import com.gym.dto.response.*;
 import com.gym.entities.Purchase;
 import com.gym.entities.Subscription;
 import com.gym.exceptions.CouponDiscountExceededException;
@@ -64,16 +61,16 @@ public class PurchaseController {
             PurchaseResponseDTO purchaseResponseDTO = purchaseService.createPurchase(requestDTO, token);
             return new ResponseEntity<>(purchaseResponseDTO, HttpStatus.CREATED);
         } catch (NotEnoughStockException ex) {
-            return new ResponseEntity<>("Not enough stock available", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Message("Not enough stock available"), HttpStatus.BAD_REQUEST);
         } catch (InsufficientCreditException ex) {
-            return new ResponseEntity<>("Insufficient credit balance", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Message("Insufficient credit balance"), HttpStatus.BAD_REQUEST);
         } catch (IllegalStateException ex) {
-            return new ResponseEntity<>("Coupon has already been spent", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Message("Coupon has already been spent"), HttpStatus.BAD_REQUEST);
         } catch (CouponDiscountExceededException ex) {
-            return new ResponseEntity<>("Total coupon discount exceeds the maximum allowed", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new Message("Total coupon discount exceeds the maximum allowed"), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new Message("Internal Server Error"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -122,6 +119,7 @@ public class PurchaseController {
             @ApiResponse(responseCode = "403", description = "No tienes autorización para acceder al recurso",content = @Content),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get-all")
     public ResponseEntity<List<PurchaseResponseDTO>> getAllPurchases(HttpServletRequest request) {
         try {
@@ -156,6 +154,7 @@ public class PurchaseController {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getByDateRange")
     public ResponseEntity<List<PurchaseResponseDTO>> getPurchasesByDateRange(@Valid @RequestBody DateRangeDTO dateRangeDTO) {
         try {
@@ -172,6 +171,7 @@ public class PurchaseController {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Double.class))}),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getTotalByDateRange")
     public ResponseEntity<Double> getTotalAfterDiscountsSumByDateRange(@Valid @RequestBody DateRangeDTO dateRangeDTO) {
         try {
@@ -188,6 +188,7 @@ public class PurchaseController {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Long.class))}),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getCountByDateRange")
     public ResponseEntity<Long> getPurchasesCountByDateRange(@Valid @RequestBody DateRangeDTO dateRangeDTO) {
         try {
@@ -204,6 +205,7 @@ public class PurchaseController {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Purchase.class))}),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAverageByDateRange")
     public ResponseEntity<Double> getPurchasesAverageByDateRange(@Valid @RequestBody DateRangeDTO dateRangeDTO) {
         try {
@@ -221,6 +223,7 @@ public class PurchaseController {
             @ApiResponse(responseCode = "404", description = "Compras no encontradas",content = @Content),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/average-purchase-amount-per-user")
     public ResponseEntity<Double> calculateAveragePurchaseAmountPerUser() {
         try {
@@ -240,6 +243,7 @@ public class PurchaseController {
             @ApiResponse(responseCode = "404", description = "Compras no encontradas",content = @Content),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/units-sold-by-product")
     public ResponseEntity<List<ProductSalesResponseDTO>> getProductsByUnitsSold() {
         try {
@@ -262,6 +266,7 @@ public class PurchaseController {
             @ApiResponse(responseCode = "404", description = "Compras no encontradas",content = @Content),
             @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/total-sales-by-product")
     public ResponseEntity<List<ProductAmountResponseDTO>> getSalesByProduct() {
         try {

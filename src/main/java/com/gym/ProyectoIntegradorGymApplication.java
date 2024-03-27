@@ -28,7 +28,6 @@ public class ProyectoIntegradorGymApplication {
 	PasswordEncoder passwordEncoder;
 	@Autowired
 	UserRepository userRepository;
-
 	@Autowired
 	RankRepository rankRepository;
 

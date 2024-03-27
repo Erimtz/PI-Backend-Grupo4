@@ -41,6 +41,7 @@ public class CouponController {
     }
 
     @Operation(summary = "Traer todos los cupones")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get-all")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
@@ -189,6 +190,7 @@ public class CouponController {
             @ApiResponse(responseCode = "200", description = "Porcentaje obtenido sin errores", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))})
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/effectiveness")
     public ResponseEntity<Double> calculateCouponEffectiveness() {
         double effectiveness = couponService.calculateCouponEffectiveness();
