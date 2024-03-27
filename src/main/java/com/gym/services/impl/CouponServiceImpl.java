@@ -196,13 +196,17 @@ public class CouponServiceImpl implements CouponService {
 
 
     private CouponResponseDTO convertToDto(Coupon coupon) {
+        Long accountId = null;
+        if (coupon.getAccount() != null) {
+            accountId = coupon.getAccount().getId();
+        }
         return new CouponResponseDTO(
                 coupon.getId(),
                 coupon.getIssueDate(),
                 coupon.getDueDate(),
                 coupon.getAmount(),
                 coupon.getSpent(),
-                coupon.getAccount().getId()
+                accountId
         );
     }
 

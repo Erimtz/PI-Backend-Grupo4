@@ -1,4 +1,4 @@
-package com.gym;
+package com.gym.Service;
 
 import com.gym.entities.Rank;
 import com.gym.enums.ERank;

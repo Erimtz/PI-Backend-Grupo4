@@ -1,4 +1,4 @@
-package com.gym.services;
+package com.gym.Service;
 
 import com.gym.dto.response.StoreSubscriptionResponseDTO;
 import com.gym.entities.StoreSubscription;
