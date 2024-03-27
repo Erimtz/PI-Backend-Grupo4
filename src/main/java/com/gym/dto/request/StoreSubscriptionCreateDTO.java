@@ -21,7 +21,7 @@ public class StoreSubscriptionCreateDTO {
     private String imageUrl;
     @NotBlank(message = "Plan type cannot be blank")
     private String planType;
-    @NotBlank(message = "Duration days cannot be blank")
+    @NotNull(message = "Duration days cannot be null")
     private Integer durationDays;
 //    private List<Purchase> purchases;
 }

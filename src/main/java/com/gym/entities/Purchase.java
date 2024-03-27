@@ -41,14 +41,21 @@ public class Purchase {
     @JsonIgnore
     private Account account;
 
+//    @Override
+//    public String toString() {
+//        return "Purchase{" +
+//                "id=" + id +
+//                ", purchaseDetails=" + purchaseDetails +
+//                ", storeSubscription=" + storeSubscription +
+//                ", purchaseDate=" + purchaseDate +
+//                ", couponsApplied=" + couponsApplied +
+//                '}';
+//    }
     @Override
     public String toString() {
         return "Purchase{" +
                 "id=" + id +
-                ", purchaseDetails=" + purchaseDetails +
-                ", storeSubscription=" + storeSubscription +
                 ", purchaseDate=" + purchaseDate +
-                ", couponsApplied=" + couponsApplied +
                 '}';
     }
 }

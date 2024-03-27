@@ -3,10 +3,8 @@ package com.gym.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gym.security.entities.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+//import org.springframework.security.core.userdetails.User;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,6 +25,7 @@ public class Account {
 
     @OneToOne
     @JoinColumn(name = "user_id")
+//    @ToString.Exclude
     private UserEntity user;
 
     @Column(name = "credit_balance")
@@ -73,6 +72,8 @@ public class Account {
                 ", transferList=" + transferList +
                 '}';
     }
+
+
     //    @OneToMany(targetEntity = PaymentMethod.class ,fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "account")
 //    private List<PaymentMethod> paymentMethodSet;
 }

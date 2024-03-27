@@ -35,11 +35,38 @@ public class ProductServiceImpl implements ProductService {
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<ProductResponseDTO> getRandomProducts() {
+        List<Product> allProducts = productRepository.findAll();
+        if (allProducts.size() <= 8) {
+            return convertToDtoList(allProducts); // Si hay menos de 8 productos, devolver todos.
+        } else {
+            List<Product> randomProducts = new ArrayList<>();
+            Set<Integer> selectedIndices = new HashSet<>();
+            Random random = new Random();
+
+            while (selectedIndices.size() < 8) {
+                int randomIndex = random.nextInt(allProducts.size());
+                if (!selectedIndices.contains(randomIndex)) {
+                    selectedIndices.add(randomIndex);
+                    randomProducts.add(allProducts.get(randomIndex));
+                }
+            }
+
+            return convertToDtoList(randomProducts);
+        }
+    }
 
     @Override
     public ProductResponseDTO getProductById(Long id) {
         return productRepository.findById(id)
                 .map(this::convertToDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
+    }
+
+    @Override
+    public Product getProductEntityById(Long id) {
+        return productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
     }
 
@@ -147,8 +174,37 @@ public class ProductServiceImpl implements ProductService {
                 orderBy,
                 orderDirection
         );
-        return products.stream()
+        List<Product> filteredProducts = filterProducts(products, request);
+        List<Product> sortedProducts = sortProducts(filteredProducts, orderBy, orderDirection);
+        return sortedProducts.stream()
                 .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private List<Product> filterProducts(List<Product> products, ProductFiltersRequestDTO request) {
+        return products.stream()
+                .filter(product -> request.getMinPrice() == null || product.getPrice() >= request.getMinPrice())
+                .filter(product -> request.getMaxPrice() == null || product.getPrice() <= request.getMaxPrice())
+                .filter(product -> request.getHasStock() == null || request.getHasStock() && product.getStock() > 0)
+                .collect(Collectors.toList());
+    }
+
+    private List<Product> sortProducts(List<Product> products, String orderBy, String orderDirection) {
+        Comparator<Product> comparator;
+        if ("price".equalsIgnoreCase(orderBy)) {
+            comparator = Comparator.comparing(Product::getPrice);
+        } else if ("name".equalsIgnoreCase(orderBy)) {
+            comparator = Comparator.comparing(Product::getName);
+        } else {
+            throw new IllegalArgumentException("El campo orderBy debe ser 'price' o 'name'.");
+        }
+
+        if ("desc".equalsIgnoreCase(orderDirection)) {
+            comparator = comparator.reversed();
+        }
+
+        return products.stream()
+                .sorted(comparator)
                 .collect(Collectors.toList());
     }
 

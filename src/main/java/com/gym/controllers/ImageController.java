@@ -1,15 +1,28 @@
 package com.gym.controllers;
 
 import com.gym.dto.request.ImageRequestDTO;
+import com.gym.dto.request.ImageS3RequestDTO;
 import com.gym.dto.response.ImageResponseDTO;
 import com.gym.entities.Image;
 import com.gym.entities.Product;
+import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
+import com.gym.security.entities.UserEntity;
+//import com.gym.services.AWSS3Service;
+//import com.gym.s3.services.StorageService;
+import com.gym.s3.services.StorageService;
 import com.gym.services.ImageService;
+import com.gym.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Validated
@@ -33,17 +47,26 @@ public class ImageController {
 
     private final ImageService imageService;
     private final ProductRepository productRepository;
+    private final ProductService productService;
     private final ImageRepository imageRepository;
+    private final StorageService storageService;
 
     @Autowired
-    public ImageController(ImageService imageService, ProductRepository productRepository, ImageRepository imageRepository) {
+    public ImageController(ImageService imageService, ProductRepository productRepository, ImageRepository imageRepository, StorageService storageService, ProductService productService) {
         this.imageService = imageService;
         this.productRepository = productRepository;
         this.imageRepository = imageRepository;
+        this.storageService = storageService;
+        this.productService = productService;
     }
 
     @Operation(summary = "Traer todas las imagenes")
     @GetMapping("/get-all")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagenes obtenidas con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            })
+    })
     public ResponseEntity<List<ImageResponseDTO>> getAllImages() {
         List<ImageResponseDTO> imageDTO = imageService.getAllImages();
         return ResponseEntity.ok(imageDTO);
@@ -51,14 +74,46 @@ public class ImageController {
 
     @Operation(summary = "Traer una imagen por ID")
     @GetMapping("/get/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagen obtenida con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            })
+    })
     public ResponseEntity<ImageResponseDTO> getImageById(@PathVariable Long id) {
         ImageResponseDTO imageDTO = imageService.getImageById(id);
         return ResponseEntity.ok(imageDTO);
     }
 
+    @Operation(summary = "Traer imágenes por producto")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imágenes obtenidas con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content =
+            @Content),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado",content =
+            @Content)
+    })
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<List<ImageResponseDTO>> getImagesByProduct(@PathVariable Long productId) {
+        try {
+            List<ImageResponseDTO> images = imageService.getImagesByProduct(productId);
+            return ResponseEntity.ok(images);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (DataAccessException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Agregar una imagen")
     @PostMapping("/create")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Imagen creada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            })
+    })
     public ResponseEntity<ImageResponseDTO> createImage(@Valid @RequestBody ImageRequestDTO imageRequestDTO) {
         ImageResponseDTO imageDTO = imageService.createImage(imageRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(imageDTO);
@@ -67,6 +122,11 @@ public class ImageController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar una imagen")
     @PutMapping("/update/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagen actualizada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            })
+    })
     public ResponseEntity<ImageResponseDTO> updateImage(@PathVariable Long id, @Valid @RequestBody ImageRequestDTO imageRequestDTO) {
         imageRequestDTO.setId(id);
         ImageResponseDTO imageDTO = imageService.updateImage(imageRequestDTO);
@@ -76,13 +136,54 @@ public class ImageController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar una imagen por ID")
     @DeleteMapping("/delete/{id}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Imagen eliminada con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content =
+            @Content),
+            @ApiResponse(responseCode = "404", description = "Imagen no encontrada",content =
+            @Content)
+    })
     public ResponseEntity<Void> deleteImageById(@PathVariable Long id) {
-        imageService.deleteImageById(id);
-        return ResponseEntity.noContent().build();
+//        imageService.deleteImageById(id);
+//        return ResponseEntity.noContent().build();
+        try {
+            ImageResponseDTO imageDTO = imageService.getImageById(id);
+            if (imageDTO == null) {
+                throw new ResourceNotFoundException("Image with ID " + id + " not found");
+            }
+
+            // Desvincular la imagen del producto si tiene un ID de producto válido
+            Long productId = imageDTO.getProductId();
+            if (productId != null) {
+                imageService.unlinkImageFromProduct(id); // Actualiza la relación producto-imagen
+            }
+
+            // Eliminar la imagen
+            imageService.deleteImageById(id);
+
+            return ResponseEntity.noContent().build();
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Subir imagen al repositorio local")
     @PostMapping("/upload/{productId}")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagen subida con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "El servidor no puede procesar la solicitud",content =
+            @Content),
+            @ApiResponse(responseCode = "400", description = "Ocurrió un error al procesar la solicitud",content =
+            @Content),
+    })
+    @Transactional
     public ResponseEntity<String> uploadImage(@PathVariable Long productId, @RequestParam("file") MultipartFile file) {
         try {
             if (productId == null) {
@@ -119,6 +220,39 @@ public class ImageController {
 
             return ResponseEntity.ok("Image uploaded successfully");
         } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image");
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/upload/s3/{productId}")
+    @Operation(summary = "Subir imagen al bucket S3")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Imagen subida con exito", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "El servidor no puede procesar la solicitud",content =
+            @Content),
+            @ApiResponse(responseCode = "400", description = "Ocurrió un error al procesar la solicitud",content =
+            @Content),
+    })
+    public ResponseEntity<String> uploadImageS3(@PathVariable Long productId, @RequestParam("file") MultipartFile file) {
+        try {
+            if (productId == null) {
+                return ResponseEntity.badRequest().body("Product ID cannot be null");
+            }
+            String uploadedFileName = storageService.uploadFile(file);
+
+            ImageS3RequestDTO imageRequestDTO = new ImageS3RequestDTO();
+            imageRequestDTO.setTitle(uploadedFileName);
+            imageRequestDTO.setUrl(storageService.getFileUrl(uploadedFileName));
+            imageRequestDTO.setProductId(productId);
+
+            ImageResponseDTO imageResponseDTO = imageService.createImageS3(imageRequestDTO);
+
+            return ResponseEntity.ok("Image uploaded successfully");
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload image");
         }

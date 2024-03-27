@@ -21,6 +21,7 @@ import com.gym.security.repositories.RoleRepository;
 import com.gym.security.repositories.UserRepository;
 import com.gym.services.impl.AccountService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -243,6 +244,10 @@ public class UserService {
         String currentPassword = changePasswordDTO.getCurrentPassword();
         String newPassword = changePasswordDTO.getNewPassword();
         String confirmPassword = changePasswordDTO.getConfirmPassword();
+
+        if (!currentPassword.equals(newPassword)) {
+            throw new BadRequestException("La nueva contraseña debe ser diferente a la contraseña actual");
+        }
 
         if (!newPassword.equals(confirmPassword)) {
             throw new BadRequestException("La nueva contraseña y la confirmación de la contraseña no coinciden");

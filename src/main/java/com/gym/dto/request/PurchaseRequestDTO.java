@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PurchaseRequestDTO {
 
+    private Long accountId;
     private List<PurchaseDetailRequestDTO> purchaseDetails;
     private List<Long> couponsIds;
     private Long storeSubscriptionId;

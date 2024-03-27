@@ -12,6 +12,7 @@ public interface ProductService {
 
     List<ProductResponseDTO> getAllProducts();
     ProductResponseDTO getProductById(Long id);
+    Product getProductEntityById(Long id);
     Optional<ProductResponseDTO> getProductByIdWithImages(Long id);
     ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO);
     ProductResponseDTO updateProduct(ProductRequestDTO productRequestDTO);
@@ -26,4 +27,6 @@ public interface ProductService {
     List<ProductResponseDTO> searchProductsByNameAndFilters(String searchTerm, ProductFiltersRequestDTO request, String orderBy, String orderDirection);
 
     ProductResponseDTO convertToDto(Product product);
+
+    List<ProductResponseDTO> getRandomProducts();
 }
