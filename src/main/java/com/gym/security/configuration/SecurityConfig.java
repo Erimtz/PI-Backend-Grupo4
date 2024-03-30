@@ -61,6 +61,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
                     authorizationManagerRequestMatcherRegistry.requestMatchers("/user/hello", "/user/create-user", "/password-reset/**", "/email/**").permitAll();
                     authorizationManagerRequestMatcherRegistry.requestMatchers("/product/get-all", "/product/get/**", "/product/get-with-images/**", "/product/category/**", "/product/filter/**", "/product/search").permitAll();
+                    authorizationManagerRequestMatcherRegistry.requestMatchers("/category/get-all", "/category/get/**", "/image/product/**", "/image/get/**", "/image/get-all").permitAll();
+                    authorizationManagerRequestMatcherRegistry.requestMatchers("/store-subscription/get-all", "/store-subscription/get/**", "/image/product/**", "/image/get/**", "/image/get-all").permitAll();
                     authorizationManagerRequestMatcherRegistry.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
                     authorizationManagerRequestMatcherRegistry.anyRequest().authenticated();
                 })
