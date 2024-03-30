@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductRepository productRepository;
+    public final ProductRepository productRepository;
     private final ImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
 
@@ -156,7 +156,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponseDTO> getProductsByCategory(Long categoryId) throws ResourceNotFoundException {
         List<Product> products = productRepository.getProductsByCategory(categoryId);
         if (products.isEmpty()) {
-            throw new ResourceNotFoundException("No se encontraron productos para la categoría con ID: " + categoryId);
+            throw new ResourceNotFoundException("No products found for category with ID: " + categoryId);
         }
         return convertToDtoList(products);
     }
@@ -245,15 +245,22 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDTO convertToDto(Product product) {
-        Set<ImageResponseDTO> imageResponseDTOs = product.getImages().stream()
-                .map(image -> {
-                    ImageResponseDTO imageResponseDTO = new ImageResponseDTO();
-                    imageResponseDTO.setId(image.getId());
-                    imageResponseDTO.setTitle(image.getTitle());
-                    imageResponseDTO.setUrl(image.getUrl());
-                    return imageResponseDTO;
-                })
-                .collect(Collectors.toSet());
+        if (product == null) {
+            return null;
+        }
+
+        Set<ImageResponseDTO> imageResponseDTOs = new HashSet<>();
+        if (product.getImages() != null) {
+            imageResponseDTOs = product.getImages().stream()
+                    .map(image -> {
+                        ImageResponseDTO imageResponseDTO = new ImageResponseDTO();
+                        imageResponseDTO.setId(image.getId());
+                        imageResponseDTO.setTitle(image.getTitle());
+                        imageResponseDTO.setUrl(image.getUrl());
+                        return imageResponseDTO;
+                    })
+                    .collect(Collectors.toSet());
+        }
 
         ProductResponseDTO productResponseDTO = new ProductResponseDTO();
         productResponseDTO.setId(product.getId());
@@ -262,6 +269,14 @@ public class ProductServiceImpl implements ProductService {
         productResponseDTO.setStock(product.getStock());
         productResponseDTO.setPrice(product.getPrice());
         productResponseDTO.setCategoryId(product.getCategory().getId());
+        productResponseDTO.setImages(imageResponseDTOs);
+
+        if (product.getCategory() != null) {
+            productResponseDTO.setCategoryId(product.getCategory().getId());
+        } else {
+            throw new ResourceNotFoundException("Category is null for product with ID " + product.getId());
+        }
+
         productResponseDTO.setImages(imageResponseDTOs);
 
         return productResponseDTO;

@@ -1,5 +1,6 @@
 package com.gym.dto.request;
 
+import com.gym.dto.response.ImageResponseDTO;
 import com.gym.entities.Image;
 import com.gym.entities.Purchase;
 import lombok.AllArgsConstructor;
@@ -21,4 +22,7 @@ public class ProductRequestDTO {
     private Purchase purchase;
     private Long categoryId;
     private Set<Image> images;
+
+    public void setImages(Set<ImageResponseDTO> images) {
+    }
 }

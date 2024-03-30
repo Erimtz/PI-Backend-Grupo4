@@ -26,10 +26,11 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+
 
 @Service
 public class AccountService {
@@ -46,8 +47,14 @@ public class AccountService {
     @Lazy
     private PurchaseService purchaseService;
 
-    public AccountService(AccountRepository accountRepository) {
+    @Autowired
+    public AccountService(AccountRepository accountRepository, RankRepository rankRepository, SubscriptionService subscriptionService) {
         this.accountRepository = accountRepository;
+        this.rankRepository = rankRepository;
+        this.subscriptionService = subscriptionService;
+    }
+
+    public AccountService(JwtUtils jwtUtilsMock) {
     }
 
     public Account createAccount(UserEntity user, String document) {
@@ -192,16 +199,21 @@ public class AccountService {
     }
 
     private AccountPurchaseDTO mapToAccountPurchaseDTO(Account account) {
+        String rankName = (account.getRank() != null) ? account.getRank().getName().name() : null;
+        List<PurchaseResponseDTO> purchaseDTOList = (account.getPurchaseList() != null) ? mapPurchasesToDTO(account.getPurchaseList()) : new ArrayList<>();
         return new AccountPurchaseDTO(
                 account.getId(),
                 account.getUser().getId(),
                 account.getCreditBalance(),
-                account.getRank().getName().name(),
+                rankName,
                 mapPurchasesToDTO(account.getPurchaseList())
         );
     }
 
     private List<PurchaseResponseDTO> mapPurchasesToDTO(List<Purchase> purchases) {
+        if (purchases == null) {
+            return Collections.emptyList(); // Devuelve una lista vacía si la lista de compras es nula
+        }
         return purchases.stream()
                 .map(this::mapToPurchaseDTO)
                 .collect(Collectors.toList());
