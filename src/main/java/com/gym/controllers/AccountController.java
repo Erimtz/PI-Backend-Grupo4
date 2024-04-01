@@ -2,7 +2,6 @@ package com.gym.controllers;
 
 import com.gym.dto.response.AccountPurchaseDTO;
 import com.gym.entities.Account;
-import com.gym.security.entities.UserEntity;
 import com.gym.services.impl.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,16 +22,14 @@ import java.util.List;
 @RequestMapping("/api/account")
 @RequiredArgsConstructor
 public class AccountController {
+
     private final AccountService accountService;
 
-//    public AccountController(AccountService accountService) {
-//        this.accountService = accountService;
-//    }
-    @Operation(summary = "Obtener todas las cuentas con sus compras")
+    @Operation(summary = "Get all accounts with your purchases")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cuentas con sus compras obtenidas con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Accounts with your purchases successfully obtained", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Account.class))}),
-            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud.",content = @Content)})
+            @ApiResponse(responseCode = "500", description = "An error occurred while processing the request.",content = @Content)})
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get-all-with-purchases")
     public ResponseEntity<?> getAllAccountsWithPurchasesDTO() {
@@ -40,7 +37,7 @@ public class AccountController {
             List<AccountPurchaseDTO> accountPurchaseDTOs = accountService.getAllAccountsWithPurchasesDTO();
             return ResponseEntity.ok(accountPurchaseDTOs);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocurrió un error al procesar la solicitud.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request.");
         }
     }
 }

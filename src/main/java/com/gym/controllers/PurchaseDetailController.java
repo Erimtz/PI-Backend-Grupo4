@@ -2,7 +2,6 @@ package com.gym.controllers;
 
 import com.gym.dto.request.PurchaseDetailRequestDTO;
 import com.gym.entities.PurchaseDetail;
-import com.gym.security.entities.UserEntity;
 import com.gym.services.PurchaseDetailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,18 +16,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/purchase-details")
-@RequiredArgsConstructor
 public class PurchaseDetailController {
 
     private final PurchaseDetailService purchaseDetailService;
 
-    @Operation(summary = "Crear detalle de commpra")
+    @Operation(summary = "Create purchase detail")
     @PostMapping
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Detalle de compra creado con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = PurchaseDetail.class))
+            @ApiResponse(responseCode = "201", description = "Purchase detail created successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = PurchaseDetail.class))
             })
     })
     public ResponseEntity<PurchaseDetail> createPurchaseDetail(@RequestBody PurchaseDetailRequestDTO requestDTO) {

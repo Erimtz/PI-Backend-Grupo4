@@ -8,7 +8,6 @@ import com.gym.entities.Product;
 import com.gym.exceptions.ResourceNotFoundException;
 import com.gym.repositories.ImageRepository;
 import com.gym.repositories.ProductRepository;
-import com.gym.security.entities.UserEntity;
 //import com.gym.services.AWSS3Service;
 //import com.gym.s3.services.StorageService;
 import com.gym.s3.services.StorageService;
@@ -21,7 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +40,7 @@ import java.util.Optional;
 
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/image")
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
 public class ImageController {
@@ -51,20 +51,11 @@ public class ImageController {
     private final ImageRepository imageRepository;
     private final StorageService storageService;
 
-    @Autowired
-    public ImageController(ImageService imageService, ProductRepository productRepository, ImageRepository imageRepository, StorageService storageService, ProductService productService) {
-        this.imageService = imageService;
-        this.productRepository = productRepository;
-        this.imageRepository = imageRepository;
-        this.storageService = storageService;
-        this.productService = productService;
-    }
-
-    @Operation(summary = "Traer todas las imagenes")
+    @Operation(summary = "Get all images")
     @GetMapping("/get-all")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Imagenes obtenidas con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            @ApiResponse(responseCode = "200", description = "Images retrieved successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Image.class))
             })
     })
     public ResponseEntity<List<ImageResponseDTO>> getAllImages() {
@@ -72,11 +63,11 @@ public class ImageController {
         return ResponseEntity.ok(imageDTO);
     }
 
-    @Operation(summary = "Traer una imagen por ID")
+    @Operation(summary = "Get an image by ID")
     @GetMapping("/get/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Imagen obtenida con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            @ApiResponse(responseCode = "200", description = "Image retrieved successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Image.class))
             })
     })
     public ResponseEntity<ImageResponseDTO> getImageById(@PathVariable Long id) {
@@ -84,14 +75,14 @@ public class ImageController {
         return ResponseEntity.ok(imageDTO);
     }
 
-    @Operation(summary = "Traer imágenes por producto")
+    @Operation(summary = "Get images by product")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Imágenes obtenidas con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            @ApiResponse(responseCode = "200", description = "Images retrieved successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Image.class))
             }),
-            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content =
+            @ApiResponse(responseCode = "500", description = "An error occurred while processing the request",content =
             @Content),
-            @ApiResponse(responseCode = "404", description = "Producto no encontrado",content =
+            @ApiResponse(responseCode = "404", description = "Product not found",content =
             @Content)
     })
     @GetMapping("/product/{productId}")
@@ -107,11 +98,11 @@ public class ImageController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Agregar una imagen")
+    @Operation(summary = "Add an image")
     @PostMapping("/create")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Imagen creada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            @ApiResponse(responseCode = "201", description = "Image created successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Image.class))
             })
     })
     public ResponseEntity<ImageResponseDTO> createImage(@Valid @RequestBody ImageRequestDTO imageRequestDTO) {
@@ -120,11 +111,11 @@ public class ImageController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Actualizar una imagen")
+    @Operation(summary = "Update an image")
     @PutMapping("/update/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Imagen actualizada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            @ApiResponse(responseCode = "200", description = "Image updated successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Image.class))
             })
     })
     public ResponseEntity<ImageResponseDTO> updateImage(@PathVariable Long id, @Valid @RequestBody ImageRequestDTO imageRequestDTO) {
@@ -134,33 +125,31 @@ public class ImageController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Eliminar una imagen por ID")
+    @Operation(summary = "Delete an image by ID")
     @DeleteMapping("/delete/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Imagen eliminada con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
+            @ApiResponse(responseCode = "204", description = "Image deleted successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Image.class))
             }),
-            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content =
+            @ApiResponse(responseCode = "500", description = "An error occurred while processing the request",content =
             @Content),
-            @ApiResponse(responseCode = "404", description = "Imagen no encontrada",content =
+            @ApiResponse(responseCode = "404", description = "Image not found",content =
             @Content)
     })
     public ResponseEntity<Void> deleteImageById(@PathVariable Long id) {
-//        imageService.deleteImageById(id);
-//        return ResponseEntity.noContent().build();
         try {
             ImageResponseDTO imageDTO = imageService.getImageById(id);
             if (imageDTO == null) {
                 throw new ResourceNotFoundException("Image with ID " + id + " not found");
             }
 
-            // Desvincular la imagen del producto si tiene un ID de producto válido
+            // Unlink the image from the product if it has a valid product ID
             Long productId = imageDTO.getProductId();
             if (productId != null) {
-                imageService.unlinkImageFromProduct(id); // Actualiza la relación producto-imagen
+                imageService.unlinkImageFromProduct(id); // Update the product-image relationship
             }
 
-            // Eliminar la imagen
+            // Delete the image
             imageService.deleteImageById(id);
 
             return ResponseEntity.noContent().build();
@@ -172,15 +161,15 @@ public class ImageController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Subir imagen al repositorio local")
+    @Operation(summary = "Upload image to local repository")
     @PostMapping("/upload/{productId}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Imagen subida con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Image uploaded successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
             }),
-            @ApiResponse(responseCode = "500", description = "El servidor no puede procesar la solicitud",content =
+            @ApiResponse(responseCode = "500", description = "The server cannot process the request",content =
             @Content),
-            @ApiResponse(responseCode = "400", description = "Ocurrió un error al procesar la solicitud",content =
+            @ApiResponse(responseCode = "400", description = "An error occurred while processing the request",content =
             @Content),
     })
     @Transactional
@@ -227,14 +216,14 @@ public class ImageController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload/s3/{productId}")
-    @Operation(summary = "Subir imagen al bucket S3")
+    @Operation(summary = "Upload image to S3 bucket")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Imagen subida con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Image uploaded successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Image.class))
             }),
-            @ApiResponse(responseCode = "500", description = "El servidor no puede procesar la solicitud",content =
+            @ApiResponse(responseCode = "500", description = "The server cannot process the request",content =
             @Content),
-            @ApiResponse(responseCode = "400", description = "Ocurrió un error al procesar la solicitud",content =
+            @ApiResponse(responseCode = "400", description = "An error occurred while processing the request",content =
             @Content),
     })
     public ResponseEntity<String> uploadImageS3(@PathVariable Long productId, @RequestParam("file") MultipartFile file) {

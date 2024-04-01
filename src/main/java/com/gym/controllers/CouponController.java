@@ -5,9 +5,7 @@ import com.gym.dto.request.CouponCreateDTO;
 import com.gym.dto.request.CouponUpdateDTO;
 import com.gym.entities.Coupon;
 import com.gym.exceptions.ResourceNotFoundException;
-import com.gym.exceptions.UnauthorizedException;
 import com.gym.security.configuration.utils.AccountTokenUtils;
-import com.gym.security.entities.UserEntity;
 import com.gym.services.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,10 +14,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,24 +25,19 @@ import java.util.List;
 
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/coupon")
 public class CouponController {
 
     private final CouponService couponService;
     private final AccountTokenUtils accountTokenUtils;
 
-    @Autowired
-    public CouponController(CouponService couponService, AccountTokenUtils accountTokenUtils) {
-        this.couponService = couponService;
-        this.accountTokenUtils = accountTokenUtils;
-    }
-
-    @Operation(summary = "Traer todos los cupones")
+    @Operation(summary = "Get all coupons")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/get-all")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
+            @ApiResponse(responseCode = "200", description = "Coupons retrieved successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<List<CouponResponseDTO>> getAllCoupons() {
@@ -53,11 +45,11 @@ public class CouponController {
         return ResponseEntity.ok(couponDTOS);
     }
 
-    @Operation(summary = "Traer cupones por id ")
+    @Operation(summary = "Get coupons by ID")
     @GetMapping("/get/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
+            @ApiResponse(responseCode = "200", description = "Coupons retrieved successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<CouponResponseDTO> getCouponById(@PathVariable Long id) {
@@ -66,11 +58,11 @@ public class CouponController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Crear cupon")
+    @Operation(summary = "Create coupon")
     @PostMapping("/create")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Cupon creado con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
+            @ApiResponse(responseCode = "201", description = "Coupon created successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<CouponResponseDTO> createCoupon(@Valid @RequestBody CouponCreateDTO couponCreateDTO) {
@@ -79,11 +71,11 @@ public class CouponController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Actualizar cupon")
+    @Operation(summary = "Update coupon")
     @PutMapping("/update/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cupon actualizado con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
+            @ApiResponse(responseCode = "200", description = "Coupon updated successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Coupon.class))
             })
     })
     public ResponseEntity<CouponResponseDTO> updateCoupon(@PathVariable Long id, @Valid @RequestBody CouponUpdateDTO couponUpdateDTO) {
@@ -93,10 +85,10 @@ public class CouponController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Elimnar cupon por id")
+    @Operation(summary = "Delete coupon by ID")
     @DeleteMapping("/delete/{id}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Cupones eliminado con exito", content = {
+            @ApiResponse(responseCode = "204", description = "Coupon deleted successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
@@ -106,10 +98,10 @@ public class CouponController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Traer cupones consumidos")
+    @Operation(summary = "Get all spent coupons")
     @GetMapping("/get-all-spent")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Coupons retrieved successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
@@ -119,10 +111,10 @@ public class CouponController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Traer cupones no consumidos")
+    @Operation(summary = "Get all not spent coupons")
     @GetMapping("/get-all-not-spent")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Coupons retrieved successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
@@ -132,10 +124,10 @@ public class CouponController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Traer cupones expirados")
+    @Operation(summary = "Get all expired coupons")
     @GetMapping("/get-all-expired")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Coupons retrieved successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
@@ -145,10 +137,10 @@ public class CouponController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Traer cupones vigentes")
+    @Operation(summary = "Get all current coupons")
     @GetMapping("/get-all-current")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Coupons retrieved successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             })
     })
@@ -157,17 +149,17 @@ public class CouponController {
         return ResponseEntity.ok(couponDTOS);
     }
 
-    @Operation(summary = "Traer cupones validos de cuenta")
+    @Operation(summary = "Get valid coupons by account")
     @GetMapping("/valid-coupons/{accountId}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Coupons retrieved successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             }),
-            @ApiResponse(responseCode = "403", description = "No está autorizado a acceder al recurso",content =
+            @ApiResponse(responseCode = "403", description = "You are not authorized to access the resource",content =
             @Content),
-            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content =
+            @ApiResponse(responseCode = "500", description = "An error occurred while processing the request",content =
             @Content),
-            @ApiResponse(responseCode = "404", description = "Cupón no encontrado",content =
+            @ApiResponse(responseCode = "404", description = "Coupon not found",content =
             @Content)
     })
     public ResponseEntity<List<CouponResponseDTO>> getValidCouponsByAccount(@PathVariable Long accountId, HttpServletRequest request) {
@@ -185,10 +177,11 @@ public class CouponController {
         }
     }
 
-    @Operation(summary = "Porcentaje de efectividad de los cupones")
+    @Operation(summary = "Coupon effectiveness percentage")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Porcentaje obtenido sin errores", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))})
+            @ApiResponse(responseCode = "200", description = "Percentage obtained successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = Coupon.class))
+            })
     })
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/effectiveness")
@@ -197,16 +190,16 @@ public class CouponController {
         return ResponseEntity.ok(effectiveness);
     }
 
-    @Operation(summary = "Traer cupones por cuenta de usuario")
+    @Operation(summary = "Get coupons by user account")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cupones obtenidos con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Coupons retrieved successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Coupon.class))
             }),
-            @ApiResponse(responseCode = "403", description = "No está autorizado a acceder al recurso",content =
+            @ApiResponse(responseCode = "403", description = "You are not authorized to access the resource",content =
             @Content),
-            @ApiResponse(responseCode = "500", description = "Ocurrió un error al procesar la solicitud",content =
+            @ApiResponse(responseCode = "500", description = "An error occurred while processing the request",content =
             @Content),
-            @ApiResponse(responseCode = "404", description = "Cupón no encontrado",content =
+            @ApiResponse(responseCode = "404", description = "Coupon not found",content =
             @Content)
     })
     @GetMapping("/account/{accountId}")
@@ -225,7 +218,7 @@ public class CouponController {
         }
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
+    //    @PreAuthorize("hasRole('ADMIN')")
 //    @PostMapping("/convert-response-to-entity")
     public Coupon convertResponseToEntity(@RequestBody CouponResponseDTO couponResponseDTO) {
         return couponService.convertResponseToEntity(couponResponseDTO);

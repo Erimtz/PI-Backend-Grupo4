@@ -5,9 +5,6 @@ import com.gym.dto.request.ProductRequestDTO;
 import com.gym.dto.response.ProductResponseDTO;
 import com.gym.entities.Product;
 import com.gym.exceptions.ResourceNotFoundException;
-import com.gym.repositories.ImageRepository;
-import com.gym.repositories.ProductRepository;
-import com.gym.security.entities.UserEntity;
 import com.gym.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,7 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,26 +26,18 @@ import java.util.Optional;
 
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/product")
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE })
 public class ProductController {
 
     private static final String UPLOAD_DIR = "src/main/resources/static/images/";
 
-    @Autowired
-    private ProductRepository productoRepository;
-    @Autowired
-    private ImageRepository imagenRepository;
     private final ProductService productService;
 
-    @Autowired
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
-
-    @Operation(summary = "Traer todos los productos")
+    @Operation(summary = "Get all products")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
             })
     })
@@ -62,32 +51,33 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProducts());
     }
 
-    @Operation(summary = "Traer 8 productos aleatorios")
+    @Operation(summary = "Get 8 random products")
     @GetMapping("/random")
     public List<ProductResponseDTO> getRandomProducts() {
         return productService.getRandomProducts();
     }
 
-    @Operation(summary = "Traer el producto por ID")
+    @Operation(summary = "Get product by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Producto obtenidos con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Product retrieved successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
-            }), @ApiResponse(responseCode = "404", description = "Suscripción no encontradas",content = @Content),
+            }), @ApiResponse(responseCode = "404", description = "Product not found",content = @Content),
     })
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getProductById (@PathVariable Long id) throws ResourceNotFoundException {
         ProductResponseDTO productResponseDTO = productService.getProductById(id);
-        if (productResponseDTO !=null){
+        if (productResponseDTO != null){
             return new ResponseEntity<>(productResponseDTO, HttpStatus.OK);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró la suscripción asociada a la cuenta proporcionada.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No product associated with the provided ID was found.");
     }
 
-    @Operation(summary = "Traer el producto por ID con imagenes")
+    @Operation(summary = "Get product by ID with images")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Producto obtenido con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
-            @ApiResponse(responseCode = "404", description = "Suscripción no encontradas",content = @Content)
+            @ApiResponse(responseCode = "200", description = "Product retrieved successfully", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Product not found",content = @Content)
     })
     @GetMapping("/get-with-images/{id}")
     public ResponseEntity<?> getProductByIdWithImages (@PathVariable Long id) throws ResourceNotFoundException {
@@ -95,15 +85,16 @@ public class ProductController {
         if (productResponseOptional.isPresent()) {
             return new ResponseEntity<>(productResponseOptional.get(), HttpStatus.OK);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encontró la suscripción asociada a la cuenta proporcionada.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No product associated with the provided ID was found.");
         }
     }
 
-    @Operation(summary = "Traer todos los productos por categoria")
+    @Operation(summary = "Get all products by category")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
-            @ApiResponse(responseCode = "404", description = "Productos no encotrados",content = @Content),
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Products not found",content = @Content),
     })
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<?> getProductsByCategory(@PathVariable(name = "categoryId") Long categoryId) {
@@ -115,15 +106,16 @@ public class ProductController {
         }
     }
 
-    @Operation(summary = "Obtener productos por categoria")
+    @Operation(summary = "Get products by category")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
-            @ApiResponse(responseCode = "404", description = "Productos no encontrados",content = @Content),
-            @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Products not found",content = @Content),
+            @ApiResponse(responseCode = "400", description = "Parameter error",content = @Content)
     })
     @GetMapping("/filter/category/{categoryId}")
-    public ResponseEntity<?> getProductsByCategotyFiltered(
+    public ResponseEntity<?> getProductsByCategoryFiltered(
             @PathVariable(name = "categoryId") Long categoryId,
             @RequestBody ProductFiltersRequestDTO request,
             @RequestParam(name = "orderBy", required = false, defaultValue = "id") String orderBy,
@@ -139,12 +131,13 @@ public class ProductController {
         }
     }
 
-    @Operation(summary = "Buscar productos por nombre")
+    @Operation(summary = "Search products by name")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
-            @ApiResponse(responseCode = "404", description = "Productos no encontrados",content = @Content),
-            @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Products not found",content = @Content),
+            @ApiResponse(responseCode = "400", description = "Parameter error",content = @Content)
     })
     @GetMapping("/search")
     public ResponseEntity<?> searchProductsByName(@RequestParam(name = "product") String product) {
@@ -159,12 +152,13 @@ public class ProductController {
         }
     }
 
-    @Operation(summary = "Buscar productos por nombre filtrado")
+    @Operation(summary = "Search products by filtered name")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Productos obtenidos con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
-            @ApiResponse(responseCode = "404", description = "Productos no encontrados",content = @Content),
-            @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
+            }),
+            @ApiResponse(responseCode = "404", description = "Products not found",content = @Content),
+            @ApiResponse(responseCode = "400", description = "Parameter error",content = @Content)
     })
     @GetMapping("/filter/search")
     public ResponseEntity<?> searchProductsByNameFiltered(
@@ -183,12 +177,13 @@ public class ProductController {
         }
     }
 
-    @Operation(summary = "Agregar un producto")
+    @Operation(summary = "Add a product")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Producto agregado con exito", content = {
-                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))}),
-            @ApiResponse(responseCode = "500", description = "Error de respuesta",content = @Content),
-            @ApiResponse(responseCode = "400", description = "Error de parametros",content = @Content)
+            @ApiResponse(responseCode = "201", description = "Product added successfully", content = {
+                    @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
+            }),
+            @ApiResponse(responseCode = "500", description = "Response error",content = @Content),
+            @ApiResponse(responseCode = "400", description = "Parameter error",content = @Content)
     })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
@@ -207,16 +202,16 @@ public class ProductController {
         }
     }
 
-    @Operation(summary = "Actualizar un producto")
+    @Operation(summary = "Update a product")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Producto actualizado con exito", content = {
+            @ApiResponse(responseCode = "200", description = "Product updated successfully", content = {
                     @Content(mediaType = "application/json",schema = @Schema(implementation = Product.class))
             }),
-            @ApiResponse(responseCode = "500", description = "Error de respuesta",content =
+            @ApiResponse(responseCode = "500", description = "Response error",content =
             @Content),
-            @ApiResponse(responseCode = "400", description = "Error de parametros",content =
+            @ApiResponse(responseCode = "400", description = "Parameter error",content =
             @Content),
-            @ApiResponse(responseCode = "404", description = "Producto no encontrado",content =
+            @ApiResponse(responseCode = "404", description = "Product not found",content =
             @Content)
     })
     @PreAuthorize("hasRole('ADMIN')")
@@ -239,12 +234,12 @@ public class ProductController {
         }
     }
 
-    @Operation(summary = "Eliminar un producto por ID")
+    @Operation(summary = "Delete a product by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Producto eliminado con exito", content = {
+            @ApiResponse(responseCode = "204", description = "Product deleted successfully", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class))
             }),
-            @ApiResponse(responseCode = "404", description = "Producto no encontrado",content = @Content)
+            @ApiResponse(responseCode = "404", description = "Product not found",content = @Content)
     })
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
@@ -252,8 +247,8 @@ public class ProductController {
         try {
             productService.deleteProductById(id);
             return new ResponseEntity<>("Product disposed correctly.", HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>("No products found", HttpStatus.NOT_FOUND);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
         }
     }
 }
