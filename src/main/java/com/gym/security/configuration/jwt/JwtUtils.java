@@ -52,7 +52,7 @@ public class JwtUtils {
                     .getBody();
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("Token inválido, error: {}", e.getMessage());
+            log.error("Invalid token, error: {}", e.getMessage());
             return false;
         }
     }
@@ -66,7 +66,7 @@ public class JwtUtils {
                     .getBody();
             return claims.getSubject();
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("Token inválido, error: {}", e.getMessage());
+            log.error("Invalid token, error: {}", e.getMessage());
             return null;
         }
     }
@@ -110,7 +110,7 @@ public class JwtUtils {
             long differenceInMillis = expirationDate.getTime() - current.getTime();
             return differenceInMillis < (5 * 60 * 1000);
         } catch (JwtException e) {
-            log.error("Error al verificar la expiración del token: {}", e.getMessage());
+            log.error("Error verifying token expiration: {}", e.getMessage());
             return false;
         }
     }

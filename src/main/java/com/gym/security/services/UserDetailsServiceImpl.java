@@ -19,12 +19,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
-//    @Autowired
-//    private UserService userService;
+
     @Override
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("El usuario "+usernameOrEmail+" no existe."));
+                .orElseThrow(() -> new UsernameNotFoundException("User with email/username "+usernameOrEmail+" does not exists."));
 
         Collection<? extends GrantedAuthority> authorities = userEntity.getRoles()
                 .stream()

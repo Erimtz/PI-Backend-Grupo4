@@ -101,7 +101,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     private Account getAccountFromToken(String token) {
         Account account = accountService.getAccountFromToken(token);
         if (account == null) {
-            throw new IllegalArgumentException("No se pudo obtener la cuenta del usuario");
+            throw new IllegalArgumentException("Failed to retrieve the user's account");
         }
         return account;
     }
@@ -115,8 +115,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         List<PurchaseDetailRequestDTO> purchaseDetailDTOs = requestDTO.getPurchaseDetails();
 
         if (storeSubscriptionId == null && (purchaseDetailDTOs == null || purchaseDetailDTOs.isEmpty())) {
-//            logger.error("Debe proporcionar al menos una suscripción a la tienda o un detalle de compra");
-            throw new IllegalArgumentException("Debe proporcionar al menos una suscripción a la tienda o un detalle de compra");
+//            logger.error("You must provide at least one store subscription or purchase detail.");
+            throw new IllegalArgumentException("You must provide at least one store subscription or purchase detail.");
         }
 
 
@@ -163,7 +163,7 @@ public class PurchaseServiceImpl implements PurchaseService {
         BigDecimal totalAfterDiscountsBigDecimal = BigDecimal.valueOf(totalAfterDiscounts);
 
         if (discount * 2 > total) {
-            throw new CouponDiscountExceededException("La suma de los descuentos de los cupones no puede superar el 50% del total de la compra");
+            throw new CouponDiscountExceededException("The sum of coupon discounts cannot exceed 50% of the total purchase.");
         }
 
         if (totalAfterDiscountsBigDecimal.compareTo(creditBalance) <= 0) {
@@ -182,12 +182,12 @@ public class PurchaseServiceImpl implements PurchaseService {
 
             couponGenerationService.createCouponByPurchase(getAccountFromToken(token), BigDecimal.valueOf(total));
         } else {
-            throw new InsufficientCreditException("El saldo de crédito de la cuenta es insuficiente para realizar la compra");
+            throw new InsufficientCreditException("The account's credit balance is insufficient to complete the purchase.");
         }
 
         Account account = purchase.getAccount();
         Subscription personalSubscription = subscriptionService.getSubscriptionByAccountId(account.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("No se pudo obtener la suscripcion con ID: " + account.getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Could not retrieve the subscription with ID: " + account.getId()));
         if (personalSubscription != null && isSubscriptionExpired(personalSubscription)) {
             StoreSubscription storeSubscription = purchase.getStoreSubscription();
             if (storeSubscription != null) {
@@ -264,7 +264,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                     CouponResponseDTO couponResponseDTO = couponService.getCouponById(couponId);
                     if (couponResponseDTO != null) {
                         if (couponResponseDTO.getSpent()) {
-                            throw new IllegalStateException("El cupón con ID " + couponId + " ya ha sido gastado.");
+                            throw new IllegalStateException("The coupon with ID " + couponId + " has already been used.");
                         }
                         Coupon coupon = new Coupon();
                         coupon.setId(couponResponseDTO.getId());
@@ -276,12 +276,12 @@ public class PurchaseServiceImpl implements PurchaseService {
                         appliedCoupons.add(coupon);
                         couponService.markCouponAsSpent(couponId);
                     } else {
-                        logger.error("No se encontró ningún cupón con ID: {}", couponId);
+                        logger.error("No coupon found with ID: {}", couponId);
                         throw new IllegalArgumentException("Coupon not found with ID: " + couponId);
                     }
                 } catch (IllegalArgumentException e) {
-                    logger.error("Error al buscar el cupón con ID: {}", couponId, e);
-                    throw new IllegalArgumentException("Error al buscar el cupón con ID: " + couponId);
+                    logger.error("Error while searching for the coupon with ID: {}", couponId, e);
+                    throw new IllegalArgumentException("Error while searching for the coupon with ID: " + couponId);
                 }
             }
             purchase.setCouponsApplied(appliedCoupons);
@@ -399,7 +399,7 @@ public class PurchaseServiceImpl implements PurchaseService {
             if (isAdmin) {
                 allPurchases = purchaseRepository.findAll();
             } else {
-                throw new UnauthorizedException("No tienes permiso para acceder a todas las compras.");
+                throw new UnauthorizedException("You do not have permission to access all purchases.");
             }
             return allPurchases.stream()
                     .map(this::buildPurchaseResponse)

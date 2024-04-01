@@ -97,7 +97,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         Subscription subscription = Subscription.builder()
                 .name("No subscription")
                 .price(0.00)
-                .imageUrl("Direccion imagen sin suscripción")
+                .imageUrl("No subscription URL image")
                 .startDate(LocalDate.now().minusDays(1))
                 .endDate(LocalDate.now().minusDays(1))
                 .planType("None")
@@ -147,10 +147,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Transactional
     public Subscription updateAutomaticRenewal(Long accountId, boolean automaticRenewal, HttpServletRequest request) {
         if (!accountTokenUtils.hasAccessToAccount(request, accountId)) {
-            throw new UnauthorizedException("No tiene permiso para modificar esta suscripción.");
+            throw new UnauthorizedException("You do not have permission to modify this subscription.");
         }
         Subscription subscription = subscriptionRepository.findByAccountId(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException("No se pudo obtener la suscripcion con ID de cuenta: " + accountId));
+                .orElseThrow(() -> new ResourceNotFoundException("Could not retrieve the subscription with account ID:  " + accountId));
         subscription.setAutomaticRenewal(automaticRenewal);
         return subscriptionRepository.save(subscription);
     }
@@ -160,10 +160,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public Subscription updateSubscriptionPurchase(StoreSubscription storeSubscription, String token) {
         Account account = accountService.getAccountFromToken(token);
         if (account == null) {
-            throw new IllegalArgumentException("No se pudo obtener la cuenta del usuario");
+            throw new IllegalArgumentException("Failed to retrieve the user's account.");
         }
         Subscription subscription = subscriptionRepository.findByAccountId(account.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("No se pudo obtener la suscripcion con ID: " + account.getId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Could not retrieve the subscription with ID: " + account.getId()));
 
             subscription.setName(storeSubscription.getName());
             subscription.setPrice(storeSubscription.getPrice());
@@ -181,17 +181,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         try{
             List<Subscription> activeSubscriptions = subscriptionRepository.findActiveSubscriptions();
             long totalUsers = subscriptionRepository.findAll().size();
-//            long totalUsers = accountService.getAllAccountsWithPurchasesDTO().size();
 
             if (totalUsers == 0) {
-                return 0.0; // Evitar la división por cero
+                return 0.0; // Avoid division by zero
             }
 
             int activeSubscriptionCount = activeSubscriptions.size();
             return (double) activeSubscriptionCount * 100 / totalUsers;
         } catch (Exception e) {
             e.printStackTrace();
-            return -1.0; // Devuelve un valor predeterminado para indicar que ha ocurrido un error
+            return -1.0; // Return a default value to indicate that an error has occurred
         }
     }
 

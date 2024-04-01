@@ -196,7 +196,7 @@ public class ProductServiceImpl implements ProductService {
         } else if ("name".equalsIgnoreCase(orderBy)) {
             comparator = Comparator.comparing(Product::getName);
         } else {
-            throw new IllegalArgumentException("El campo orderBy debe ser 'price' o 'name'.");
+            throw new IllegalArgumentException("The 'orderBy' field must be 'price' or 'name'.");
         }
 
         if ("desc".equalsIgnoreCase(orderDirection)) {

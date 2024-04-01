@@ -47,7 +47,7 @@ public class CouponServiceImpl implements CouponService {
         return couponRepository.findById(id)
                 .map(this::convertToDto)
                 .orElseThrow(() -> {
-                    logger.error("No se encontró ningún cupón con ID: {}", id);
+                    logger.error("No coupon found with ID: {}", id);
                     return new ResourceNotFoundException("Coupon with ID " + id + " not found");
                 });
     }
@@ -160,7 +160,7 @@ public class CouponServiceImpl implements CouponService {
         try {
             boolean hasAccess = accountTokenUtils.hasAccessToAccount(request, accountId);
             if (!hasAccess) {
-                throw new UnauthorizedException("Acceso denegado a los cupones de la cuenta con ID " + accountId);
+                throw new UnauthorizedException("Access denied to coupons of the account with ID " + accountId);
             }
             List<Coupon> accountCoupons = couponRepository.findByAccountId(accountId);
             List<Coupon> validCoupons = accountCoupons.stream()
@@ -180,7 +180,7 @@ public class CouponServiceImpl implements CouponService {
         try {
             boolean hasAccess = accountTokenUtils.hasAccessToAccount(request, accountId);
             if (!hasAccess) {
-                throw new UnauthorizedException("Acceso denegado a los cupones de la cuenta con ID " + accountId);
+                throw new UnauthorizedException("Access denied to coupons of the account with ID " + accountId);
             }
             List<Coupon> accountCoupons = couponRepository.findByAccountId(accountId);
             List<Coupon> validCoupons = accountCoupons.stream()
@@ -212,7 +212,7 @@ public class CouponServiceImpl implements CouponService {
 
     public Coupon convertResponseToEntity(CouponResponseDTO couponResponseDTO) {
         Account account = accountRepository.findByUserId(couponResponseDTO.getAccountId())
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró la cuenta asociada al cupón"));
+                .orElseThrow(() -> new IllegalArgumentException("No account associated with the coupon found"));
         Coupon coupon = new Coupon();
         coupon.setId(couponResponseDTO.getId());
         coupon.setIssueDate(couponResponseDTO.getIssueDate());

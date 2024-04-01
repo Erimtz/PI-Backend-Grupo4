@@ -16,7 +16,7 @@ public class UserExceptionHandler {
         exception.getBindingResult().getFieldErrors().forEach(error ->{
             errors.put(error.getField(), error.getDefaultMessage());
         });
-        System.out.println("Errores de validación: " + errors);
+        System.out.println("Validation errors: " + errors);
         return errors;
     }
 }

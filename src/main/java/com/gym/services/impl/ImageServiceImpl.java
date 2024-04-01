@@ -85,7 +85,7 @@ public class ImageServiceImpl implements ImageService {
 
             Optional<Product> productOptional = productRepository.findByIdWithImages(imageS3RequestDTO.getProductId());
             if (productOptional.isEmpty()) {
-                throw new NotFoundException("No se encontro el producto con ID: " + imageS3RequestDTO.getProductId());
+                throw new NotFoundException("No product found with ID: " + imageS3RequestDTO.getProductId());
             }
             Product product = productOptional.get();
 

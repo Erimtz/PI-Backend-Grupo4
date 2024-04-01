@@ -20,7 +20,7 @@ public class SwaggerConfig {
                         .version("1.0-SNAPSHOT")
                         .description("API del Proyecto Integrador 2 del Grupo 4 de un E-Commerce para el gimnasio Lightweight desarrollada con Spring")
                         .contact(new io.swagger.v3.oas.models.info.Contact().url("https://twitter.com/lightweightgym").email("lightweightgym@gmail.com"))
-                        .license(new io.swagger.v3.oas.models.info.License().name("Todos los derechos reservados").url("URL de license"))
+                        .license(new io.swagger.v3.oas.models.info.License().name("All rights reserved").url("URL de license"))
                         .termsOfService("terms Of Service"))
                 .components(new Components()
                         .addSecuritySchemes("bearer-key", new SecurityScheme()
@@ -30,11 +30,4 @@ public class SwaggerConfig {
                 .addSecurityItem(new SecurityRequirement().addList("bearer-key"));
     }
 
-//    @Bean
-//    public GroupedOpenApi customApi() {
-//        return GroupedOpenApi.builder()
-//                .group("api")
-//                .pathsToMatch("/product/**") // Aquí debes especificar el path de tus controladores
-//                .build();
-//    }
 }

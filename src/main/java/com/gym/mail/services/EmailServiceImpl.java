@@ -156,13 +156,13 @@ public class EmailServiceImpl implements EmailService {
                         e.printStackTrace();
                     }
                 } else {
-                    throw new EmailNotRegisteredException("El usuario no tiene un correo electrónico registrado.");
+                    throw new EmailNotRegisteredException("The user does not have a registered email.");
                 }
             } else {
-                throw new UserNotFoundException("El usuario no se encontró en la base de datos.");
+                throw new UserNotFoundException("The user was not found in the database.");
             }
         } else {
-            throw new InvalidTokenException("El token JWT no es válido.");
+            throw new InvalidTokenException("The JWT token is not valid.");
         }
     }
 }

@@ -61,20 +61,20 @@ public class UserService {
 
     public UserProfileDTO getUserProfile(String username, String token) {
         if (token == null || !token.startsWith("Bearer ")) {
-            throw new UnauthorizedException("No se encontró un token de autorización válido.");
+            throw new UnauthorizedException("No valid authorization token found.");
         }
         token = token.substring(7);
 
         String tokenUsername = jwtUtils.getUsernameFromToken(token);
         if (username == null) {
-            throw new UnauthorizedException("No se pudo obtener el nombre de usuario del token.");
+            throw new UnauthorizedException("Unable to retrieve the username from the token.");
         } else if (!username.equals(tokenUsername)) {
-            throw new UnauthorizedException("El usuario a acceder no coincide con el usuario autenticado");
+            throw new UnauthorizedException("The user to access does not match the authenticated user.");
         }
 
         Optional<UserEntity> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException("Usuario no encontrado");
+            throw new UserNotFoundException("User not found.");
         }
         UserEntity user = optionalUser.get();
         Account account = accountRepository.findByUserId(optionalUser.get().getId()).orElse(null);
@@ -85,7 +85,7 @@ public class UserService {
 
     public ResponseUserDTO getUserById(Long userId) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado con ID: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID:  " + userId));
         return convertToUserDto(user);
     }
 
@@ -97,7 +97,7 @@ public class UserService {
             responseUserDTOList.add(responseUserDTO);
         }
         if (responseUserDTOList.isEmpty()) {
-            throw new EmptyUserListException("La lista de usuarios está vacía.");
+            throw new EmptyUserListException("The list of users is empty.");
         }
         return responseUserDTOList;
     }
@@ -105,11 +105,11 @@ public class UserService {
     public UserEntity createAdminUser(CreateUserDTO createUserDTO) {
 
         if (userRepository.existsByEmail(createUserDTO.getEmail())) {
-            throw new EmailAlreadyExistsException("El email ya está en uso.");
+            throw new EmailAlreadyExistsException("The email is already in use.");
         }
 
         if (userRepository.existsByUsername(createUserDTO.getUsername())) {
-            throw new UsernameAlreadyExistsException("El username ya está en uso.");
+            throw new UsernameAlreadyExistsException("The username is already in use.");
         }
 
         Set<RoleEntity> roles = new HashSet<>();
@@ -147,11 +147,11 @@ public class UserService {
         });
 
         if (userRepository.existsByEmail(createUserDTO.getEmail())) {
-            throw new EmailAlreadyExistsException("El email ya está en uso.");
+            throw new EmailAlreadyExistsException("The email is already in use.");
         }
 
         if (userRepository.existsByUsername(createUserDTO.getUsername())) {
-            throw new UsernameAlreadyExistsException("El username ya está en uso.");
+            throw new UsernameAlreadyExistsException("The username is already in use.");
         }
 
         UserEntity userEntity = UserEntity.builder()
@@ -195,20 +195,20 @@ public class UserService {
     public ResponseUserDTO updateUser(String username, UpdateUserDTO updateUserDTO, String token) {
 
         if (token == null || !token.startsWith("Bearer ")) {
-            throw new UnauthorizedException("No se encontró un token de autorización válido.");
+            throw new UnauthorizedException("No valid authorization token found.");
         }
         token = token.substring(7);
 
         String tokenUsername = jwtUtils.getUsernameFromToken(token);
         if (username == null) {
-            throw new UnauthorizedException("No se pudo obtener el nombre de usuario del token.");
+            throw new UnauthorizedException("Unable to retrieve the username from the token.");
         } else if (!username.equals(tokenUsername)) {
-            throw new UnauthorizedException("El usuario a modificar no coincide con el usuario autenticado");
+            throw new UnauthorizedException("The user to modify does not match the authenticated user.");
         }
 
         Optional<UserEntity> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException("Usuario no encontrado");
+            throw new UserNotFoundException("User not found.");
         }
         UserEntity user = optionalUser.get();
 
@@ -231,14 +231,14 @@ public class UserService {
 
     public void changePassword(ChangePasswordDTO changePasswordDTO, String token) throws BadRequestException {
         if (token == null || !token.startsWith("Bearer ")) {
-            throw new UnauthorizedException("No se encontró un token de autorización válido.");
+            throw new UnauthorizedException("No valid authorization token found.");
         }
         token = token.substring(7);
 
         String username = jwtUtils.getUsernameFromToken(token);
 
         if (username == null) {
-            throw new UnauthorizedException("No se pudo obtener el nombre de usuario del token.");
+            throw new UnauthorizedException("Unable to retrieve the username from the token.");
         }
 
         String currentPassword = changePasswordDTO.getCurrentPassword();
@@ -246,18 +246,18 @@ public class UserService {
         String confirmPassword = changePasswordDTO.getConfirmPassword();
 
         if (!currentPassword.equals(newPassword)) {
-            throw new BadRequestException("La nueva contraseña debe ser diferente a la contraseña actual");
+            throw new BadRequestException("The new password must be different from the current password.");
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            throw new BadRequestException("La nueva contraseña y la confirmación de la contraseña no coinciden");
+            throw new BadRequestException("The new password and password confirmation do not match.");
         }
 
         UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new BadRequestException("La contraseña actual es incorrecta");
+            throw new BadRequestException("The current password is incorrect.");
         }
 
         String encodedPassword = passwordEncoder.encode(newPassword);
@@ -268,7 +268,7 @@ public class UserService {
 
     public void deleteUserById(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("El usuario con ID=" + id + " no existe.");
+            throw new UserNotFoundException("The user with ID: " + id + " does not exists.");
         }
         Account account = accountRepository.findByUserId(id).get();
         subscriptionRepository.deleteById(account.getId());
@@ -300,9 +300,9 @@ public class UserService {
 
     public Message save(CreateUserDTO createUserDTO){
         if(userRepository.existsByUsername(createUserDTO.getUsername()))
-            throw new CustomException(HttpStatus.BAD_REQUEST, "ese nombre de usuario ya existe");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "That username already exists.");
         if(userRepository.existsByEmail(createUserDTO.getEmail()))
-            throw new CustomException(HttpStatus.BAD_REQUEST, "ese email de usuario ya existe");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "That user email already exists.");
         UserEntity user =
                 new UserEntity(createUserDTO.getFirstName(), createUserDTO.getLastName(), createUserDTO.getUsername(), createUserDTO.getEmail(),
                         passwordEncoder.encode(createUserDTO.getPassword()));
@@ -310,7 +310,7 @@ public class UserService {
         roles.add(roleRepository.findByName(ERole.USER).get());
         user.setRoles(roles);
         userRepository.save(user);
-        return new Message(user.getUsername() + " ha sido creado");
+        return new Message(user.getUsername() + " has been created");
     }
 
     private ResponseUserDTO convertToDto(Account account) {
@@ -370,7 +370,7 @@ public class UserService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                null, // No hay accountId en UserEntity, así que se deja como null
+                null,
                 determineRole(user.getRoles())
         );
     }

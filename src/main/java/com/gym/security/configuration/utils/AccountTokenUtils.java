@@ -31,38 +31,38 @@ public class AccountTokenUtils {
     public Account getAccountFromToken(HttpServletRequest request) {
         String token = getTokenFromRequest(request);
         if (token == null) {
-            throw new UnauthorizedException("No se encontró un token de autorización.");
+            throw new UnauthorizedException("No authorization token found.");
         }
 
         String tokenUsername = jwtUtils.getUsernameFromToken(token);
         if (tokenUsername == null) {
-            throw new UnauthorizedException("No se pudo obtener el nombre de usuario del token.");
+            throw new UnauthorizedException("Could not retrieve the username from the token.");
         }
 
         Optional<UserEntity> optionalUser = userRepository.findByUsername(tokenUsername);
         if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException("Usuario no encontrado.");
+            throw new UserNotFoundException("User not found.");
         }
 
         UserEntity user = optionalUser.get();
         return accountRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Cuenta no encontrada para el usuario: " + user.getId()));
+                .orElseThrow(() -> new IllegalArgumentException("Account not found for the user: " + user.getId()));
     }
 
     public boolean isAdminFromToken(HttpServletRequest request) {
         String token = getTokenFromRequest(request);
         if (token == null) {
-            throw new UnauthorizedException("No se encontró un token de autorización.");
+            throw new UnauthorizedException("No authorization token found.");
         }
 
         String tokenUsername = jwtUtils.getUsernameFromToken(token);
         if (tokenUsername == null) {
-            throw new UnauthorizedException("No se pudo obtener el nombre de usuario del token.");
+            throw new UnauthorizedException("Could not retrieve the username from the token.");
         }
 
         Optional<UserEntity> optionalUser = userRepository.findByUsername(tokenUsername);
         if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException("Usuario no encontrado.");
+            throw new UserNotFoundException("User not found.");
         }
 
         UserEntity user = optionalUser.get();
@@ -80,14 +80,14 @@ public class AccountTokenUtils {
     public boolean hasAccessToAccount(HttpServletRequest request, Long accountId) {
         boolean isAdmin = isAdminFromToken(request);
         if (isAdmin) {
-            return true; // Los administradores siempre tienen acceso
+            return true; // Administrators always have access
         }
 
         Account authenticatedAccount = getAccountFromToken(request);
         if (authenticatedAccount != null && authenticatedAccount.getId().equals(accountId)) {
-            return true; // El usuario autenticado tiene acceso solo a su propia cuenta
+            return true; // Authenticated users have access only to their own account
         }
 
-        return false; // El usuario autenticado no tiene acceso a la cuenta especificada, mucho menos si no está autenticado
+        return false; // The authenticated user does not have access to the specified account, especially if not authenticated.
     }
 }

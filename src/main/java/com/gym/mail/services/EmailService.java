@@ -10,10 +10,7 @@ public interface EmailService {
 
     void sendEmail(String[] toUsers, String subject, String message);
     void sendEmailWithFile(String[] toUsers, String subject, String message, File file);
-
     void sendEmailTemplate(EmailValuesDTO dto);
-
     void sendEmailNewUser(ResponseUserDTO dto);
-
     void sendPurchaseConfirmationEmail(PurchaseResponseDTO dto, String token);
 }

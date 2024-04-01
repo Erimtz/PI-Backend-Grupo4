@@ -44,7 +44,6 @@ public class LevenshteinDistance {
             distances.put(product, distance);
         }
 
-        // Ordenar los productos por distancia y mostrar los más cercanos
         distances.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .limit(5)

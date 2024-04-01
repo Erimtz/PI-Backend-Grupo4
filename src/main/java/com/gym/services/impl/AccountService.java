@@ -163,28 +163,28 @@ public class AccountService {
     @Transactional
     public void updateSubscription(Account account) {
         if (account == null) {
-            throw new IllegalArgumentException("La cuenta no puede ser nula");
+            throw new IllegalArgumentException("The account cannot be null.");
         }
         accountRepository.save(account);
     }
 
     public Account getAccountFromToken(String token) {
         if (token == null || !token.startsWith("Bearer ")) {
-            throw new UnauthorizedException("No se encontró un token de autorización válido.");
+            throw new UnauthorizedException("No valid authorization token found.");
         }
         token = token.substring(7);
 
         String tokenUsername = jwtUtils.getUsernameFromToken(token);
         if (tokenUsername == null) {
-            throw new UnauthorizedException("No se pudo obtener el nombre de usuario del token.");
+            throw new UnauthorizedException("Could not retrieve the username from the token.");
         }
         Optional<UserEntity> optionalUser = userRepository.findByUsername(tokenUsername);
         if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException("Usuario no encontrado");
+            throw new UserNotFoundException("User not found.");
         }
         UserEntity user = optionalUser.get();
         return accountRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Cuenta no encontrada para el usuario: " + user.getId()));
+                .orElseThrow(() -> new IllegalArgumentException("Account not found for the user: " + user.getId()));
     }
 
 
