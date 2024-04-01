@@ -245,7 +245,7 @@ public class UserService {
         String newPassword = changePasswordDTO.getNewPassword();
         String confirmPassword = changePasswordDTO.getConfirmPassword();
 
-        if (!currentPassword.equals(newPassword)) {
+        if (currentPassword.equals(newPassword)) {
             throw new BadRequestException("The new password must be different from the current password.");
         }
 
